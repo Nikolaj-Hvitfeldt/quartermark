@@ -14,11 +14,13 @@
   justify-content: center;
   text-align: center;
   gap: 2rem;
+  color: white;
 }
 
 .waiting-screen h2,
 .round-screen h2 {
   font-size: 2rem;
+  color: white;
 }
 
 .person-image {
@@ -199,5 +201,55 @@
   margin-bottom: 0.5rem;
   background: #111827;
   border-radius: 4px;
+}
+
+.score-screen {
+  margin-top: 2rem;
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+}
+
+.score-screen h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.standings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.standing-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: #1f2937;
+  border-radius: 8px;
+  border: 2px solid #374151;
+}
+
+.standing-rank {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #9ca3af;
+  min-width: 40px;
+}
+
+.standing-name {
+  font-size: 1.125rem;
+  font-weight: 500;
+  flex: 1;
+  text-align: left;
+  margin-left: 1rem;
+}
+
+.standing-score {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #4f46e5;
 }
 

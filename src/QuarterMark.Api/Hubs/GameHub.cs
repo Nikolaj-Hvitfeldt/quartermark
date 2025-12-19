@@ -155,6 +155,23 @@ public class GameHub : Hub
                 totalVotes = question.Votes.Count,
                 totalVoters
             });
+
+        // Check if everyone has voted - if so, automatically reveal answer
+        if (question.Votes.Count >= totalVoters)
+        {
+            var roundScores = await _wouldILieService.RevealAnswerAsync(roomCode);
+            
+            await _notificationService.NotifyRoomAsync(roomCode, "AnswerRevealed", new
+            {
+                correctPlayer = question.TruthTellerName,
+                votes = question.Votes,
+                roundScores
+            });
+
+            // Update overall player scores
+            var updatedPlayers = await _roomService.GetPlayersAsync(roomCode);
+            await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", updatedPlayers);
+        }
     }
 
     public async Task RevealAnswer()
@@ -269,6 +286,23 @@ public class GameHub : Hub
                 totalVotes = question.Votes.Count,
                 totalVoters
             });
+
+        // Check if everyone has voted - if so, automatically reveal answer
+        if (question.Votes.Count >= totalVoters)
+        {
+            var roundScores = await _wouldILieService.RevealAnswerAsync(roomCode);
+            
+            await _notificationService.NotifyRoomAsync(roomCode, "AnswerRevealed", new
+            {
+                correctPlayer = question.TruthTellerName,
+                votes = question.Votes,
+                roundScores
+            });
+
+            // Update overall player scores
+            var updatedPlayers = await _roomService.GetPlayersAsync(roomCode);
+            await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", updatedPlayers);
+        }
     }
 
     private Question? GetCurrentQuestion(string roomCode)

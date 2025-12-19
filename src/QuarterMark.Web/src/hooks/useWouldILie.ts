@@ -171,6 +171,8 @@ export function useWouldILie(connection: any) {
     voteProgress,
     roundScores,
     answerRevealed,
+    setAnswerRevealed,
+    setCurrentQuestion,
     startRound,
     showQuestion,
     submitClaim,

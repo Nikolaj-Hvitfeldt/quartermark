@@ -137,22 +137,47 @@ public class WouldILieService : IWouldILieService
         room.CurrentQuestion.IsRevealed = true;
 
         var correctPlayer = room.CurrentQuestion.TruthTellerName;
-        var votesForCorrect = room.CurrentQuestion.Votes.Count(v => v.Value == correctPlayer);
+        const int pointsForCorrectGuess = 10;
 
-        // Award round points
-        if (room.WouldILieRound.RoundScores.ContainsKey(correctPlayer))
-        {
-            room.WouldILieRound.RoundScores[correctPlayer] += votesForCorrect * 10;
-        }
-
+        // Award points to voters who guessed correctly
         foreach (var vote in room.CurrentQuestion.Votes)
         {
             if (vote.Value == correctPlayer)
             {
+                // Voter guessed correctly - give them points
                 if (room.WouldILieRound.RoundScores.ContainsKey(vote.Key))
                 {
-                    room.WouldILieRound.RoundScores[vote.Key] += 5;
+                    room.WouldILieRound.RoundScores[vote.Key] += pointsForCorrectGuess;
                 }
+                else
+                {
+                    room.WouldILieRound.RoundScores[vote.Key] = pointsForCorrectGuess;
+                }
+            }
+            // If they guessed wrong, they get 0 points (no action needed)
+        }
+
+        // Award points to truth teller based on how many people guessed correctly
+        var votesForCorrect = room.CurrentQuestion.Votes.Count(v => v.Value == correctPlayer);
+        if (room.WouldILieRound.RoundScores.ContainsKey(correctPlayer))
+        {
+            room.WouldILieRound.RoundScores[correctPlayer] += votesForCorrect * 10;
+        }
+        else
+        {
+            room.WouldILieRound.RoundScores[correctPlayer] = votesForCorrect * 10;
+        }
+
+        // Update overall player scores immediately so standings are current
+        // RoundScores is cumulative for the current round, so we set Player.Score to match
+        foreach (var roundScore in room.WouldILieRound.RoundScores)
+        {
+            var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
+            if (player != null)
+            {
+                // Set player's score to their current round total
+                // (RoundScores accumulates points as questions are answered)
+                player.Score = roundScore.Value;
             }
         }
 
@@ -165,20 +190,22 @@ public class WouldILieService : IWouldILieService
         if (room == null || room.WouldILieRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
+        // Update player scores from round scores
+        foreach (var roundScore in room.WouldILieRound.RoundScores)
+        {
+            var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
+            if (player != null)
+            {
+                player.Score += roundScore.Value;
+            }
+        }
+
+        // Host gets points equal to lowest scoring player
         var lowestScore = room.WouldILieRound.RoundScores.Values.DefaultIfEmpty(0).Min();
         var host = room.Players.FirstOrDefault(p => p.IsHost);
-
         if (host != null)
         {
             host.Score += lowestScore;
-            foreach (var roundScore in room.WouldILieRound.RoundScores)
-            {
-                var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
-                if (player != null)
-                {
-                    player.Score += roundScore.Value;
-                }
-            }
         }
 
         room.WouldILieRound.IsActive = false;
