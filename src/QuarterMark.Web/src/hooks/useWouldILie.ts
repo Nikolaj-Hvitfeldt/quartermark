@@ -37,6 +37,7 @@ export function useWouldILie(connection: any) {
       setCurrentQuestion({
         imageUrl: data.imageUrl,
         assignedPlayers: data.assignedPlayers,
+        truthTellerName: data.truthTellerName,
       });
       setClaims(data.claims || []);
       setVoteProgress({ total: 0, received: 0 });
@@ -173,6 +174,7 @@ export function useWouldILie(connection: any) {
     answerRevealed,
     setAnswerRevealed,
     setCurrentQuestion,
+    setRoundActive,
     startRound,
     showQuestion,
     submitClaim,

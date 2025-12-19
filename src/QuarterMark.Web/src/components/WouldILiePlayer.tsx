@@ -79,8 +79,8 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     };
 
     const handleRoundEnded = () => {
-      setRoundState('Waiting');
-      setRoundScores({});
+      setRoundState('RoundEnded');
+      // Keep roundScores to show final standings
     };
 
     signalRService.on('WouldILieRoundStarted', handleRoundStarted);
@@ -128,9 +128,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
 
   return (
     <div className="would-i-lie-player">
-      <button className="btn btn-back" onClick={onBack}>
-        ← Back to Lobby
-      </button>
 
       {roundState === 'Waiting' && (
         <div className="waiting-screen">
@@ -189,13 +186,16 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
             <p className="correct-answer">
               The correct answer is: <strong>{correctPlayer}</strong>
             </p>
-            {isClaimer && (
-              <p className={`result ${correctPlayer === playerName ? 'correct' : 'incorrect'}`}>
-                {correctPlayer === playerName 
-                  ? '🎉 You were telling the truth!' 
-                  : '😅 You were bluffing!'}
-              </p>
-            )}
+            {isClaimer && (() => {
+              const votesReceived = Object.values(votes).filter(v => v === playerName).length;
+              return (
+                <p className={`result ${votesReceived > 0 ? 'correct' : 'incorrect'}`}>
+                  {votesReceived > 0 
+                    ? `🎉 You received ${votesReceived} vote(s)! +${votesReceived * 10} points`
+                    : '😅 No one voted for you. 0 points'}
+                </p>
+              );
+            })()}
             {!isClaimer && (
               <p className={`result ${votes[playerName] === correctPlayer ? 'correct' : 'incorrect'}`}>
                 {votes[playerName] === correctPlayer 
@@ -219,6 +219,25 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
                   </div>
                 ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {roundState === 'RoundEnded' && (
+        <div className="round-screen">
+          <h2>Final Standings</h2>
+          <p className="round-complete-message">Round complete - SKÅL!</p>
+          <div className="standings-list">
+            {players
+              .filter(p => !p.isHost)
+              .sort((a, b) => b.score - a.score)
+              .map((player, index) => (
+                <div key={player.name} className="standing-item">
+                  <span className="standing-rank">#{index + 1}</span>
+                  <span className="standing-name">{player.name}</span>
+                  <span className="standing-score">{player.score} pts</span>
+                </div>
+              ))}
           </div>
         </div>
       )}

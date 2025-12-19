@@ -80,7 +80,8 @@ public class GameRoomService : IGameRoomService
         {
             Name = p.Name,
             IsHost = p.IsHost,
-            Score = p.Score
+            Score = p.Score,
+            IsDummy = p.IsDummy
         }).ToList());
     }
 
@@ -124,7 +125,8 @@ public class GameRoomService : IGameRoomService
         {
             ConnectionId = dummyConnectionId,
             Name = playerName,
-            IsHost = false
+            IsHost = false,
+            IsDummy = true
         };
 
         room.Players.Add(player);
@@ -140,7 +142,7 @@ public class GameRoomService : IGameRoomService
 
         var player = room.Players.FirstOrDefault(p => 
             p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase) && 
-            p.ConnectionId.StartsWith("DUMMY_"));
+            p.IsDummy);
 
         if (player == null)
             return Task.FromResult(false);

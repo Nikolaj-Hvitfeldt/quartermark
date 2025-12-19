@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { ClaimDto } from '../types';
 
-type RoundState = 'Waiting' | 'ShowingImage' | 'ShowingClaims' | 'Voting' | 'Revealed';
+type RoundState = 'Waiting' | 'ShowingImage' | 'ShowingClaims' | 'Voting' | 'Revealed' | 'RoundEnded';
 
 interface PlayerGameState {
   roundState: RoundState;

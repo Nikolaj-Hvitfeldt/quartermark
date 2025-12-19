@@ -207,7 +207,15 @@
   margin-top: 2rem;
   text-align: center;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.round-complete-message {
+  font-size: 1.25rem;
+  color: #9ca3af;
+  margin-bottom: 1rem;
 }
 
 .score-screen h3 {
@@ -220,13 +228,17 @@
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 2rem;
+  max-width: 700px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .standing-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: 1.25rem 2rem;
   background: #1f2937;
   border-radius: 8px;
   border: 2px solid #374151;

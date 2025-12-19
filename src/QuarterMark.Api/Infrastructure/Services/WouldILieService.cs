@@ -137,35 +137,53 @@ public class WouldILieService : IWouldILieService
         room.CurrentQuestion.IsRevealed = true;
 
         var correctPlayer = room.CurrentQuestion.TruthTellerName;
+        const int pointsPerVote = 10;
         const int pointsForCorrectGuess = 10;
 
-        // Award points to voters who guessed correctly
-        foreach (var vote in room.CurrentQuestion.Votes)
+        // Get list of claimers (truth teller and liars)
+        var claimerNames = room.CurrentQuestion.Claims.Select(c => c.PlayerName).ToList();
+
+        // Award points to claimers: 10 points for each vote they receive
+        foreach (var claimerName in claimerNames)
         {
-            if (vote.Value == correctPlayer)
+            var votesReceived = room.CurrentQuestion.Votes.Count(v => v.Value == claimerName);
+            if (votesReceived > 0)
             {
-                // Voter guessed correctly - give them points
-                if (room.WouldILieRound.RoundScores.ContainsKey(vote.Key))
+                var points = votesReceived * pointsPerVote;
+                if (room.WouldILieRound.RoundScores.ContainsKey(claimerName))
                 {
-                    room.WouldILieRound.RoundScores[vote.Key] += pointsForCorrectGuess;
+                    room.WouldILieRound.RoundScores[claimerName] += points;
                 }
                 else
                 {
-                    room.WouldILieRound.RoundScores[vote.Key] = pointsForCorrectGuess;
+                    room.WouldILieRound.RoundScores[claimerName] = points;
                 }
             }
-            // If they guessed wrong, they get 0 points (no action needed)
         }
 
-        // Award points to truth teller based on how many people guessed correctly
-        var votesForCorrect = room.CurrentQuestion.Votes.Count(v => v.Value == correctPlayer);
-        if (room.WouldILieRound.RoundScores.ContainsKey(correctPlayer))
+        // Award points to voters (non-claimers): 10 points if they vote correctly, 0 if wrong
+        foreach (var vote in room.CurrentQuestion.Votes)
         {
-            room.WouldILieRound.RoundScores[correctPlayer] += votesForCorrect * 10;
-        }
-        else
-        {
-            room.WouldILieRound.RoundScores[correctPlayer] = votesForCorrect * 10;
+            var voterName = vote.Key;
+            var votedFor = vote.Value;
+
+            // Only award points to voters (not claimers)
+            if (!claimerNames.Contains(voterName))
+            {
+                if (votedFor == correctPlayer)
+                {
+                    // Voter guessed correctly - give them 10 points
+                    if (room.WouldILieRound.RoundScores.ContainsKey(voterName))
+                    {
+                        room.WouldILieRound.RoundScores[voterName] += pointsForCorrectGuess;
+                    }
+                    else
+                    {
+                        room.WouldILieRound.RoundScores[voterName] = pointsForCorrectGuess;
+                    }
+                }
+                // If they guessed wrong, they get 0 points (no action needed)
+            }
         }
 
         // Update overall player scores immediately so standings are current

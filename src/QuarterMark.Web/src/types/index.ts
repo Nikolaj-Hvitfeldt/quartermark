@@ -3,6 +3,7 @@ export interface PlayerDto {
   name: string;
   isHost: boolean;
   score: number;
+  isDummy?: boolean;
 }
 
 export interface ClaimDto {
@@ -14,6 +15,7 @@ export interface QuestionShownData {
   imageUrl: string;
   assignedPlayers: string[];
   claims: ClaimDto[];
+  truthTellerName?: string;
 }
 
 export interface ClaimSubmittedData {
@@ -65,10 +67,10 @@ export interface WouldILiePlayerProps {
 export interface CurrentQuestion {
   imageUrl: string;
   assignedPlayers: string[];
+  truthTellerName?: string;
 }
 
 export interface VoteProgress {
   total: number;
   received: number;
 }
-

@@ -106,7 +106,8 @@ public class GameHub : Hub
         {
             imageUrl,
             assignedPlayers,
-            claims
+            claims,
+            truthTellerName
         });
     }
 
@@ -261,7 +262,7 @@ public class GameHub : Hub
         if (room == null) return;
 
         var dummyPlayer = room.Players.FirstOrDefault(p => 
-            p.Name == dummyPlayerName && p.ConnectionId.StartsWith("DUMMY_"));
+            p.Name == dummyPlayerName && p.IsDummy);
         
         if (dummyPlayer == null) return;
 
