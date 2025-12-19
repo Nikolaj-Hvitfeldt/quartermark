@@ -1,13 +1,12 @@
-import { useCallback, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import signalRService from '../services/signalRService';
-import { useWouldILieStore } from '../stores/wouldILieStore';
+import { useCallback, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
+import signalRService from "../services/signalRService";
+import { useWouldILieStore } from "../stores/wouldILieStore";
 import {
   QuestionShownData,
   VoteReceivedData,
   AnswerRevealedData,
-  ClaimDto,
-} from '../types';
+} from "../types";
 
 export function useWouldILie(connection: any) {
   const {
@@ -39,13 +38,9 @@ export function useWouldILie(connection: any) {
         imageUrl: data.imageUrl,
         assignedPlayers: data.assignedPlayers,
       });
-      setClaims([]);
+      setClaims(data.claims || []);
       setVoteProgress({ total: 0, received: 0 });
       setAnswerRevealed(false);
-    };
-
-    const handleClaimsReady = (claimsList: ClaimDto[]) => {
-      setClaims(claimsList);
     };
 
     const handleVoteReceived = (data: VoteReceivedData) => {
@@ -62,20 +57,18 @@ export function useWouldILie(connection: any) {
       setCurrentQuestion(null);
     };
 
-    signalRService.on('WouldILieRoundStarted', handleRoundStarted);
-    signalRService.on('QuestionShown', handleQuestionShown);
-    signalRService.on('ClaimsReady', handleClaimsReady);
-    signalRService.on('VoteReceived', handleVoteReceived);
-    signalRService.on('AnswerRevealed', handleAnswerRevealed);
-    signalRService.on('WouldILieRoundEnded', handleRoundEnded);
+    signalRService.on("WouldILieRoundStarted", handleRoundStarted);
+    signalRService.on("QuestionShown", handleQuestionShown);
+    signalRService.on("VoteReceived", handleVoteReceived);
+    signalRService.on("AnswerRevealed", handleAnswerRevealed);
+    signalRService.on("WouldILieRoundEnded", handleRoundEnded);
 
     return () => {
-      signalRService.off('WouldILieRoundStarted', handleRoundStarted);
-      signalRService.off('QuestionShown', handleQuestionShown);
-      signalRService.off('ClaimsReady', handleClaimsReady);
-      signalRService.off('VoteReceived', handleVoteReceived);
-      signalRService.off('AnswerRevealed', handleAnswerRevealed);
-      signalRService.off('WouldILieRoundEnded', handleRoundEnded);
+      signalRService.off("WouldILieRoundStarted", handleRoundStarted);
+      signalRService.off("QuestionShown", handleQuestionShown);
+      signalRService.off("VoteReceived", handleVoteReceived);
+      signalRService.off("AnswerRevealed", handleAnswerRevealed);
+      signalRService.off("WouldILieRoundEnded", handleRoundEnded);
     };
   }, [
     connection,
@@ -89,7 +82,7 @@ export function useWouldILie(connection: any) {
 
   const startRoundMutation = useMutation({
     mutationFn: async () => {
-      await signalRService.invoke('StartWouldILieRound');
+      await signalRService.invoke("StartWouldILieRound");
     },
   });
 
@@ -103,37 +96,37 @@ export function useWouldILie(connection: any) {
       truthTeller: string;
       liars: string[];
     }) => {
-      await signalRService.invoke('ShowQuestion', imageUrl, truthTeller, liars);
+      await signalRService.invoke("ShowQuestion", imageUrl, truthTeller, liars);
     },
   });
 
   const submitClaimMutation = useMutation({
-    mutationFn: async (story: string) => {
-      await signalRService.invoke('SubmitClaim', story);
+    mutationFn: async () => {
+      await signalRService.invoke("SubmitClaim");
     },
   });
 
   const startVotingMutation = useMutation({
     mutationFn: async () => {
-      await signalRService.invoke('StartVoting');
+      await signalRService.invoke("StartVoting");
     },
   });
 
   const submitVoteMutation = useMutation({
     mutationFn: async (claimedPlayerName: string) => {
-      await signalRService.invoke('SubmitVote', claimedPlayerName);
+      await signalRService.invoke("SubmitVote", claimedPlayerName);
     },
   });
 
   const revealAnswerMutation = useMutation({
     mutationFn: async () => {
-      await signalRService.invoke('RevealAnswer');
+      await signalRService.invoke("RevealAnswer");
     },
   });
 
   const endRoundMutation = useMutation({
     mutationFn: async () => {
-      await signalRService.invoke('EndWouldILieRound');
+      await signalRService.invoke("EndWouldILieRound");
     },
   });
 
@@ -148,12 +141,9 @@ export function useWouldILie(connection: any) {
     [showQuestionMutation]
   );
 
-  const submitClaim = useCallback(
-    async (story: string) => {
-      await submitClaimMutation.mutateAsync(story);
-    },
-    [submitClaimMutation]
-  );
+  const submitClaim = useCallback(async () => {
+    await submitClaimMutation.mutateAsync();
+  }, [submitClaimMutation]);
 
   const startVoting = useCallback(async () => {
     await startVotingMutation.mutateAsync();

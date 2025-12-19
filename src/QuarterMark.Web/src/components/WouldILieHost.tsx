@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useWouldILie } from "../hooks/useWouldILie";
+import signalRService from "../services/signalRService";
 import { WouldILieHostProps } from "../types";
 import "./WouldILieHost.css";
 
@@ -18,12 +20,20 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
     endRound,
   } = useWouldILie(connection);
 
-  const [imageUrl, setImageUrl] = useState<string>("");
   const [truthTeller, setTruthTeller] = useState<string>("");
-  const [selectedLiars, setSelectedLiars] = useState<string[]>([]);
+  const [selectedLiar, setSelectedLiar] = useState<string>("");
   const [questionNumber, setQuestionNumber] = useState<number>(0);
+  const [dummyVotePlayer, setDummyVotePlayer] = useState<string>("");
+  const [dummyVoteFor, setDummyVoteFor] = useState<string>("");
+  const [isLoadingImage, setIsLoadingImage] = useState<boolean>(false);
 
   const nonHostPlayers = players.filter((p) => !p.isHost).map((p) => p.name);
+
+  const submitDummyVoteMutation = useMutation({
+    mutationFn: async ({ playerName, votedFor }: { playerName: string; votedFor: string }) => {
+      await signalRService.invoke("SubmitDummyPlayerVote", playerName, votedFor);
+    },
+  });
 
   const handleStartRound = async () => {
     try {
@@ -34,22 +44,40 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
     }
   };
 
+  const getRandomImageMutation = useMutation({
+    mutationFn: async () => {
+      const image = await signalRService.invoke<string>("GetRandomImage");
+      return image;
+    },
+  });
+
   const handleShowQuestion = async () => {
-    if (!imageUrl || !truthTeller || selectedLiars.length === 0) {
+    if (!truthTeller || !selectedLiar) {
       alert(
-        "Please enter image URL, select truth teller, and at least one liar"
+        "Please select truth teller and one liar"
       );
       return;
     }
 
+    setIsLoadingImage(true);
     try {
-      await showQuestion(imageUrl, truthTeller, selectedLiars);
+      // Automatically get a random image
+      const image = await getRandomImageMutation.mutateAsync();
+      if (!image) {
+        alert("No more images available! All images have been used in this round.");
+        setIsLoadingImage(false);
+        return;
+      }
+
+      await showQuestion(image, truthTeller, [selectedLiar]);
       setQuestionNumber((prev) => prev + 1);
-      setImageUrl("");
       setTruthTeller("");
-      setSelectedLiars([]);
+      setSelectedLiar("");
     } catch (error) {
       console.error("Error showing question:", error);
+      alert("Failed to show question. Please try again.");
+    } finally {
+      setIsLoadingImage(false);
     }
   };
 
@@ -84,14 +112,6 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
     }
   };
 
-  const toggleLiar = (playerName: string) => {
-    if (playerName === truthTeller) return; // Can't select truth teller as liar
-    setSelectedLiars((prev) =>
-      prev.includes(playerName)
-        ? prev.filter((p) => p !== playerName)
-        : [...prev, playerName]
-    );
-  };
 
   if (!roundActive) {
     return (
@@ -126,16 +146,6 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
           <h2>Question {questionNumber + 1}</h2>
           <div className="setup-form">
             <div className="form-group">
-              <label>Image URL:</label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://..."
-                className="input"
-              />
-            </div>
-            <div className="form-group">
               <label>Who actually knows this person? (Truth Teller):</label>
               <select
                 value={truthTeller}
@@ -151,28 +161,30 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
               </select>
             </div>
             <div className="form-group">
-              <label>Who will lie? (Select one or more):</label>
-              <div className="player-checkboxes">
+              <label>Who will lie? (Select one):</label>
+              <select
+                value={selectedLiar}
+                onChange={(e) => setSelectedLiar(e.target.value)}
+                className="input"
+              >
+                <option value="">Select liar...</option>
                 {nonHostPlayers
                   .filter((name) => name !== truthTeller)
                   .map((name) => (
-                    <label key={name} className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={selectedLiars.includes(name)}
-                        onChange={() => toggleLiar(name)}
-                      />
+                    <option key={name} value={name}>
                       {name}
-                    </label>
+                    </option>
                   ))}
-              </div>
+              </select>
             </div>
             <button
               className="btn btn-primary btn-large"
               onClick={handleShowQuestion}
-              disabled={!imageUrl || !truthTeller || selectedLiars.length === 0}
+              disabled={!truthTeller || !selectedLiar || isLoadingImage || getRandomImageMutation.isPending}
             >
-              Show Question to Players
+              {isLoadingImage || getRandomImageMutation.isPending
+                ? "Loading..."
+                : "Show Question to Players"}
             </button>
           </div>
           {Object.keys(roundScores).length > 0 && (
@@ -211,36 +223,79 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
           </div>
         )}
 
-        {claims.length === 0 ? (
-          <div className="waiting-claims">
-            <p>Waiting for assigned players to submit their stories...</p>
-            <p>Assigned: {currentQuestion.assignedPlayers.join(", ")}</p>
-          </div>
-        ) : (
-          <>
-            <div className="claims-display">
-              <h3>Claims Submitted:</h3>
-              {claims.map((claim, index) => (
-                <div key={index} className="claim-card">
-                  <h4>{claim.playerName}</h4>
-                  <p>{claim.story}</p>
-                </div>
-              ))}
+        <div className="claims-display">
+          <h3>Players who claim to know this person:</h3>
+          {claims.map((claim, index) => (
+            <div key={index} className="claim-card">
+              <h4>{claim.playerName}</h4>
             </div>
-            <button
-              className="btn btn-primary btn-large"
-              onClick={handleStartVoting}
-            >
-              Start Voting
-            </button>
-          </>
-        )}
+          ))}
+        </div>
+        <button
+          className="btn btn-primary btn-large"
+          onClick={handleStartVoting}
+        >
+          Start Voting
+        </button>
 
         {voteProgress.received > 0 && (
           <div className="voting-progress">
             <p>
               Votes: {voteProgress.received}/{voteProgress.total}
             </p>
+            
+            {/* Dummy player vote submission for testing */}
+            {voteProgress.received < voteProgress.total && (
+              <div className="dummy-player-actions">
+                <h4>Submit vote for dummy player (testing):</h4>
+                <div className="dummy-action-controls">
+                  <select
+                    value={dummyVotePlayer}
+                    onChange={(e) => setDummyVotePlayer(e.target.value)}
+                    className="input"
+                  >
+                    <option value="">Select dummy player...</option>
+                    {nonHostPlayers
+                      .filter(name => 
+                        !currentQuestion.assignedPlayers.includes(name) &&
+                        !claims.some(c => c.playerName === name)
+                      )
+                      .map(name => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                  </select>
+                  <select
+                    value={dummyVoteFor}
+                    onChange={(e) => setDummyVoteFor(e.target.value)}
+                    className="input"
+                  >
+                    <option value="">Select who to vote for...</option>
+                    {claims.map(claim => (
+                      <option key={claim.playerName} value={claim.playerName}>
+                        {claim.playerName}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      if (dummyVotePlayer && dummyVoteFor) {
+                        submitDummyVoteMutation.mutate({
+                          playerName: dummyVotePlayer,
+                          votedFor: dummyVoteFor,
+                        });
+                        setDummyVotePlayer("");
+                        setDummyVoteFor("");
+                      }
+                    }}
+                    disabled={!dummyVotePlayer || !dummyVoteFor}
+                  >
+                    Submit Vote
+                  </button>
+                </div>
+              </div>
+            )}
+            
             <button
               className="btn btn-primary btn-large"
               onClick={handleReveal}

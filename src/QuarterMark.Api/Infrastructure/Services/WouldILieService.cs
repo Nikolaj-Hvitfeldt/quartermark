@@ -1,6 +1,8 @@
+using QuarterMark.Api.Application.DTOs;
 using QuarterMark.Api.Application.Interfaces;
 using QuarterMark.Api.Domain.Entities;
 using QuarterMark.Api.Domain.Enums;
+using QuarterMark.Api.Infrastructure.Data;
 
 namespace QuarterMark.Api.Infrastructure.Services;
 
@@ -43,37 +45,60 @@ public class WouldILieService : IWouldILieService
 
         room.CurrentQuestion = question;
         room.WouldILieRound.Questions.Add(question);
+        
+        // Track that this image has been used
+        if (!room.WouldILieRound.UsedImageUrls.Contains(imageUrl))
+        {
+            room.WouldILieRound.UsedImageUrls.Add(imageUrl);
+        }
 
         return Task.FromResult(true);
     }
 
-    public Task<bool> SubmitClaimAsync(string roomCode, string connectionId, string story)
+    public Task<string?> GetRandomImageAsync(string roomCode)
+    {
+        var room = GetRoom(roomCode);
+        if (room == null || room.WouldILieRound == null) 
+            return Task.FromResult<string?>(null);
+
+        var usedImages = room.WouldILieRound.UsedImageUrls;
+        var randomImage = ImagePool.GetRandomUnusedImage(usedImages);
+        
+        return Task.FromResult(randomImage);
+    }
+
+    public Task<bool> AutoCreateClaimsAsync(string roomCode, List<string> assignedPlayers)
     {
         var room = GetRoom(roomCode);
         if (room == null || room.CurrentQuestion == null) return Task.FromResult(false);
 
-        var player = room.Players.FirstOrDefault(p => p.ConnectionId == connectionId);
-        if (player == null) return Task.FromResult(false);
-
-        var assignedPlayers = room.CurrentQuestion.LiarNames.Concat(new[] { room.CurrentQuestion.TruthTellerName }).ToList();
-        if (!assignedPlayers.Contains(player.Name)) return Task.FromResult(false);
-
-        if (room.CurrentQuestion.Claims.Any(c => c.PlayerName == player.Name))
-            return Task.FromResult(false);
-
-        room.CurrentQuestion.Claims.Add(new Claim
+        // Automatically create claims for all assigned players
+        foreach (var playerName in assignedPlayers)
         {
-            PlayerName = player.Name,
-            Story = story
-        });
-
-        var totalNeeded = room.CurrentQuestion.LiarNames.Count + 1;
-        if (room.CurrentQuestion.Claims.Count >= totalNeeded)
-        {
-            room.CurrentQuestion.State = QuestionState.ShowingClaims;
+            if (!room.CurrentQuestion.Claims.Any(c => c.PlayerName == playerName))
+            {
+                room.CurrentQuestion.Claims.Add(new Claim
+                {
+                    PlayerName = playerName
+                });
+            }
         }
 
+        room.CurrentQuestion.State = QuestionState.ShowingClaims;
         return Task.FromResult(true);
+    }
+
+    public Task<List<ClaimDto>> GetClaimsAsync(string roomCode)
+    {
+        var room = GetRoom(roomCode);
+        if (room == null || room.CurrentQuestion == null)
+            return Task.FromResult(new List<ClaimDto>());
+
+        var claims = room.CurrentQuestion.Claims
+            .Select(c => new ClaimDto { PlayerName = c.PlayerName })
+            .ToList();
+
+        return Task.FromResult(claims);
     }
 
     public Task<bool> StartVotingAsync(string roomCode)

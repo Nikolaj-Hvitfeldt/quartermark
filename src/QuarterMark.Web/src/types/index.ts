@@ -7,13 +7,13 @@ export interface PlayerDto {
 
 export interface ClaimDto {
   playerName: string;
-  story: string;
 }
 
 // SignalR Events
 export interface QuestionShownData {
   imageUrl: string;
   assignedPlayers: string[];
+  claims: ClaimDto[];
 }
 
 export interface ClaimSubmittedData {

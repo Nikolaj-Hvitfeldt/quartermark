@@ -110,6 +110,47 @@ public class GameRoomService : IGameRoomService
         return Task.FromResult(room?.HostConnectionId ?? string.Empty);
     }
 
+    public Task<bool> CreateDummyPlayerAsync(string roomCode, string playerName)
+    {
+        if (!_rooms.TryGetValue(roomCode, out var room))
+            return Task.FromResult(false);
+
+        // Check if player already exists
+        if (room.Players.Any(p => p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase)))
+            return Task.FromResult(false);
+
+        var dummyConnectionId = $"DUMMY_{playerName}_{Guid.NewGuid()}";
+        var player = new Player
+        {
+            ConnectionId = dummyConnectionId,
+            Name = playerName,
+            IsHost = false
+        };
+
+        room.Players.Add(player);
+        _playerToRoom[dummyConnectionId] = roomCode;
+
+        return Task.FromResult(true);
+    }
+
+    public Task<bool> RemoveDummyPlayerAsync(string roomCode, string playerName)
+    {
+        if (!_rooms.TryGetValue(roomCode, out var room))
+            return Task.FromResult(false);
+
+        var player = room.Players.FirstOrDefault(p => 
+            p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase) && 
+            p.ConnectionId.StartsWith("DUMMY_"));
+
+        if (player == null)
+            return Task.FromResult(false);
+
+        room.Players.Remove(player);
+        _playerToRoom.Remove(player.ConnectionId);
+
+        return Task.FromResult(true);
+    }
+
     private static string GenerateRoomCode()
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
