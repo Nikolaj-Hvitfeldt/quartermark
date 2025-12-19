@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useGameRoom } from "../hooks/useGameRoom";
+import { useMutation } from "@tanstack/react-query";
+import signalRService from "../services/signalRService";
 import WouldILieHost from "./WouldILieHost";
 import { HostScreenProps } from "../types";
 import "./HostScreen.css";
@@ -8,7 +10,36 @@ function HostScreen({ onBack }: HostScreenProps) {
   const { connection, roomCode, players, isConnected, createRoom } =
     useGameRoom();
   const [playerName, setPlayerName] = useState<string>("");
+  const [dummyPlayerName, setDummyPlayerName] = useState<string>("");
   const [inGame, setInGame] = useState<boolean>(false);
+
+  const createDummyPlayerMutation = useMutation({
+    mutationFn: async (name: string) => {
+      await signalRService.invoke("CreateDummyPlayer", name);
+    },
+  });
+
+  const removeDummyPlayerMutation = useMutation({
+    mutationFn: async (name: string) => {
+      await signalRService.invoke("RemoveDummyPlayer", name);
+    },
+  });
+
+  const handleCreateDummyPlayer = async () => {
+    if (!dummyPlayerName.trim()) {
+      alert("Please enter a name for the dummy player");
+      return;
+    }
+
+    createDummyPlayerMutation.mutate(dummyPlayerName);
+    setDummyPlayerName("");
+  };
+
+  const handleRemoveDummyPlayer = (name: string) => {
+    removeDummyPlayerMutation.mutate(name);
+  };
+
+  const dummyPlayers = players.filter((p) => !p.isHost);
 
   const handleCreateRoom = async () => {
     if (!playerName.trim()) {
@@ -74,6 +105,52 @@ function HostScreen({ onBack }: HostScreenProps) {
             </div>
           </div>
 
+          <div className="dummy-players-section">
+            <h3>Test Players (Dummy)</h3>
+            <p className="dummy-hint">
+              Create dummy players for testing without opening multiple browsers
+            </p>
+            <div className="dummy-player-controls">
+              <input
+                type="text"
+                placeholder="Enter dummy player name"
+                value={dummyPlayerName}
+                onChange={(e) => setDummyPlayerName(e.target.value)}
+                className="input"
+                maxLength={20}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleCreateDummyPlayer();
+                  }
+                }}
+              />
+              <button
+                className="btn btn-secondary"
+                onClick={handleCreateDummyPlayer}
+                disabled={
+                  !dummyPlayerName.trim() || createDummyPlayerMutation.isPending
+                }
+              >
+                Add Dummy Player
+              </button>
+            </div>
+            {dummyPlayers.length > 0 && (
+              <div className="dummy-players-list">
+                {dummyPlayers.map((player, index) => (
+                  <div key={index} className="dummy-player-item">
+                    <span>{player.name}</span>
+                    <button
+                      className="btn btn-small"
+                      onClick={() => handleRemoveDummyPlayer(player.name)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="game-actions">
             <button
               className="btn btn-primary btn-large"
@@ -89,4 +166,3 @@ function HostScreen({ onBack }: HostScreenProps) {
 }
 
 export default HostScreen;
-

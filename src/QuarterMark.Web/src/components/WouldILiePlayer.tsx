@@ -9,7 +9,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
   const {
     roundState,
     imageUrl,
-    story,
     claims,
     canVote,
     hasVoted,
@@ -22,7 +21,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     roundScores,
     setRoundState,
     setImageUrl,
-    setStory,
     setClaims,
     setCanVote,
     setHasVoted,
@@ -41,7 +39,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     const handleRoundStarted = () => {
       setRoundState('Waiting');
       setImageUrl('');
-      setStory('');
       setClaims([]);
       setCanVote(false);
       setHasVoted(false);
@@ -52,22 +49,16 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     };
 
     const handleQuestionShown = (data: QuestionShownData) => {
-      setRoundState('ShowingImage');
       setImageUrl(data.imageUrl);
-      setStory('');
-      setClaims([]);
+      setClaims(data.claims || []);
       setCanVote(false);
       setHasVoted(false);
       setIsRevealed(false);
-      setIsClaimer(false);
-      setIsAssigned(data.assignedPlayers.includes(playerName));
-    };
-
-    const handleClaimsReady = (claimsList: ClaimDto[]) => {
-      setClaims(claimsList);
-      setRoundState('ShowingClaims');
-      const claimerNames = claimsList.map(c => c.playerName);
+      const claimerNames = (data.claims || []).map(c => c.playerName);
       setIsClaimer(claimerNames.includes(playerName));
+      setIsAssigned(data.assignedPlayers.includes(playerName));
+      // Go straight to claims screen since claims are automatically created
+      setRoundState('ShowingClaims');
     };
 
     const handleVotingStarted = (claimerNames: string[]) => {
@@ -109,7 +100,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     playerName,
     setRoundState,
     setImageUrl,
-    setStory,
     setClaims,
     setCanVote,
     setHasVoted,
@@ -122,15 +112,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     setRoundScores,
   ]);
 
-  const submitClaimMutation = useMutation({
-    mutationFn: async (story: string) => {
-      await signalRService.invoke('SubmitClaim', story);
-    },
-    onSuccess: () => {
-      setIsClaimer(true);
-    },
-  });
-
   const submitVoteMutation = useMutation({
     mutationFn: async (claimerName: string) => {
       await signalRService.invoke('SubmitVote', claimerName);
@@ -139,15 +120,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
       setHasVoted(true);
     },
   });
-
-  const handleSubmitClaim = async () => {
-    if (!story.trim()) {
-      alert('Please write your story');
-      return;
-    }
-
-    submitClaimMutation.mutate(story);
-  };
 
   const handleVote = async (claimerName: string) => {
     submitVoteMutation.mutate(claimerName);
@@ -165,54 +137,23 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
         </div>
       )}
 
-      {roundState === 'ShowingImage' && (
+      {roundState === 'ShowingClaims' && (
         <div className="round-screen">
-          <h2>Who knows this person?</h2>
+          <h2>Players who claim to know this person:</h2>
           {imageUrl && (
             <div className="person-image">
               <img src={imageUrl} alt="Person" />
             </div>
           )}
-          {isAssigned ? (
-            <div className="claim-section">
-              <h3>You've been assigned! Write your story:</h3>
-              <p className="hint">Write a convincing story about how you know them (or bluff if you don't)!</p>
-              <textarea
-                value={story}
-                onChange={(e) => setStory(e.target.value)}
-                placeholder="Write your story here..."
-                className="story-input"
-                rows={6}
-              />
-              <button
-                className="btn btn-primary btn-large"
-                onClick={handleSubmitClaim}
-                disabled={!story.trim()}
-              >
-                Submit My Story
-              </button>
-            </div>
-          ) : (
-            <div className="waiting-assignment">
-              <p>You haven't been assigned to this question. Waiting for assigned players to submit their stories...</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {roundState === 'ShowingClaims' && (
-        <div className="round-screen">
-          <h2>Here are the claims:</h2>
           <div className="claims-list">
             {claims.map((claim, index) => (
               <div key={index} className="claim-card">
                 <h3>{claim.playerName}</h3>
-                <p>{claim.story}</p>
               </div>
             ))}
           </div>
           {isClaimer && (
-            <p className="claimer-note">You submitted a claim. Waiting for others to vote...</p>
+            <p className="claimer-note">You claimed to know them. Waiting for others to vote...</p>
           )}
         </div>
       )}

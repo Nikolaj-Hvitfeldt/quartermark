@@ -76,6 +76,17 @@ public class GameHub : Hub
         await _notificationService.NotifyRoomAsync(roomCode, "WouldILieRoundStarted");
     }
 
+    public async Task<string?> GetRandomImage()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return null;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return null;
+
+        return await _wouldILieService.GetRandomImageAsync(roomCode);
+    }
+
     public async Task ShowQuestion(string imageUrl, string truthTellerName, List<string> liarNames)
     {
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
@@ -86,43 +97,19 @@ public class GameHub : Hub
 
         await _wouldILieService.ShowQuestionAsync(roomCode, imageUrl, truthTellerName, liarNames);
         
+        // Automatically create claims for all assigned players (they'll speak in person)
         var assignedPlayers = liarNames.Concat(new[] { truthTellerName }).ToList();
+        await _wouldILieService.AutoCreateClaimsAsync(roomCode, assignedPlayers);
+        
+        var claims = await _wouldILieService.GetClaimsAsync(roomCode);
         await _notificationService.NotifyRoomAsync(roomCode, "QuestionShown", new
         {
             imageUrl,
-            assignedPlayers
+            assignedPlayers,
+            claims
         });
     }
 
-    public async Task SubmitClaim(string story)
-    {
-        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
-        if (roomCode == null) return;
-
-        var success = await _wouldILieService.SubmitClaimAsync(roomCode, Context.ConnectionId, story);
-        if (!success) return;
-
-        var question = GetCurrentQuestion(roomCode);
-        if (question == null) return;
-
-        var totalNeeded = question.LiarNames.Count + 1;
-        
-        if (question.Claims.Count >= totalNeeded)
-        {
-            var claims = question.Claims.Select(c => new ClaimDto { PlayerName = c.PlayerName, Story = c.Story }).ToList();
-            await _notificationService.NotifyRoomAsync(roomCode, "ClaimsReady", claims);
-        }
-        else
-        {
-            var players = await _roomService.GetPlayersAsync(roomCode);
-            var player = players.FirstOrDefault(p => p.Name == question.Claims.Last().PlayerName);
-            
-            await _notificationService.NotifyClientAsync(
-                await GetHostConnectionId(roomCode),
-                "ClaimSubmitted",
-                new { playerName = player?.Name, claimsCount = question.Claims.Count, totalNeeded });
-        }
-    }
 
     public async Task StartVoting()
     {
@@ -210,6 +197,78 @@ public class GameHub : Hub
         });
         
         await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+    }
+
+    public async Task CreateDummyPlayer(string playerName)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var success = await _roomService.CreateDummyPlayerAsync(roomCode, playerName);
+        if (success)
+        {
+            var players = await _roomService.GetPlayersAsync(roomCode);
+            await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+        }
+    }
+
+    public async Task RemoveDummyPlayer(string playerName)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var success = await _roomService.RemoveDummyPlayerAsync(roomCode, playerName);
+        if (success)
+        {
+            var players = await _roomService.GetPlayersAsync(roomCode);
+            await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+        }
+    }
+
+
+    public async Task SubmitDummyPlayerVote(string dummyPlayerName, string claimedPlayerName)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var room = _roomService.GetRoom(roomCode);
+        if (room == null) return;
+
+        var dummyPlayer = room.Players.FirstOrDefault(p => 
+            p.Name == dummyPlayerName && p.ConnectionId.StartsWith("DUMMY_"));
+        
+        if (dummyPlayer == null) return;
+
+        await _wouldILieService.SubmitVoteAsync(roomCode, dummyPlayer.ConnectionId, claimedPlayerName);
+        
+        var question = GetCurrentQuestion(roomCode);
+        if (question == null) return;
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var assignedPlayers = question.LiarNames.Concat(new[] { question.TruthTellerName }).ToList();
+        var totalVoters = players.Count(p => !p.IsHost && !assignedPlayers.Contains(p.Name));
+        
+        var player = players.FirstOrDefault(p => p.Name == question.Votes.LastOrDefault().Key);
+        
+        await _notificationService.NotifyClientAsync(
+            Context.ConnectionId,
+            "VoteReceived",
+            new
+            {
+                voterName = player?.Name,
+                votedFor = claimedPlayerName,
+                totalVotes = question.Votes.Count,
+                totalVoters
+            });
     }
 
     private Question? GetCurrentQuestion(string roomCode)

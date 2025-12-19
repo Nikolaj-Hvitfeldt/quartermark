@@ -6,7 +6,6 @@ type RoundState = 'Waiting' | 'ShowingImage' | 'ShowingClaims' | 'Voting' | 'Rev
 interface PlayerGameState {
   roundState: RoundState;
   imageUrl: string;
-  story: string;
   claims: ClaimDto[];
   canVote: boolean;
   hasVoted: boolean;
@@ -19,7 +18,6 @@ interface PlayerGameState {
   roundScores: Record<string, number>;
   setRoundState: (state: RoundState) => void;
   setImageUrl: (url: string) => void;
-  setStory: (story: string) => void;
   setClaims: (claims: ClaimDto[]) => void;
   setCanVote: (canVote: boolean) => void;
   setHasVoted: (hasVoted: boolean) => void;
@@ -36,7 +34,6 @@ interface PlayerGameState {
 export const usePlayerGameStore = create<PlayerGameState>((set) => ({
   roundState: 'Waiting',
   imageUrl: '',
-  story: '',
   claims: [],
   canVote: false,
   hasVoted: false,
@@ -49,7 +46,6 @@ export const usePlayerGameStore = create<PlayerGameState>((set) => ({
   roundScores: {},
   setRoundState: (roundState) => set({ roundState }),
   setImageUrl: (imageUrl) => set({ imageUrl }),
-  setStory: (story) => set({ story }),
   setClaims: (claims) => set({ claims }),
   setCanVote: (canVote) => set({ canVote }),
   setHasVoted: (hasVoted) => set({ hasVoted }),
@@ -63,7 +59,6 @@ export const usePlayerGameStore = create<PlayerGameState>((set) => ({
   reset: () => set({
     roundState: 'Waiting',
     imageUrl: '',
-    story: '',
     claims: [],
     canVote: false,
     hasVoted: false,

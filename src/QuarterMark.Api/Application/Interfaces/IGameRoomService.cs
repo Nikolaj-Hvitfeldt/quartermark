@@ -13,5 +13,7 @@ public interface IGameRoomService
     Task<string?> GetRoomCodeAsync(string connectionId);
     GameRoom? GetRoom(string roomCode);
     Task<string> GetHostConnectionIdAsync(string roomCode);
+    Task<bool> CreateDummyPlayerAsync(string roomCode, string playerName);
+    Task<bool> RemoveDummyPlayerAsync(string roomCode, string playerName);
 }
 

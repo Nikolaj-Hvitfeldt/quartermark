@@ -7,7 +7,9 @@ public interface IWouldILieService
 {
     Task<bool> StartRoundAsync(string roomCode);
     Task<bool> ShowQuestionAsync(string roomCode, string imageUrl, string truthTellerName, List<string> liarNames);
-    Task<bool> SubmitClaimAsync(string roomCode, string connectionId, string story);
+    Task<string?> GetRandomImageAsync(string roomCode);
+    Task<bool> AutoCreateClaimsAsync(string roomCode, List<string> assignedPlayers);
+    Task<List<ClaimDto>> GetClaimsAsync(string roomCode);
     Task<bool> StartVotingAsync(string roomCode);
     Task<bool> SubmitVoteAsync(string roomCode, string connectionId, string claimedPlayerName);
     Task<Dictionary<string, int>> RevealAnswerAsync(string roomCode);

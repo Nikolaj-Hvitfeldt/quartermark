@@ -90,6 +90,68 @@
   text-align: center;
 }
 
+.image-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.selected-image {
+  margin-top: 1rem;
+}
+
+.image-preview-small {
+  margin-top: 0.5rem;
+}
+
+.image-preview-small img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  border: 2px solid #374151;
+}
+
+.dummy-player-actions {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #111827;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.dummy-player-actions h4 {
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  color: #9ca3af;
+}
+
+.dummy-action-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dummy-action-controls .input {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #374151;
+  border-radius: 8px;
+  background: #1f2937;
+  color: white;
+  font-family: inherit;
+}
+
+.dummy-action-controls textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.dummy-action-controls .input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
 .round-setup {
   background: #1f2937;
   border-radius: 12px;
