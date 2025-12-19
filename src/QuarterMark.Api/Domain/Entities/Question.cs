@@ -1,3 +1,5 @@
+using QuarterMark.Api.Domain.Enums;
+
 namespace QuarterMark.Api.Domain.Entities;
 
 public class Question
