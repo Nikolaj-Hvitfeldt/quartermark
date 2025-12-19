@@ -1,0 +1,18 @@
+using QuarterMark.Api.Application.DTOs;
+using QuarterMark.Api.Domain.Entities;
+
+namespace QuarterMark.Api.Application.Interfaces;
+
+public interface IWouldILieService
+{
+    Task<bool> StartRoundAsync(string roomCode);
+    Task<bool> ShowQuestionAsync(string roomCode, string imageUrl, string truthTellerName, List<string> liarNames);
+    Task<bool> SubmitClaimAsync(string roomCode, string connectionId, string story);
+    Task<bool> StartVotingAsync(string roomCode);
+    Task<bool> SubmitVoteAsync(string roomCode, string connectionId, string claimedPlayerName);
+    Task<Dictionary<string, int>> RevealAnswerAsync(string roomCode);
+    Task<Dictionary<string, int>> EndRoundAsync(string roomCode);
+    Task<bool> IsRoundActiveAsync(string roomCode);
+    Question? GetCurrentQuestion(string roomCode);
+}
+

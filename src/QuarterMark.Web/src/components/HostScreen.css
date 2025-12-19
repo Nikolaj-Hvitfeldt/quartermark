@@ -1,0 +1,136 @@
+.host-screen {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-back {
+  background: #374151;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  margin-bottom: 2rem;
+  align-self: flex-start;
+}
+
+.host-setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 2rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.host-setup h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.25rem;
+  border: 2px solid #374151;
+  border-radius: 8px;
+  background: #1f2937;
+  color: white;
+  text-align: center;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.host-game {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.room-code-display {
+  text-align: center;
+  padding: 2rem;
+  background: #1f2937;
+  border-radius: 12px;
+}
+
+.room-code-display h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #9ca3af;
+}
+
+.room-code {
+  font-size: 5rem;
+  font-weight: bold;
+  letter-spacing: 1rem;
+  color: #4f46e5;
+  margin: 1rem 0;
+  font-family: 'Courier New', monospace;
+}
+
+.room-code-hint {
+  color: #9ca3af;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.players-section {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.players-section h3 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.players-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.player-card {
+  background: #111827;
+  padding: 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.player-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.host-badge {
+  background: #4f46e5;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.player-score {
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+.game-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
