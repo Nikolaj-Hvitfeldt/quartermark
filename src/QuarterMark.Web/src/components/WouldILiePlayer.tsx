@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import signalRService from '../services/signalRService';
 import { usePlayerGameStore } from '../stores/playerGameStore';
+import { useGameRoom } from '../hooks/useGameRoom';
 import { WouldILiePlayerProps, QuestionShownData, AnswerRevealedData, ClaimDto } from '../types';
 import './WouldILiePlayer.css';
 
@@ -32,6 +33,8 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     setIsAssigned,
     setRoundScores,
   } = usePlayerGameStore();
+
+  const { players } = useGameRoom();
 
   useEffect(() => {
     if (!connection) return;
@@ -82,7 +85,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
 
     signalRService.on('WouldILieRoundStarted', handleRoundStarted);
     signalRService.on('QuestionShown', handleQuestionShown);
-    signalRService.on('ClaimsReady', handleClaimsReady);
     signalRService.on('VotingStarted', handleVotingStarted);
     signalRService.on('AnswerRevealed', handleAnswerRevealed);
     signalRService.on('WouldILieRoundEnded', handleRoundEnded);
@@ -90,7 +92,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     return () => {
       signalRService.off('WouldILieRoundStarted', handleRoundStarted);
       signalRService.off('QuestionShown', handleQuestionShown);
-      signalRService.off('ClaimsReady', handleClaimsReady);
       signalRService.off('VotingStarted', handleVotingStarted);
       signalRService.off('AnswerRevealed', handleAnswerRevealed);
       signalRService.off('WouldILieRoundEnded', handleRoundEnded);
@@ -198,30 +199,26 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
             {!isClaimer && (
               <p className={`result ${votes[playerName] === correctPlayer ? 'correct' : 'incorrect'}`}>
                 {votes[playerName] === correctPlayer 
-                  ? '🎉 You guessed correctly!' 
-                  : '❌ You guessed wrong!'}
+                  ? '🎉 You guessed correctly! +10 points' 
+                  : '❌ You guessed wrong! 0 points'}
               </p>
             )}
-            <div className="votes-summary">
-              <h3>Votes:</h3>
-              {Object.entries(votes).map(([voter, votedFor]) => (
-                <div key={voter} className="vote-item">
-                  {voter} voted for {votedFor}
-                </div>
-              ))}
+          </div>
+          
+          <div className="score-screen">
+            <h3>Current Standings</h3>
+            <div className="standings-list">
+              {players
+                .filter(p => !p.isHost)
+                .sort((a, b) => b.score - a.score)
+                .map((player, index) => (
+                  <div key={player.name} className="standing-item">
+                    <span className="standing-rank">#{index + 1}</span>
+                    <span className="standing-name">{player.name}</span>
+                    <span className="standing-score">{player.score} pts</span>
+                  </div>
+                ))}
             </div>
-            {Object.keys(roundScores).length > 0 && (
-              <div className="round-scores">
-                <h3>Round Scores:</h3>
-                {Object.entries(roundScores)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([name, score]) => (
-                    <div key={name} className="score-item">
-                      {name}: {score} pts
-                    </div>
-                  ))}
-              </div>
-            )}
           </div>
         </div>
       )}

@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useWouldILie } from "../hooks/useWouldILie";
+import { useGameRoom } from "../hooks/useGameRoom";
 import signalRService from "../services/signalRService";
 import { WouldILieHostProps } from "../types";
 import "./WouldILieHost.css";
 
-function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
+function WouldILieHost({ connection, players: initialPlayers, onBack }: WouldILieHostProps) {
   const {
     roundActive,
     currentQuestion,
@@ -13,12 +14,16 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
     voteProgress,
     roundScores,
     answerRevealed,
+    setAnswerRevealed,
+    setCurrentQuestion,
     startRound,
     showQuestion,
     startVoting,
     revealAnswer,
     endRound,
   } = useWouldILie(connection);
+
+  const { players } = useGameRoom();
 
   const [truthTeller, setTruthTeller] = useState<string>("");
   const [selectedLiar, setSelectedLiar] = useState<string>("");
@@ -209,6 +214,43 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
     );
   }
 
+  // Show standings screen when answer is revealed
+  if (answerRevealed) {
+    return (
+      <div className="would-i-lie-host">
+        <button className="btn btn-back" onClick={onBack}>
+          ← Back to Lobby
+        </button>
+
+        <div className="score-screen">
+          <h2>Current Standings</h2>
+          <div className="standings-list">
+            {players
+              .filter(p => !p.isHost)
+              .sort((a, b) => b.score - a.score)
+              .map((player, index) => (
+                <div key={player.name} className="standing-item">
+                  <span className="standing-rank">#{index + 1}</span>
+                  <span className="standing-name">{player.name}</span>
+                  <span className="standing-score">{player.score} pts</span>
+                </div>
+              ))}
+          </div>
+          <button
+            className="btn btn-primary btn-large"
+            onClick={() => {
+              // Reset state to allow setting up next question
+              setAnswerRevealed(false);
+              setCurrentQuestion(null);
+            }}
+          >
+            Next Question
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="would-i-lie-host">
       <button className="btn btn-back" onClick={onBack}>
@@ -295,41 +337,7 @@ function WouldILieHost({ connection, players, onBack }: WouldILieHostProps) {
                 </div>
               </div>
             )}
-            
-            <button
-              className="btn btn-primary btn-large"
-              onClick={handleReveal}
-            >
-              Reveal Answer
-            </button>
           </div>
-        )}
-
-        {Object.keys(roundScores).length > 0 && (
-          <div className="round-scores">
-            <h3>Round Scores</h3>
-            <div className="scores-list">
-              {Object.entries(roundScores)
-                .sort((a, b) => b[1] - a[1])
-                .map(([name, score]) => (
-                  <div key={name} className="score-item">
-                    {name}: {score} pts
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {answerRevealed && (
-          <button
-            className="btn btn-secondary btn-large"
-            onClick={() => {
-              // This will be handled by showing a new question
-              // The state will reset when a new question is shown
-            }}
-          >
-            Next Question
-          </button>
         )}
       </div>
     </div>
