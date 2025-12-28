@@ -61,6 +61,29 @@ export interface WouldILiePlayerProps {
   onBack: () => void;
 }
 
+export interface ContestantGuessHostProps {
+  connection: any; // HubConnection from SignalR
+  players: PlayerDto[];
+  onBack: () => void;
+}
+
+export interface ContestantGuessPlayerProps {
+  connection: any; // HubConnection from SignalR
+  playerName: string;
+  onBack: () => void;
+}
+
+export interface ContestantGuessQuestionShownData {
+  imageUrl: string;
+  possibleAnswers: string[];
+}
+
+export interface ContestantGuessAnswerRevealedData {
+  correctAnswer: string;
+  guesses: Record<string, string>;
+  roundScores: Record<string, number>;
+}
+
 // Game State
 export interface CurrentQuestion {
   imageUrl: string;

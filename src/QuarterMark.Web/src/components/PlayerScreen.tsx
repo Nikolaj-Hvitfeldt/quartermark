@@ -1,26 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameRoom } from '../hooks/useGameRoom';
 import { usePlayerStore } from '../stores/playerStore';
 import signalRService from '../services/signalRService';
 import WouldILiePlayer from './WouldILiePlayer';
+import ContestantGuessPlayer from './ContestantGuessPlayer';
 import { PlayerScreenProps } from '../types';
 import './PlayerScreen.css';
 
 function PlayerScreen({ onBack }: PlayerScreenProps) {
   const { connection, roomCode, players, error, isConnected, joinRoom } = useGameRoom();
-  const { playerName, roomCodeInput, inGame, setPlayerName, setRoomCodeInput, setInGame } = usePlayerStore();
+  const { playerName, roomCodeInput, setPlayerName, setRoomCodeInput } = usePlayerStore();
+  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", or "contestantGuess"
 
   useEffect(() => {
     if (!connection) return;
 
-    const handleRoundStarted = () => {
-      setInGame(true);
+    const handleWouldILieRoundStarted = () => {
+      setCurrentGame("wouldILie");
     };
 
-    signalRService.on('WouldILieRoundStarted', handleRoundStarted);
+    const handleContestantGuessRoundStarted = () => {
+      setCurrentGame("contestantGuess");
+    };
+
+    signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
+    signalRService.on('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
 
     return () => {
-      signalRService.off('WouldILieRoundStarted', handleRoundStarted);
+      signalRService.off('WouldILieRoundStarted', handleWouldILieRoundStarted);
+      signalRService.off('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
     };
   }, [connection]);
 
@@ -70,11 +78,17 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
             Join Room
           </button>
         </div>
-      ) : inGame ? (
+      ) : currentGame === "wouldILie" ? (
         <WouldILiePlayer
           connection={connection}
           playerName={playerName}
-          onBack={() => setInGame(false)}
+          onBack={() => setCurrentGame(null)}
+        />
+      ) : currentGame === "contestantGuess" ? (
+        <ContestantGuessPlayer
+          connection={connection}
+          playerName={playerName}
+          onBack={() => setCurrentGame(null)}
         />
       ) : (
         <div className="player-game">

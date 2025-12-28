@@ -10,15 +10,18 @@ public class GameHub : Hub
 {
     private readonly IGameRoomService _roomService;
     private readonly IWouldILieService _wouldILieService;
+    private readonly IContestantGuessService _contestantGuessService;
     private readonly ISignalRNotificationService _notificationService;
 
     public GameHub(
         IGameRoomService roomService,
         IWouldILieService wouldILieService,
+        IContestantGuessService contestantGuessService,
         ISignalRNotificationService notificationService)
     {
         _roomService = roomService;
         _wouldILieService = wouldILieService;
+        _contestantGuessService = contestantGuessService;
         _notificationService = notificationService;
     }
 
@@ -212,9 +215,116 @@ public class GameHub : Hub
         await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
     }
 
+    // Contestant Guess Game Methods
+    public async Task StartContestantGuessRound()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        await _contestantGuessService.StartRoundAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "ContestantGuessRoundStarted");
+    }
+
+    public async Task ShowContestantGuessQuestion(string imageUrl, string correctAnswer, List<string> possibleAnswers)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        await _contestantGuessService.ShowQuestionAsync(roomCode, imageUrl, correctAnswer, possibleAnswers);
+        
+        await _notificationService.NotifyRoomAsync(roomCode, "ContestantGuessQuestionShown", new
+        {
+            imageUrl,
+            possibleAnswers
+        });
+    }
+
+    public async Task SubmitContestantGuess(string guessedContestantName)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var success = await _contestantGuessService.SubmitGuessAsync(roomCode, Context.ConnectionId, guessedContestantName);
+        if (!success) return;
+
+        var question = GetCurrentContestantGuessQuestion(roomCode);
+        if (question == null) return;
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var nonHostPlayers = players.Where(p => !p.IsHost).ToList();
+        var totalPlayers = nonHostPlayers.Count;
+        var totalGuesses = question.Guesses.Count;
+
+        var player = players.FirstOrDefault(p => p.Name == question.Guesses.LastOrDefault().Key);
+        
+        await _notificationService.NotifyClientAsync(
+            await GetHostConnectionId(roomCode),
+            "ContestantGuessReceived",
+            new
+            {
+                playerName = player?.Name,
+                guessedContestantName,
+                totalGuesses,
+                totalPlayers
+            });
+    }
+
+    public async Task RevealContestantGuessAnswer()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var roundScores = await _contestantGuessService.RevealAnswerAsync(roomCode);
+        
+        var question = GetCurrentContestantGuessQuestion(roomCode);
+        if (question != null)
+        {
+            await _notificationService.NotifyRoomAsync(roomCode, "ContestantGuessAnswerRevealed", new
+            {
+                correctAnswer = question.CorrectAnswer,
+                guesses = question.Guesses,
+                roundScores
+            });
+        }
+    }
+
+    public async Task EndContestantGuessRound()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var roundScores = await _contestantGuessService.EndRoundAsync(roomCode);
+        
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "ContestantGuessRoundEnded", new
+        {
+            finalScores = players,
+            roundScores
+        });
+        
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+    }
+
     private Question? GetCurrentQuestion(string roomCode)
     {
         return _wouldILieService.GetCurrentQuestion(roomCode);
+    }
+
+    private ContestantGuessQuestion? GetCurrentContestantGuessQuestion(string roomCode)
+    {
+        return _contestantGuessService.GetCurrentQuestion(roomCode);
     }
 
     private async Task<string> GetHostConnectionId(string roomCode)

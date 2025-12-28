@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
+using QuarterMark.Api.Hubs;
 
 namespace QuarterMark.Api.Application.Interfaces;
 

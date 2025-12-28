@@ -7,5 +7,7 @@ public class GameRoom
     public List<Player> Players { get; set; } = new();
     public WouldILieRound? WouldILieRound { get; set; }
     public Question? CurrentQuestion { get; set; }
+    public ContestantGuessRound? ContestantGuessRound { get; set; }
+    public ContestantGuessQuestion? CurrentContestantGuessQuestion { get; set; }
 }
 

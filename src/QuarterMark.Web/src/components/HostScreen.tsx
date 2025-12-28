@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useGameRoom } from "../hooks/useGameRoom";
 import WouldILieHost from "./WouldILieHost";
+import ContestantGuessHost from "./ContestantGuessHost";
 import { HostScreenProps } from "../types";
 import "./HostScreen.css";
 
@@ -8,7 +9,7 @@ function HostScreen({ onBack }: HostScreenProps) {
   const { connection, roomCode, players, isConnected, createRoom } =
     useGameRoom();
   const [playerName, setPlayerName] = useState<string>("");
-  const [inGame, setInGame] = useState<boolean>(false);
+  const [inGame, setInGame] = useState<string | null>(null); // null, "wouldILie", or "contestantGuess"
 
   const handleCreateRoom = async () => {
     if (!playerName.trim()) {
@@ -47,11 +48,17 @@ function HostScreen({ onBack }: HostScreenProps) {
             Create Room
           </button>
         </div>
-      ) : inGame ? (
+      ) : inGame === "wouldILie" ? (
         <WouldILieHost
           connection={connection}
           players={players}
-          onBack={() => setInGame(false)}
+          onBack={() => setInGame(null)}
+        />
+      ) : inGame === "contestantGuess" ? (
+        <ContestantGuessHost
+          connection={connection}
+          players={players}
+          onBack={() => setInGame(null)}
         />
       ) : (
         <div className="host-game">
@@ -77,9 +84,15 @@ function HostScreen({ onBack }: HostScreenProps) {
           <div className="game-actions">
             <button
               className="btn btn-primary btn-large"
-              onClick={() => setInGame(true)}
+              onClick={() => setInGame("wouldILie")}
             >
               Start "Would I Lie to You?" Round
+            </button>
+            <button
+              className="btn btn-primary btn-large"
+              onClick={() => setInGame("contestantGuess")}
+            >
+              Start "Contestant Guess" Round
             </button>
           </div>
         </div>
