@@ -1,17 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGameRoom } from "../hooks/useGameRoom";
 import { useMutation } from "@tanstack/react-query";
+import { useGameSession } from "../hooks/useGameSession";
 import signalRService from "../services/signalRService";
 import WouldILieHost from "./WouldILieHost";
+import ContestantGuessHost from "./ContestantGuessHost";
+import DrinkingWheelHost from "./DrinkingWheelHost";
 import { HostScreenProps } from "../types";
 import "./HostScreen.css";
 
 function HostScreen({ onBack }: HostScreenProps) {
   const { connection, roomCode, players, isConnected, createRoom } =
     useGameRoom();
+  const { isActive: sessionActive, currentGameNumber, showDrinkingWheel, setShowDrinkingWheel, startSession } = useGameSession(connection);
   const [playerName, setPlayerName] = useState<string>("");
   const [dummyPlayerName, setDummyPlayerName] = useState<string>("");
-  const [inGame, setInGame] = useState<boolean>(false);
+  const [inGame, setInGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", or "drinkingWheel"
 
   const createDummyPlayerMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -54,6 +58,21 @@ function HostScreen({ onBack }: HostScreenProps) {
     }
   };
 
+  // Listen for drinking wheel event
+  useEffect(() => {
+    if (!connection || !sessionActive) return;
+
+    const handleShowDrinkingWheel = () => {
+      setInGame("drinkingWheel");
+    };
+
+    signalRService.on("ShowDrinkingWheel", handleShowDrinkingWheel);
+
+    return () => {
+      signalRService.off("ShowDrinkingWheel", handleShowDrinkingWheel);
+    };
+  }, [connection, sessionActive]);
+
   return (
     <div className="host-screen">
       <button className="btn btn-back" onClick={onBack}>
@@ -78,11 +97,25 @@ function HostScreen({ onBack }: HostScreenProps) {
             Create Room
           </button>
         </div>
-      ) : inGame ? (
+      ) : showDrinkingWheel || inGame === "drinkingWheel" ? (
+        <DrinkingWheelHost
+          players={players}
+          onSpinComplete={() => {
+            setShowDrinkingWheel(false);
+            setInGame(null);
+          }}
+        />
+      ) : inGame === "wouldILie" ? (
         <WouldILieHost
           connection={connection}
           players={players}
-          onBack={() => setInGame(false)}
+          onBack={() => setInGame(null)}
+        />
+      ) : inGame === "contestantGuess" ? (
+        <ContestantGuessHost
+          connection={connection}
+          players={players}
+          onBack={() => setInGame(null)}
         />
       ) : (
         <div className="host-game">
@@ -152,12 +185,47 @@ function HostScreen({ onBack }: HostScreenProps) {
           </div>
 
           <div className="game-actions">
-            <button
-              className="btn btn-primary btn-large"
-              onClick={() => setInGame(true)}
-            >
-              Start "Would I Lie to You?" Round
-            </button>
+            {!sessionActive && (
+              <button
+                className="btn btn-primary btn-large"
+                onClick={async () => {
+                  await startSession();
+                }}
+              >
+                Start Game Session (5 Mini-Games)
+              </button>
+            )}
+            {sessionActive && (
+              <>
+                <div className="session-info">
+                  <p>Game {currentGameNumber} of 5</p>
+                </div>
+                <button
+                  className="btn btn-primary btn-large"
+                  onClick={() => setInGame("wouldILie")}
+                >
+                  Start "Would I Lie to You?" Round
+                </button>
+                <button
+                  className="btn btn-primary btn-large"
+                  onClick={() => setInGame("contestantGuess")}
+                >
+                  Start "Contestant Guess" Round
+                </button>
+              </>
+            )}
+            
+            {/* TEST BUTTONS - Remove these after testing */}
+            <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #374151' }}>
+              <h4 style={{ marginBottom: '1rem', color: '#9ca3af' }}>🧪 Test Mode</h4>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setInGame("drinkingWheel")}
+                style={{ marginRight: '1rem' }}
+              >
+                Test Drinking Wheel
+              </button>
+            </div>
           </div>
         </div>
       )}

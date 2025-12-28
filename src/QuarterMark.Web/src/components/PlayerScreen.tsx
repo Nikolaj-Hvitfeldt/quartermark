@@ -1,26 +1,41 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameRoom } from '../hooks/useGameRoom';
 import { usePlayerStore } from '../stores/playerStore';
 import signalRService from '../services/signalRService';
 import WouldILiePlayer from './WouldILiePlayer';
+import ContestantGuessPlayer from './ContestantGuessPlayer';
+import DrinkingWheelPlayer from './DrinkingWheelPlayer';
 import { PlayerScreenProps } from '../types';
 import './PlayerScreen.css';
 
 function PlayerScreen({ onBack }: PlayerScreenProps) {
   const { connection, roomCode, players, error, isConnected, joinRoom } = useGameRoom();
-  const { playerName, roomCodeInput, inGame, setPlayerName, setRoomCodeInput, setInGame } = usePlayerStore();
+  const { playerName, roomCodeInput, setPlayerName, setRoomCodeInput } = usePlayerStore();
+  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", or "drinkingWheel"
 
   useEffect(() => {
     if (!connection) return;
 
-    const handleRoundStarted = () => {
-      setInGame(true);
+    const handleWouldILieRoundStarted = () => {
+      setCurrentGame("wouldILie");
     };
 
-    signalRService.on('WouldILieRoundStarted', handleRoundStarted);
+    const handleContestantGuessRoundStarted = () => {
+      setCurrentGame("contestantGuess");
+    };
+
+    const handleShowDrinkingWheel = () => {
+      setCurrentGame("drinkingWheel");
+    };
+
+    signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
+    signalRService.on('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
+    signalRService.on('ShowDrinkingWheel', handleShowDrinkingWheel);
 
     return () => {
-      signalRService.off('WouldILieRoundStarted', handleRoundStarted);
+      signalRService.off('WouldILieRoundStarted', handleWouldILieRoundStarted);
+      signalRService.off('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
+      signalRService.off('ShowDrinkingWheel', handleShowDrinkingWheel);
     };
   }, [connection]);
 
@@ -70,11 +85,21 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
             Join Room
           </button>
         </div>
-      ) : inGame ? (
+      ) : currentGame === "drinkingWheel" ? (
+        <DrinkingWheelPlayer
+          playerName={playerName}
+        />
+      ) : currentGame === "wouldILie" ? (
         <WouldILiePlayer
           connection={connection}
           playerName={playerName}
-          onBack={() => setInGame(false)}
+          onBack={() => setCurrentGame(null)}
+        />
+      ) : currentGame === "contestantGuess" ? (
+        <ContestantGuessPlayer
+          connection={connection}
+          playerName={playerName}
+          onBack={() => setCurrentGame(null)}
         />
       ) : (
         <div className="player-game">
@@ -98,6 +123,17 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
 
           <div className="waiting-message">
             <p>Waiting for host to start the game...</p>
+          </div>
+          
+          {/* TEST BUTTONS - Remove these after testing */}
+          <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #374151' }}>
+            <h4 style={{ marginBottom: '1rem', color: '#9ca3af' }}>🧪 Test Mode</h4>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setCurrentGame("drinkingWheel")}
+            >
+              Test Drinking Wheel
+            </button>
           </div>
         </div>
       )}

@@ -63,6 +63,38 @@ export interface WouldILiePlayerProps {
   onBack: () => void;
 }
 
+export interface ContestantGuessHostProps {
+  connection: any; // HubConnection from SignalR
+  players: PlayerDto[];
+  onBack: () => void;
+}
+
+export interface ContestantGuessPlayerProps {
+  connection: any; // HubConnection from SignalR
+  playerName: string;
+  onBack: () => void;
+}
+
+export interface ContestantGuessQuestionShownData {
+  imageUrl: string;
+  possibleAnswers: string[];
+}
+
+export interface ContestantGuessAnswerRevealedData {
+  correctAnswer: string;
+  guesses: Record<string, string>;
+  roundScores: Record<string, number>;
+}
+
+export interface DrinkingWheelHostProps {
+  players: PlayerDto[];
+  onSpinComplete: () => void;
+}
+
+export interface DrinkingWheelPlayerProps {
+  playerName: string;
+}
+
 // Game State
 export interface CurrentQuestion {
   imageUrl: string;

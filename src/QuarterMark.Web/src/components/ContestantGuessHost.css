@@ -1,0 +1,148 @@
+.contestant-guess-host {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.round-controls {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.image-preview {
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+.image-preview img {
+  width: 100%;
+  border-radius: 12px;
+  border: 4px solid #4f46e5;
+}
+
+.round-scores {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #1f2937;
+  border-radius: 8px;
+}
+
+.round-scores h3 {
+  margin-bottom: 1rem;
+}
+
+.scores-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.score-item {
+  padding: 0.75rem;
+  background: #111827;
+  border-radius: 4px;
+  font-size: 1.125rem;
+}
+
+.question-display {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.round-setup {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.round-setup h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.setup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 1.125rem;
+  color: #9ca3af;
+}
+
+.form-group .input {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #374151;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+}
+
+.guessing-progress {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: #1f2937;
+  border-radius: 8px;
+}
+
+.answer-reveal {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #1f2937;
+  border-radius: 8px;
+}
+
+.answer-reveal h3 {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.correct-answer {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #065f46;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.correct-answer strong {
+  color: #10b981;
+  font-size: 1.75rem;
+}
+
+.guesses-summary {
+  text-align: left;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.guesses-summary h4 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.guess-item {
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  background: #111827;
+  font-size: 1.125rem;
+}
+
