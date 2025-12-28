@@ -91,7 +91,6 @@ export interface DrinkingWheelHostProps {
 
 export interface DrinkingWheelPlayerProps {
   playerName: string;
-  onSpinComplete?: () => void;
 }
 
 // Game State

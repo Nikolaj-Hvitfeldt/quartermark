@@ -217,31 +217,7 @@ public class GameHub : Hub
         
         await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
 
-        // If game session is active, complete the game
-        var sessionActive = await _gameSessionService.IsGameSessionActiveAsync(roomCode);
-        if (sessionActive)
-        {
-            await _gameSessionService.CompleteGameAsync(roomCode, "WouldILie", roundScores);
-            
-            var currentGameNumber = await _gameSessionService.GetCurrentGameNumberAsync(roomCode);
-            var accumulatedScores = await _gameSessionService.GetAccumulatedScoresAsync(roomCode);
-            var updatedPlayers = await _roomService.GetPlayersAsync(roomCode);
-
-            await _notificationService.NotifyRoomAsync(roomCode, "GameCompleted", new
-            {
-                gameType = "WouldILie",
-                currentGameNumber,
-                accumulatedScores,
-                players = updatedPlayers
-            });
-
-            // Check if we should show drinking wheel (after games 2 and 4)
-            if (currentGameNumber == 2 || currentGameNumber == 4)
-            {
-                await _gameSessionService.ShowDrinkingWheelAsync(roomCode);
-                await _notificationService.NotifyRoomAsync(roomCode, "ShowDrinkingWheel");
-            }
-        }
+        await CompleteGameAndCheckDrinkingWheelAsync(roomCode, "WouldILie", roundScores);
     }
 
     // Contestant Guess Game Methods
@@ -345,31 +321,7 @@ public class GameHub : Hub
         
         await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
 
-        // If game session is active, complete the game
-        var sessionActive = await _gameSessionService.IsGameSessionActiveAsync(roomCode);
-        if (sessionActive)
-        {
-            await _gameSessionService.CompleteGameAsync(roomCode, "ContestantGuess", roundScores);
-            
-            var currentGameNumber = await _gameSessionService.GetCurrentGameNumberAsync(roomCode);
-            var accumulatedScores = await _gameSessionService.GetAccumulatedScoresAsync(roomCode);
-            var updatedPlayers = await _roomService.GetPlayersAsync(roomCode);
-
-            await _notificationService.NotifyRoomAsync(roomCode, "GameCompleted", new
-            {
-                gameType = "ContestantGuess",
-                currentGameNumber,
-                accumulatedScores,
-                players = updatedPlayers
-            });
-
-            // Check if we should show drinking wheel (after games 2 and 4)
-            if (currentGameNumber == 2 || currentGameNumber == 4)
-            {
-                await _gameSessionService.ShowDrinkingWheelAsync(roomCode);
-                await _notificationService.NotifyRoomAsync(roomCode, "ShowDrinkingWheel");
-            }
-        }
+        await CompleteGameAndCheckDrinkingWheelAsync(roomCode, "ContestantGuess", roundScores);
     }
 
     private Question? GetCurrentQuestion(string roomCode)
@@ -380,6 +332,34 @@ public class GameHub : Hub
     private ContestantGuessQuestion? GetCurrentContestantGuessQuestion(string roomCode)
     {
         return _contestantGuessService.GetCurrentQuestion(roomCode);
+    }
+
+    private async Task CompleteGameAndCheckDrinkingWheelAsync(string roomCode, string gameType, Dictionary<string, int> roundScores)
+    {
+        var sessionActive = await _gameSessionService.IsGameSessionActiveAsync(roomCode);
+        if (!sessionActive) return;
+
+        await _gameSessionService.CompleteGameAsync(roomCode, gameType, roundScores);
+
+        var currentGameNumber = await _gameSessionService.GetCurrentGameNumberAsync(roomCode);
+        var accumulatedScores = await _gameSessionService.GetAccumulatedScoresAsync(roomCode);
+        var updatedPlayers = await _roomService.GetPlayersAsync(roomCode);
+
+        await _notificationService.NotifyRoomAsync(roomCode, "GameCompleted", new
+        {
+            gameType,
+            currentGameNumber,
+            accumulatedScores,
+            players = updatedPlayers
+        });
+
+        // Check if we should show drinking wheel (after games 2 and 4)
+        if (currentGameNumber == GameHubConstants.DrinkingWheelAfterGame2 || 
+            currentGameNumber == GameHubConstants.DrinkingWheelAfterGame4)
+        {
+            await _gameSessionService.ShowDrinkingWheelAsync(roomCode);
+            await _notificationService.NotifyRoomAsync(roomCode, "ShowDrinkingWheel");
+        }
     }
 
     // Game Session Methods
@@ -395,6 +375,8 @@ public class GameHub : Hub
         await _notificationService.NotifyRoomAsync(roomCode, "GameSessionStarted");
     }
 
+    // Note: CompleteGame hub method is not currently used as games complete automatically
+    // when they end. Kept for potential future use or manual game completion.
     public async Task CompleteGame(string gameType, Dictionary<string, int> gameScores)
     {
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
@@ -403,26 +385,7 @@ public class GameHub : Hub
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
 
-        await _gameSessionService.CompleteGameAsync(roomCode, gameType, gameScores);
-        
-        var currentGameNumber = await _gameSessionService.GetCurrentGameNumberAsync(roomCode);
-        var accumulatedScores = await _gameSessionService.GetAccumulatedScoresAsync(roomCode);
-        var players = await _roomService.GetPlayersAsync(roomCode);
-
-        await _notificationService.NotifyRoomAsync(roomCode, "GameCompleted", new
-        {
-            gameType,
-            currentGameNumber,
-            accumulatedScores,
-            players
-        });
-
-        // Check if we should show drinking wheel (after games 2 and 4)
-        if (currentGameNumber == 2 || currentGameNumber == 4)
-        {
-            await _gameSessionService.ShowDrinkingWheelAsync(roomCode);
-            await _notificationService.NotifyRoomAsync(roomCode, "ShowDrinkingWheel");
-        }
+        await CompleteGameAndCheckDrinkingWheelAsync(roomCode, gameType, gameScores);
     }
 
     public async Task SpinDrinkingWheel()
