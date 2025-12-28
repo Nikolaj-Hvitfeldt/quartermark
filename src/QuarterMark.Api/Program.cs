@@ -21,6 +21,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddSingleton<IGameRoomService, GameRoomService>();
 builder.Services.AddScoped<IWouldILieService, WouldILieService>();
 builder.Services.AddScoped<IContestantGuessService, ContestantGuessService>();
+builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<ISignalRNotificationService, SignalRNotificationService>();
 
 var app = builder.Build();

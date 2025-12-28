@@ -84,6 +84,16 @@ export interface ContestantGuessAnswerRevealedData {
   roundScores: Record<string, number>;
 }
 
+export interface DrinkingWheelHostProps {
+  players: PlayerDto[];
+  onSpinComplete: () => void;
+}
+
+export interface DrinkingWheelPlayerProps {
+  playerName: string;
+  onSpinComplete?: () => void;
+}
+
 // Game State
 export interface CurrentQuestion {
   imageUrl: string;

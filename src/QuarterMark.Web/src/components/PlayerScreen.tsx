@@ -4,13 +4,14 @@ import { usePlayerStore } from '../stores/playerStore';
 import signalRService from '../services/signalRService';
 import WouldILiePlayer from './WouldILiePlayer';
 import ContestantGuessPlayer from './ContestantGuessPlayer';
+import DrinkingWheelPlayer from './DrinkingWheelPlayer';
 import { PlayerScreenProps } from '../types';
 import './PlayerScreen.css';
 
 function PlayerScreen({ onBack }: PlayerScreenProps) {
   const { connection, roomCode, players, error, isConnected, joinRoom } = useGameRoom();
   const { playerName, roomCodeInput, setPlayerName, setRoomCodeInput } = usePlayerStore();
-  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", or "contestantGuess"
+  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", or "drinkingWheel"
 
   useEffect(() => {
     if (!connection) return;
@@ -23,12 +24,18 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       setCurrentGame("contestantGuess");
     };
 
+    const handleShowDrinkingWheel = () => {
+      setCurrentGame("drinkingWheel");
+    };
+
     signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
     signalRService.on('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
+    signalRService.on('ShowDrinkingWheel', handleShowDrinkingWheel);
 
     return () => {
       signalRService.off('WouldILieRoundStarted', handleWouldILieRoundStarted);
       signalRService.off('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
+      signalRService.off('ShowDrinkingWheel', handleShowDrinkingWheel);
     };
   }, [connection]);
 
@@ -78,6 +85,10 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
             Join Room
           </button>
         </div>
+      ) : currentGame === "drinkingWheel" ? (
+        <DrinkingWheelPlayer
+          playerName={playerName}
+        />
       ) : currentGame === "wouldILie" ? (
         <WouldILiePlayer
           connection={connection}
@@ -112,6 +123,17 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
 
           <div className="waiting-message">
             <p>Waiting for host to start the game...</p>
+          </div>
+          
+          {/* TEST BUTTONS - Remove these after testing */}
+          <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #374151' }}>
+            <h4 style={{ marginBottom: '1rem', color: '#9ca3af' }}>🧪 Test Mode</h4>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setCurrentGame("drinkingWheel")}
+            >
+              Test Drinking Wheel
+            </button>
           </div>
         </div>
       )}

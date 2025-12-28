@@ -9,5 +9,6 @@ public class GameRoom
     public Question? CurrentQuestion { get; set; }
     public ContestantGuessRound? ContestantGuessRound { get; set; }
     public ContestantGuessQuestion? CurrentContestantGuessQuestion { get; set; }
+    public GameSession? GameSession { get; set; }
 }
 
