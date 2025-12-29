@@ -447,13 +447,8 @@ public class GameHub : Hub
             players = updatedPlayers
         });
 
-        // Check if we should show drinking wheel (after games 2 and 4)
-        if (currentGameNumber == GameHubConstants.DrinkingWheelAfterGame2 || 
-            currentGameNumber == GameHubConstants.DrinkingWheelAfterGame4)
-        {
-            await _gameSessionService.ShowDrinkingWheelAsync(roomCode);
-            await _notificationService.NotifyRoomAsync(roomCode, "ShowDrinkingWheel");
-        }
+        // Don't automatically show drinking wheel - let the frontend decide when to show it
+        // The frontend will show completion screen first, then drinking wheel after "Continue to Next Game"
     }
 
     // Game Session Methods
@@ -490,6 +485,12 @@ public class GameHub : Hub
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
 
+        // Notify all players that the wheel is starting to spin
+        await _notificationService.NotifyRoomAsync(roomCode, "DrinkingWheelSpinning");
+        
+        // Wait a bit for the animation to start, then get the result
+        await Task.Delay(2000);
+        
         var selectedPlayer = await _gameSessionService.SpinDrinkingWheelAsync(roomCode);
         
         await _notificationService.NotifyRoomAsync(roomCode, "DrinkingWheelResult", new

@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import signalRService from "../services/signalRService";
-import { GAME_CONSTANTS } from "../utils/gameUtils";
 import { DrinkingWheelHostProps } from "../types";
-import { BottleSvg } from "./BottleSvg";
+import { PieChartWheel } from "./PieChartWheel";
+import { Confetti } from "./Confetti";
+import { WheelHeader } from "./WheelHeader";
+import { useDrinkingWheel } from "../hooks/useDrinkingWheel";
 import "./DrinkingWheel.css";
 import "./DrinkingWheelHost.css";
 
 function DrinkingWheelHost({ players, onSpinComplete }: DrinkingWheelHostProps) {
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+  const { isSpinning, selectedPlayer } = useDrinkingWheel();
 
   const spinMutation = useMutation({
     mutationFn: async () => {
@@ -17,72 +17,47 @@ function DrinkingWheelHost({ players, onSpinComplete }: DrinkingWheelHostProps) 
     },
   });
 
-  useEffect(() => {
-    const handleWheelResult = (data: { selectedPlayer: string }) => {
-      setSelectedPlayer(data.selectedPlayer);
-      setIsSpinning(false);
-      
-      // Notify parent after a delay
-      setTimeout(() => {
-        if (onSpinComplete) {
-          onSpinComplete();
-        }
-      }, GAME_CONSTANTS.DRINKING_WHEEL_SPIN_COMPLETE_DELAY);
-    };
-
-    signalRService.on("DrinkingWheelResult", handleWheelResult);
-
-    return () => {
-      signalRService.off("DrinkingWheelResult", handleWheelResult);
-    };
-  }, [onSpinComplete]);
-
   const handleSpin = async () => {
-    setIsSpinning(true);
-    setSelectedPlayer(null);
     await spinMutation.mutateAsync();
   };
 
   const nonHostPlayers = players.filter((p) => !p.isHost);
+  const showConfetti = selectedPlayer !== null && !isSpinning;
 
   return (
     <div className="drinking-wheel-host">
+      <Confetti active={showConfetti} />
       <div className="wheel-container">
-        <h2>🍺 Smirnoff Ice Wheel 🍺</h2>
-        <p className="wheel-subtitle">Time to spin the wheel!</p>
+        <WheelHeader selectedPlayer={selectedPlayer} isSpinning={isSpinning} subtitle="Time to spin the wheel!" />
         
-        <div className={`bottle-wheel ${isSpinning ? "spinning" : ""}`}>
-          <BottleSvg className="bottle-svg" />
-        </div>
-
-        {selectedPlayer && !isSpinning && (
-          <div className="selected-player">
-            <h3>🎉 {selectedPlayer} must drink! 🎉</h3>
-            <p className="drink-message">Cheers! 🍻</p>
-          </div>
+        {nonHostPlayers.length > 0 ? (
+          <PieChartWheel
+            players={nonHostPlayers}
+            selectedPlayer={selectedPlayer}
+            isSpinning={isSpinning}
+          />
+        ) : (
+          <p>No players available to spin for</p>
         )}
 
-        <button
-          className="btn btn-primary btn-large spin-button"
-          onClick={handleSpin}
-          disabled={isSpinning}
-        >
-          {isSpinning ? "Spinning..." : "Spin the Wheel!"}
-        </button>
+        {!selectedPlayer && (
+          <button
+            className="btn btn-primary btn-large spin-button"
+            onClick={handleSpin}
+            disabled={isSpinning}
+          >
+            {isSpinning ? "Spinning..." : "Spin the Wheel!"}
+          </button>
+        )}
 
-        <div className="player-list-wheel">
-          <h4>Players in the running:</h4>
-          <div className="players-grid">
-            {nonHostPlayers.map((player, index) => (
-              <div
-                key={index}
-                className={`player-chip ${selectedPlayer === player.name ? "selected" : ""}`}
-              >
-                {player.name}
-              </div>
-            ))}
-          </div>
-        </div>
+        {selectedPlayer && !isSpinning && (
+          <button
+            className="btn btn-primary btn-large continue-button"
+            onClick={() => onSpinComplete?.()}
+          >
+            Continue →
+          </button>
+        )}
       </div>
     </div>
   );

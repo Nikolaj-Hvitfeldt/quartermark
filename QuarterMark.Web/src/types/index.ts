@@ -92,7 +92,7 @@ export interface DrinkingWheelHostProps {
 }
 
 export interface DrinkingWheelPlayerProps {
-  playerName: string;
+  players: PlayerDto[];
 }
 
 // Game State

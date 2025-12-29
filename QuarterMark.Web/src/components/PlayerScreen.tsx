@@ -110,7 +110,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
         />
       ) : currentGame === "drinkingWheel" ? (
         <DrinkingWheelPlayer
-          playerName={playerName}
+          players={players}
         />
       ) : currentGame === "wouldILie" ? (
         <WouldILiePlayer
