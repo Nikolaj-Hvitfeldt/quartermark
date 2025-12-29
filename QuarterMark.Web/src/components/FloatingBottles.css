@@ -1,0 +1,162 @@
+.floating-bottles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.floating-bottle {
+  position: absolute;
+  width: 100px;
+  height: auto;
+  opacity: 0.25;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4)) brightness(1.15) saturate(1.2);
+  animation: float 8s ease-in-out infinite;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  border-radius: 8px;
+}
+
+.floating-bottle:hover {
+  transform: scale(1.15) rotate(10deg);
+  opacity: 0.35;
+}
+
+/* Left side - 3 far away */
+.bottle-1 {
+  top: 10%;
+  left: 3%;
+  animation-delay: 0s;
+  animation-duration: 10s;
+  transform: scale(0.85);
+}
+
+.bottle-2 {
+  top: 45%;
+  left: 2%;
+  animation-delay: 2s;
+  animation-duration: 12s;
+  transform: scale(0.9);
+}
+
+.bottle-3 {
+  bottom: 15%;
+  left: 4%;
+  animation-delay: 4s;
+  animation-duration: 11s;
+  transform: scale(0.8);
+}
+
+/* Left side - 3 close to pie */
+.bottle-4 {
+  top: 20%;
+  left: 28%;
+  animation-delay: 1s;
+  animation-duration: 13s;
+  transform: scale(0.95);
+}
+
+.bottle-5 {
+  top: 50%;
+  left: 32%;
+  animation-delay: 0.5s;
+  animation-duration: 11s;
+  transform: scale(0.9);
+}
+
+.bottle-6 {
+  bottom: 25%;
+  left: 30%;
+  animation-delay: 3s;
+  animation-duration: 12s;
+  transform: scale(0.85);
+}
+
+/* Right side - 3 far away */
+.bottle-7 {
+  top: 10%;
+  right: 3%;
+  animation-delay: 2.5s;
+  animation-duration: 14s;
+  transform: scale(0.85);
+}
+
+.bottle-8 {
+  top: 45%;
+  right: 2%;
+  animation-delay: 1.5s;
+  animation-duration: 10s;
+  transform: scale(0.9);
+}
+
+.bottle-9 {
+  bottom: 15%;
+  right: 4%;
+  animation-delay: 0.8s;
+  animation-duration: 13s;
+  transform: scale(0.8);
+}
+
+/* Right side - 3 close to pie */
+.bottle-10 {
+  top: 20%;
+  right: 28%;
+  animation-delay: 1.2s;
+  animation-duration: 11s;
+  transform: scale(0.95);
+}
+
+.bottle-11 {
+  top: 50%;
+  right: 32%;
+  animation-delay: 2.2s;
+  animation-duration: 12s;
+  transform: scale(0.9);
+}
+
+.bottle-12 {
+  bottom: 25%;
+  right: 30%;
+  animation-delay: 3.5s;
+  animation-duration: 10s;
+  transform: scale(0.85);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-25px) rotate(3deg);
+  }
+}
+
+/* Add some extra bottles for more fun */
+.floating-bottle::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+

@@ -12,9 +12,9 @@ export function WheelHeader({ selectedPlayer, isSpinning, subtitle }: WheelHeade
   return (
     <>
       {showCongratulations ? (
-        <>
-          <h2>Congratulations!</h2>
-          <p className="wheel-subtitle">
+        <div className="congratulations-container">
+          <h2 className="congratulations-title">Congratulations!</h2>
+          <p className="wheel-subtitle congratulations-subtitle">
             Enjoy your{' '}
             <img
               src="/images/smirnoff-logo.png"
@@ -22,10 +22,12 @@ export function WheelHeader({ selectedPlayer, isSpinning, subtitle }: WheelHeade
               className="smirnoff-logo-inline"
             />
           </p>
-        </>
+        </div>
       ) : (
         <>
-          <h2>🍺 Smirnoff Ice Wheel 🍺</h2>
+          <h2>
+            <span className="emoji">🍺</span> Smirnoff Ice Wheel <span className="emoji">🍺</span>
+          </h2>
           <p className="wheel-subtitle">
             {subtitle || (isSpinning ? 'Spinning the wheel...' : 'Waiting for host to spin...')}
           </p>
