@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import signalRService from '../services/signalRService';
 import { useContestantGuessStore } from '../stores/contestantGuessStore';
+import { GAME_CONSTANTS } from '../utils/gameUtils';
 import { ContestantGuessPlayerProps, ContestantGuessQuestionShownData, ContestantGuessAnswerRevealedData } from '../types';
 import './ContestantGuessPlayer.css';
 
@@ -56,6 +57,10 @@ function ContestantGuessPlayer({ connection, playerName, onBack }: ContestantGue
     const handleRoundEnded = () => {
       setRoundState('Waiting');
       setRoundScores({});
+      // After a short delay, go back to show completion screen
+      setTimeout(() => {
+        onBack();
+      }, GAME_CONSTANTS.PLAYER_ROUND_END_DELAY_CONTESTANT_GUESS);
     };
 
     signalRService.on('ContestantGuessRoundStarted', handleRoundStarted);

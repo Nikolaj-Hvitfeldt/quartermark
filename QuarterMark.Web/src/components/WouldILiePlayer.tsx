@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import signalRService from '../services/signalRService';
 import { usePlayerGameStore } from '../stores/playerGameStore';
 import { useGameRoom } from '../hooks/useGameRoom';
+import { GAME_CONSTANTS } from '../utils/gameUtils';
 import { WouldILiePlayerProps, QuestionShownData, AnswerRevealedData, ClaimDto } from '../types';
 import './WouldILiePlayer.css';
 
@@ -80,7 +81,10 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
 
     const handleRoundEnded = () => {
       setRoundState('RoundEnded');
-      // Keep roundScores to show final standings
+      // After a short delay, go back to show completion screen
+      setTimeout(() => {
+        onBack();
+      }, GAME_CONSTANTS.PLAYER_ROUND_END_DELAY_WOULD_ILIE);
     };
 
     signalRService.on('WouldILieRoundStarted', handleRoundStarted);
