@@ -15,6 +15,8 @@ export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartW
   const [isAnimating, setIsAnimating] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
   const hasStartedSpinningRef = useRef(false);
+  const hasResultBeenShownRef = useRef(false); // Track if we've shown a result to prevent restarting
+  const hasStartedFinalAnimationRef = useRef(false); // Track if we've started the final animation
   const currentRotationRef = useRef(-90); // Track current rotation in a ref to avoid dependency issues
 
   const playerCount = players.length;
@@ -27,17 +29,19 @@ export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartW
     '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6'
   ];
 
-  // Reset spinning state when isSpinning becomes false
+  // Reset spinning state when isSpinning becomes false, but only if we don't have a selected player
+  // This prevents the spinner from restarting after a result is shown
   useEffect(() => {
-    if (!isSpinning) {
+    if (!isSpinning && !selectedPlayer && !hasResultBeenShownRef.current) {
       hasStartedSpinningRef.current = false;
+      hasStartedFinalAnimationRef.current = false; // Reset final animation flag too
       setIsAnimating(false);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
     }
-  }, [isSpinning]);
+  }, [isSpinning, selectedPlayer]);
 
   // Update ref when rotation changes
   useEffect(() => {
@@ -46,7 +50,7 @@ export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartW
 
   // Start spinning animation
   useEffect(() => {
-    if (isSpinning && !selectedPlayer && !hasStartedSpinningRef.current) {
+    if (isSpinning && !selectedPlayer && !hasStartedSpinningRef.current && !hasResultBeenShownRef.current) {
       hasStartedSpinningRef.current = true;
       setIsAnimating(true);
       // Start spinning with at least 1 full rotation plus some extra
@@ -89,9 +93,11 @@ export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartW
     }
   }, [isSpinning, selectedPlayer]); // Removed spinnerRotation from dependencies
 
-  // Calculate the target rotation when result is received
+  // Calculate the target rotation when result is received - smoothly transition to final position WITHOUT additional full rotation
   useEffect(() => {
-    if (selectedPlayer && !isSpinning) {
+    if (selectedPlayer && !isSpinning && !hasStartedFinalAnimationRef.current) {
+      hasResultBeenShownRef.current = true; // Mark that we've shown a result
+      hasStartedFinalAnimationRef.current = true; // Mark that we've started the final animation
       const playerIndex = players.findIndex(p => p.name === selectedPlayer);
       if (playerIndex !== -1) {
         // Cancel any ongoing animation first
@@ -108,30 +114,26 @@ export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartW
         // Calculate the center angle of the selected player's slice
         // Slices are drawn starting from -90 degrees (top)
         // Slice center in SVG coordinates: -90 + playerIndex * sliceAngle + sliceAngle / 2
-        // The spinner starts at -90 degrees (pointing up)
-        // To point at the selected slice, we need to rotate to that angle
         const sliceCenterAngle = -90 + playerIndex * sliceAngle + sliceAngle / 2;
         
         // Get current rotation normalized to 0-360
         const currentNormalized = ((currentRotation % 360) + 360) % 360;
         
         // Calculate how much we need to rotate from current position to point at the slice
-        // We want the spinner to point at the slice center
-        let targetRotation = sliceCenterAngle;
-        // Normalize to 0-360
-        targetRotation = ((targetRotation % 360) + 360) % 360;
+        let targetNormalized = ((sliceCenterAngle % 360) + 360) % 360;
         
-        // Calculate rotation needed
-        let rotationNeeded = targetRotation - currentNormalized;
-        if (rotationNeeded < 0) rotationNeeded += 360;
+        // Calculate shortest rotation path
+        let rotationNeeded = targetNormalized - currentNormalized;
+        if (rotationNeeded > 180) rotationNeeded -= 360;
+        if (rotationNeeded < -180) rotationNeeded += 360;
         
-        // Ensure at least 1 full rotation, then add the needed rotation
+        // Smoothly transition from current position to target (no extra full rotation)
         const startRotation = currentRotation;
-        const finalRotation = startRotation + 360 + rotationNeeded;
+        const finalRotation = startRotation + rotationNeeded;
         
         // Animate to final position with continuous updates
         const startTime = Date.now();
-        const duration = 3000;
+        const duration = 1500; // Shorter duration for final positioning
         
         const animate = () => {
           const elapsed = Date.now() - startTime;

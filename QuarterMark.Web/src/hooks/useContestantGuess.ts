@@ -29,12 +29,16 @@ export function useContestantGuess(connection: any) {
     roundScores,
     answerRevealed,
     correctAnswer,
+    roundState,
+    hasGuessed,
     setRoundActive,
     setCurrentQuestion,
     setGuesses,
     setRoundScores,
     setAnswerRevealed,
     setCorrectAnswer,
+    setRoundState,
+    setHasGuessed,
   } = useContestantGuessStore();
 
   useEffect(() => {
@@ -45,6 +49,8 @@ export function useContestantGuess(connection: any) {
       setRoundScores({});
       setCurrentQuestion(null);
       setAnswerRevealed(false);
+      setRoundState('Waiting');
+      setHasGuessed(false);
     };
 
     const handleQuestionShown = (data: ContestantGuessQuestionShownData) => {
@@ -55,6 +61,8 @@ export function useContestantGuess(connection: any) {
       setGuesses({});
       setAnswerRevealed(false);
       setCorrectAnswer('');
+      setRoundState('ShowingImage');
+      setHasGuessed(false);
     };
 
     const handleGuessReceived = (data: ContestantGuessReceivedData) => {
@@ -67,25 +75,22 @@ export function useContestantGuess(connection: any) {
       setAnswerRevealed(true);
       setCorrectAnswer(data.correctAnswer);
       setGuesses(data.guesses);
+      setRoundState('Revealed');
     };
 
-    const handleRoundEnded = () => {
-      setRoundActive(false);
-      setCurrentQuestion(null);
-    };
+    // Note: RoundEnded is handled by the component for navigation
+    // The hook doesn't need to reset state here since the component will navigate away
 
     signalRService.on('ContestantGuessRoundStarted', handleRoundStarted);
     signalRService.on('ContestantGuessQuestionShown', handleQuestionShown);
     signalRService.on('ContestantGuessReceived', handleGuessReceived);
     signalRService.on('ContestantGuessAnswerRevealed', handleAnswerRevealed);
-    signalRService.on('ContestantGuessRoundEnded', handleRoundEnded);
 
     return () => {
       signalRService.off('ContestantGuessRoundStarted', handleRoundStarted);
       signalRService.off('ContestantGuessQuestionShown', handleQuestionShown);
       signalRService.off('ContestantGuessReceived', handleGuessReceived);
       signalRService.off('ContestantGuessAnswerRevealed', handleAnswerRevealed);
-      signalRService.off('ContestantGuessRoundEnded', handleRoundEnded);
     };
   }, [
     connection,
@@ -120,6 +125,7 @@ export function useContestantGuess(connection: any) {
   const submitGuessMutation = useMutation({
     mutationFn: async (guessedContestantName: string) => {
       await signalRService.invoke('SubmitContestantGuess', guessedContestantName);
+      setHasGuessed(true);
     },
   });
 
@@ -168,6 +174,8 @@ export function useContestantGuess(connection: any) {
     roundScores,
     answerRevealed,
     correctAnswer,
+    roundState,
+    hasGuessed,
     startRound,
     showQuestion,
     submitGuess,

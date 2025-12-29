@@ -33,6 +33,14 @@ public class ContestantGuessService : IContestantGuessService
         var room = GetRoom(roomCode);
         if (room == null || room.ContestantGuessRound == null) return Task.FromResult(false);
 
+        // Ensure we have exactly 4 answers
+        if (possibleAnswers.Count != 4)
+            return Task.FromResult(false);
+
+        // Ensure correct answer is in the list
+        if (!possibleAnswers.Contains(correctAnswer))
+            return Task.FromResult(false);
+
         var question = new ContestantGuessQuestion
         {
             ImageUrl = imageUrl,

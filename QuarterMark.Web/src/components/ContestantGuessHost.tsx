@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import { useContestantGuess } from "../hooks/useContestantGuess";
 import { ContestantGuessHostProps } from "../types";
 import signalRService from "../services/signalRService";
+import { ImageDisplay } from "./ImageDisplay";
+import { AnswerGrid } from "./AnswerGrid";
+import { ContestantGuessRoundScores } from "./ContestantGuessRoundScores";
+import { CONTESTANT_GUESS_QUESTIONS } from "../data/contestantGuessQuestions";
+import "./ContestantGuess.css";
 import "./ContestantGuessHost.css";
 
 function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHostProps) {
@@ -18,49 +23,66 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
     endRound,
   } = useContestantGuess(connection);
 
-  const [imageUrl, setImageUrl] = useState<string>("");
-  const [correctAnswerInput, setCorrectAnswerInput] = useState<string>("");
-  const [possibleAnswers, setPossibleAnswers] = useState<string>(""); // Comma-separated list
-  const [questionNumber, setQuestionNumber] = useState<number>(0);
-
-  // For tracking guess progress
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [guessProgress, setGuessProgress] = useState({ total: 0, received: 0 });
+
+  useEffect(() => {
+    if (!connection) return;
+
+    const handleGuessReceived = (data: { totalGuesses: number; totalPlayers: number }) => {
+      setGuessProgress({ total: data.totalPlayers, received: data.totalGuesses });
+    };
+
+    signalRService.on("ContestantGuessReceived", handleGuessReceived);
+
+    return () => {
+      signalRService.off("ContestantGuessReceived", handleGuessReceived);
+    };
+  }, [connection]);
 
   const handleStartRound = async () => {
     try {
       await startRound();
-      setQuestionNumber(0);
+      setCurrentQuestionIndex(0);
+      // Automatically show the first question
+      if (CONTESTANT_GUESS_QUESTIONS.length > 0) {
+        const firstQuestion = CONTESTANT_GUESS_QUESTIONS[0];
+        await showQuestion(
+          firstQuestion.imageUrl,
+          firstQuestion.correctAnswer,
+          [...firstQuestion.answers]
+        );
+        setGuessProgress({ total: players.filter(p => !p.isHost).length, received: 0 });
+      }
     } catch (error) {
       console.error("Error starting round:", error);
     }
   };
 
-  const handleShowQuestion = async () => {
-    if (!imageUrl || !correctAnswerInput || !possibleAnswers) {
-      alert("Please enter image URL, correct answer, and possible answers");
-      return;
-    }
-
-    const answersList = possibleAnswers.split(',').map(a => a.trim()).filter(a => a.length > 0);
-    if (!answersList.includes(correctAnswerInput.trim())) {
-      alert("Correct answer must be in the list of possible answers");
+  const handleNextQuestion = async () => {
+    const nextIndex = currentQuestionIndex + 1;
+    
+    if (nextIndex >= CONTESTANT_GUESS_QUESTIONS.length) {
+      // All questions completed, end the round
+      await handleEndRound();
       return;
     }
 
     try {
-      await showQuestion(imageUrl, correctAnswerInput.trim(), answersList);
-      setQuestionNumber((prev) => prev + 1);
-      setImageUrl("");
-      setCorrectAnswerInput("");
-      setPossibleAnswers("");
-      const nonHostPlayers = players.filter((p) => !p.isHost);
-      setGuessProgress({ total: nonHostPlayers.length, received: 0 });
+      const nextQuestion = CONTESTANT_GUESS_QUESTIONS[nextIndex];
+      await showQuestion(
+        nextQuestion.imageUrl,
+        nextQuestion.correctAnswer,
+        [...nextQuestion.answers]
+      );
+      setCurrentQuestionIndex(nextIndex);
+      setGuessProgress({ total: players.filter(p => !p.isHost).length, received: 0 });
     } catch (error) {
-      console.error("Error showing question:", error);
+      console.error("Error showing next question:", error);
     }
   };
 
-  const handleReveal = async () => {
+  const handleRevealAnswer = async () => {
     try {
       await revealAnswer();
     } catch (error) {
@@ -69,195 +91,93 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
   };
 
   const handleEndRound = async () => {
-    if (
-      window.confirm(
-        "End the round? Host will receive points equal to lowest scoring player."
-      )
-    ) {
-      try {
-        await endRound();
-        setQuestionNumber(0);
-      } catch (error) {
-        console.error("Error ending round:", error);
-      }
+    try {
+      await endRound();
+    } catch (error) {
+      console.error("Error ending round:", error);
     }
   };
 
-  // Listen for guess progress updates
-  useEffect(() => {
-    const handleGuessReceived = (data: any) => {
-      setGuessProgress((prev) => ({
-        total: prev.total,
-        received: data.totalGuesses,
-      }));
-    };
-
-    signalRService.on("ContestantGuessReceived", handleGuessReceived);
-
-    return () => {
-      signalRService.off("ContestantGuessReceived", handleGuessReceived);
-    };
-  }, []);
+  const nonHostPlayers = players.filter((p) => !p.isHost);
 
   if (!roundActive) {
     return (
       <div className="contestant-guess-host">
         <button className="btn btn-back" onClick={onBack}>
-          ← Back to Lobby
+          ← Back
         </button>
-        <div className="round-setup">
-          <h2>Contestant Guess - Round Setup</h2>
-          <p>
-            Start a round where players guess which contestant is in the picture with a celebrity.
-          </p>
-          <button
-            className="btn btn-primary btn-large"
-            onClick={handleStartRound}
-          >
-            Start Round
-          </button>
-        </div>
+        <h2>Contestant Guess</h2>
+        <button className="btn btn-primary btn-large" onClick={handleStartRound}>
+          Start Contestant Guess Round
+        </button>
       </div>
     );
   }
 
-  if (!currentQuestion) {
+  if (currentQuestion) {
+    const allGuessed = guessProgress.received === guessProgress.total && guessProgress.total > 0;
+    const isLastQuestion = currentQuestionIndex + 1 >= CONTESTANT_GUESS_QUESTIONS.length;
+
     return (
       <div className="contestant-guess-host">
         <button className="btn btn-back" onClick={onBack}>
-          ← Back to Lobby
+          ← Back
         </button>
-        <div className="round-controls">
-          <h2>Question {questionNumber + 1}</h2>
-          <div className="setup-form">
-            <div className="form-group">
-              <label>Image URL:</label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://..."
-                className="input"
-              />
-            </div>
-            <div className="form-group">
-              <label>Correct Answer (Contestant Name):</label>
-              <input
-                type="text"
-                value={correctAnswerInput}
-                onChange={(e) => setCorrectAnswerInput(e.target.value)}
-                placeholder="Enter contestant name"
-                className="input"
-              />
-            </div>
-            <div className="form-group">
-              <label>Possible Answers (comma-separated):</label>
-              <input
-                type="text"
-                value={possibleAnswers}
-                onChange={(e) => setPossibleAnswers(e.target.value)}
-                placeholder="Contestant1, Contestant2, Contestant3"
-                className="input"
-              />
-            </div>
-            <button
-              className="btn btn-primary btn-large"
-              onClick={handleShowQuestion}
-              disabled={!imageUrl || !correctAnswerInput || !possibleAnswers}
-            >
-              Show Question to Players
-            </button>
-          </div>
-          {Object.keys(roundScores).length > 0 && (
-            <div className="round-scores">
-              <h3>Round Scores (so far)</h3>
-              <div className="scores-list">
-                {Object.entries(roundScores)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([name, score]) => (
-                    <div key={name} className="score-item">
-                      {name}: {score} pts
-                    </div>
-                  ))}
+        <h3 className="question-progress-header">Question {currentQuestionIndex + 1} of {CONTESTANT_GUESS_QUESTIONS.length}</h3>
+        <div className="contestant-guess-question-container">
+          <ImageDisplay imageUrl={currentQuestion.imageUrl} />
+
+          {!answerRevealed ? (
+            <>
+              <div className="guess-progress">
+                <p>
+                  Guesses received: {guessProgress.received} / {guessProgress.total}
+                </p>
               </div>
-            </div>
+              <AnswerGrid answers={currentQuestion.possibleAnswers} />
+              <button
+                className="btn btn-primary"
+                onClick={handleRevealAnswer}
+                disabled={!allGuessed}
+              >
+                {allGuessed ? "Reveal Answer" : `Waiting for ${guessProgress.total - guessProgress.received} more guess(es)`}
+              </button>
+            </>
+          ) : (
+            <>
+              <AnswerGrid
+                answers={currentQuestion.possibleAnswers}
+                correctAnswer={revealedCorrectAnswer}
+                guesses={guesses}
+                revealed={true}
+              />
+              <ContestantGuessRoundScores
+                roundScores={roundScores}
+                players={players}
+              />
+              <button className="btn btn-primary" onClick={handleNextQuestion}>
+                {isLastQuestion ? "End Round" : "Next Question"}
+              </button>
+            </>
           )}
-          <button className="btn btn-secondary" onClick={handleEndRound}>
-            End Round
-          </button>
         </div>
       </div>
     );
   }
 
+  // Fallback if round is active but no current question
   return (
     <div className="contestant-guess-host">
       <button className="btn btn-back" onClick={onBack}>
-        ← Back to Lobby
+        ← Back
       </button>
-
-      <div className="question-display">
-        <h2>Question {questionNumber}</h2>
-        {currentQuestion.imageUrl && (
-          <div className="image-preview">
-            <img src={currentQuestion.imageUrl} alt="Question" />
-          </div>
-        )}
-
-        <div className="guessing-progress">
-          <p>
-            Guesses: {guessProgress.received}/{guessProgress.total}
-          </p>
-          <button
-            className="btn btn-primary btn-large"
-            onClick={handleReveal}
-          >
-            Reveal Answer
-          </button>
-        </div>
-
-        {Object.keys(roundScores).length > 0 && (
-          <div className="round-scores">
-            <h3>Round Scores</h3>
-            <div className="scores-list">
-              {Object.entries(roundScores)
-                .sort((a, b) => b[1] - a[1])
-                .map(([name, score]) => (
-                  <div key={name} className="score-item">
-                    {name}: {score} pts
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {answerRevealed && (
-          <div className="answer-reveal">
-            <h3>Answer Revealed!</h3>
-            <p className="correct-answer">Correct Answer: <strong>{revealedCorrectAnswer}</strong></p>
-            <div className="guesses-summary">
-              <h4>Guesses:</h4>
-              {Object.entries(guesses).map(([playerName, guessedAnswer]) => (
-                <div key={playerName} className="guess-item">
-                  {playerName}: {guessedAnswer} {guessedAnswer === revealedCorrectAnswer ? "✓" : "✗"}
-                </div>
-              ))}
-            </div>
-            <button
-              className="btn btn-secondary btn-large"
-              onClick={() => {
-                // Reset for next question
-                setGuessProgress({ total: 0, received: 0 });
-              }}
-            >
-              Next Question
-            </button>
-          </div>
-        )}
-      </div>
+      <h2>Contestant Guess</h2>
+      <p>Round active, but no question currently displayed. This should not happen.</p>
+      <button className="btn btn-secondary" onClick={handleEndRound}>
+        End Round
+      </button>
     </div>
   );
 }
 
 export default ContestantGuessHost;
-
