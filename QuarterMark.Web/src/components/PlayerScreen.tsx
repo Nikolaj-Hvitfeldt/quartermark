@@ -19,9 +19,8 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
   const { currentGameNumber, accumulatedScores } = useGameSession(connection);
   const { completedGame, clearCompletedGame } = useGameCompletion({
     connection,
-    onGameCompleted: () => {
-      setCurrentGame(null);
-    },
+    // Don't set currentGame to null here - let completedGame state handle the navigation
+    // The completion screen will be shown when completedGame is set
   });
   const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", or "drinkingWheel"
 
@@ -130,6 +129,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
         <ContestantGuessPlayer
           connection={connection}
           playerName={playerName}
+          players={players}
           onBack={() => setCurrentGame(null)}
         />
       ) : currentGame === "quiz" ? (
