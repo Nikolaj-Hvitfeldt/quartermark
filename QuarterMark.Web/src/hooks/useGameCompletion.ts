@@ -29,22 +29,12 @@ export function useGameCompletion({ connection, onGameCompleted }: UseGameComple
         onGameCompleted(data);
       }
 
-      // Handle completion screen display timing
-      if (shouldShowDrinkingWheel(data.currentGameNumber)) {
-        // Drinking wheel will be shown, store completion data for later
-        setTimeout(() => {
-          setCompletedGame({
-            gameType: data.gameType,
-            gameNumber: data.currentGameNumber,
-          });
-        }, GAME_CONSTANTS.COMPLETION_SCREEN_DELAY_AFTER_WHEEL);
-      } else {
-        // Show completion screen immediately
-        setCompletedGame({
-          gameType: data.gameType,
-          gameNumber: data.currentGameNumber,
-        });
-      }
+      // Always show completion screen first
+      // The drinking wheel will be shown after the host clicks "Continue to Next Game"
+      setCompletedGame({
+        gameType: data.gameType,
+        gameNumber: data.currentGameNumber,
+      });
     };
 
     signalRService.on('GameCompleted', handleGameCompleted);

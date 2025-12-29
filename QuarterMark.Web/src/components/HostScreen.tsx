@@ -3,7 +3,7 @@ import { useGameRoom } from "../hooks/useGameRoom";
 import { useMutation } from "@tanstack/react-query";
 import { useGameSession } from "../hooks/useGameSession";
 import { useGameCompletion } from "../hooks/useGameCompletion";
-import { GAME_CONSTANTS, getNextGameType } from "../utils/gameUtils";
+import { GAME_CONSTANTS, getNextGameType, shouldShowDrinkingWheel } from "../utils/gameUtils";
 import signalRService from "../services/signalRService";
 import WouldILieHost from "./WouldILieHost";
 import ContestantGuessHost from "./ContestantGuessHost";
@@ -67,20 +67,7 @@ function HostScreen({ onBack }: HostScreenProps) {
     }
   };
 
-  // Listen for drinking wheel event
-  useEffect(() => {
-    if (!connection || !sessionActive) return;
-
-    const handleShowDrinkingWheel = () => {
-      setInGame("drinkingWheel");
-    };
-
-    signalRService.on("ShowDrinkingWheel", handleShowDrinkingWheel);
-
-    return () => {
-      signalRService.off("ShowDrinkingWheel", handleShowDrinkingWheel);
-    };
-  }, [connection, sessionActive]);
+  // No longer listening for ShowDrinkingWheel event - we handle it manually in handleContinueToNextGame
 
   // Auto-start first game when session starts
   useEffect(() => {
@@ -96,8 +83,17 @@ function HostScreen({ onBack }: HostScreenProps) {
 
   const handleContinueToNextGame = () => {
     clearCompletedGame();
-    const nextGameType = getNextGameType(currentGameNumber);
-    setInGame(nextGameType);
+    
+    // Check if we should show drinking wheel after this game
+    if (shouldShowDrinkingWheel(currentGameNumber)) {
+      // Show drinking wheel instead of next game
+      setShowDrinkingWheel(true);
+      setInGame("drinkingWheel");
+    } else {
+      // Go to next game
+      const nextGameType = getNextGameType(currentGameNumber);
+      setInGame(nextGameType);
+    }
   };
 
   const handleEndGame = () => {
@@ -144,9 +140,11 @@ function HostScreen({ onBack }: HostScreenProps) {
         <DrinkingWheelHost
           players={players}
           onSpinComplete={() => {
+            // When host clicks "Continue" on drinking wheel, go to next game
             setShowDrinkingWheel(false);
             setInGame(null);
-            // Completion screen will be shown automatically by useGameCompletion hook
+            const nextGameType = getNextGameType(currentGameNumber);
+            setInGame(nextGameType);
           }}
         />
       ) : inGame === "wouldILie" ? (
