@@ -12,6 +12,7 @@ public class GameHub : Hub
     private readonly IWouldILieService _wouldILieService;
     private readonly IContestantGuessService _contestantGuessService;
     private readonly IQuizService _quizService;
+    private readonly ISocialMediaGuessService _socialMediaGuessService;
     private readonly IGameSessionService _gameSessionService;
     private readonly ISignalRNotificationService _notificationService;
 
@@ -20,6 +21,7 @@ public class GameHub : Hub
         IWouldILieService wouldILieService,
         IContestantGuessService contestantGuessService,
         IQuizService quizService,
+        ISocialMediaGuessService socialMediaGuessService,
         IGameSessionService gameSessionService,
         ISignalRNotificationService notificationService)
     {
@@ -27,6 +29,7 @@ public class GameHub : Hub
         _wouldILieService = wouldILieService;
         _contestantGuessService = contestantGuessService;
         _quizService = quizService;
+        _socialMediaGuessService = socialMediaGuessService;
         _gameSessionService = gameSessionService;
         _notificationService = notificationService;
     }
@@ -434,6 +437,110 @@ public class GameHub : Hub
         await CompleteGameAndCheckDrinkingWheelAsync(roomCode, "Quiz", roundScores);
     }
 
+    // Social Media Guess Game Methods
+    public async Task StartSocialMediaGuessRound()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        await _socialMediaGuessService.StartRoundAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "SocialMediaGuessRoundStarted");
+    }
+
+    public async Task ShowSocialMediaGuessQuestion(string imageUrl, string correctAnswer, List<string> possibleAnswers)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        await _socialMediaGuessService.ShowQuestionAsync(roomCode, imageUrl, correctAnswer, possibleAnswers);
+        
+        await _notificationService.NotifyRoomAsync(roomCode, "SocialMediaGuessQuestionShown", new
+        {
+            imageUrl,
+            possibleAnswers
+        });
+    }
+
+    public async Task SubmitSocialMediaGuess(string guessedContestantName)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var success = await _socialMediaGuessService.SubmitGuessAsync(roomCode, Context.ConnectionId, guessedContestantName);
+        if (!success) return;
+
+        var question = GetCurrentSocialMediaGuessQuestion(roomCode);
+        if (question == null) return;
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var nonHostPlayers = players.Where(p => !p.IsHost).ToList();
+        var totalPlayers = nonHostPlayers.Count;
+        var totalGuesses = question.Guesses.Count;
+
+        var player = players.FirstOrDefault(p => p.Name == question.Guesses.LastOrDefault().Key);
+        
+        await _notificationService.NotifyClientAsync(
+            await GetHostConnectionId(roomCode),
+            "SocialMediaGuessReceived",
+            new
+            {
+                playerName = player?.Name,
+                guessedContestantName,
+                totalGuesses,
+                totalPlayers
+            });
+    }
+
+    public async Task RevealSocialMediaGuessAnswer()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var roundScores = await _socialMediaGuessService.RevealAnswerAsync(roomCode);
+        
+        var question = GetCurrentSocialMediaGuessQuestion(roomCode);
+        if (question != null)
+        {
+            await _notificationService.NotifyRoomAsync(roomCode, "SocialMediaGuessAnswerRevealed", new
+            {
+                correctAnswer = question.CorrectAnswer,
+                guesses = question.Guesses,
+                roundScores
+            });
+        }
+    }
+
+    public async Task EndSocialMediaGuessRound()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var roundScores = await _socialMediaGuessService.EndRoundAsync(roomCode);
+        
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "SocialMediaGuessRoundEnded", new
+        {
+            finalScores = players,
+            roundScores
+        });
+        
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+
+        await CompleteGameAndCheckDrinkingWheelAsync(roomCode, "SocialMediaGuess", roundScores);
+    }
+
     public async Task CreateDummyPlayer(string playerName)
     {
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
@@ -536,6 +643,11 @@ public class GameHub : Hub
     private QuizQuestion? GetCurrentQuizQuestion(string roomCode)
     {
         return _quizService.GetCurrentQuestion(roomCode);
+    }
+
+    private SocialMediaGuessQuestion? GetCurrentSocialMediaGuessQuestion(string roomCode)
+    {
+        return _socialMediaGuessService.GetCurrentQuestion(roomCode);
     }
 
     private async Task CompleteGameAndCheckDrinkingWheelAsync(string roomCode, string gameType, Dictionary<string, int> roundScores)

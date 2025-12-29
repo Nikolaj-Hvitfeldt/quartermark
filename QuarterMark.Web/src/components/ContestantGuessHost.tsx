@@ -98,8 +98,6 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
     }
   };
 
-  const nonHostPlayers = players.filter((p) => !p.isHost);
-
   if (!roundActive) {
     return (
       <div className="contestant-guess-host">
@@ -156,7 +154,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
                 players={players}
               />
               <button className="btn btn-primary" onClick={handleNextQuestion}>
-                {isLastQuestion ? "End Round" : "Next Question"}
+                {isLastQuestion ? "End Round" : "Next Question →"}
               </button>
             </>
           )}

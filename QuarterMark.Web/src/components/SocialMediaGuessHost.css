@@ -1,0 +1,6 @@
+@import './SocialMediaGuess.css';
+
+.social-media-guess-host {
+  /* Specific host styles if any, otherwise inherits from SocialMediaGuess.css */
+}
+

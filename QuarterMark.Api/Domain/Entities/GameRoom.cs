@@ -11,6 +11,8 @@ public class GameRoom
     public ContestantGuessQuestion? CurrentContestantGuessQuestion { get; set; }
     public QuizRound? QuizRound { get; set; }
     public QuizQuestion? CurrentQuizQuestion { get; set; }
+    public SocialMediaGuessRound? SocialMediaGuessRound { get; set; }
+    public SocialMediaGuessQuestion? CurrentSocialMediaGuessQuestion { get; set; }
     public GameSession? GameSession { get; set; }
 }
 

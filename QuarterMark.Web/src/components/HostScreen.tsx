@@ -8,6 +8,7 @@ import signalRService from "../services/signalRService";
 import WouldILieHost from "./WouldILieHost";
 import ContestantGuessHost from "./ContestantGuessHost";
 import QuizHost from "./QuizHost";
+import SocialMediaGuessHost from "./SocialMediaGuessHost";
 import DrinkingWheelHost from "./DrinkingWheelHost";
 import GameCompletionScreen from "./GameCompletionScreen";
 import { HostScreenProps } from "../types";
@@ -25,7 +26,7 @@ function HostScreen({ onBack }: HostScreenProps) {
   });
   const [playerName, setPlayerName] = useState<string>("");
   const [dummyPlayerName, setDummyPlayerName] = useState<string>("");
-  const [inGame, setInGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", or "drinkingWheel"
+  const [inGame, setInGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
 
   const createDummyPlayerMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -168,6 +169,15 @@ function HostScreen({ onBack }: HostScreenProps) {
         />
       ) : inGame === "quiz" ? (
         <QuizHost
+          connection={connection}
+          players={players}
+          onBack={() => {
+            setInGame(null);
+            setCompletedGame(null);
+          }}
+        />
+      ) : inGame === "socialMediaGuess" ? (
+        <SocialMediaGuessHost
           connection={connection}
           players={players}
           onBack={() => {
