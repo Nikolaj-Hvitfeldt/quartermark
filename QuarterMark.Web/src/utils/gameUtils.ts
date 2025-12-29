@@ -7,7 +7,9 @@ export const GAME_CONSTANTS = {
   COMPLETION_SCREEN_DELAY_AFTER_WHEEL: 3000,
   PLAYER_ROUND_END_DELAY_WOULD_ILIE: 3000,
   PLAYER_ROUND_END_DELAY_CONTESTANT_GUESS: 2000,
+  PLAYER_ROUND_END_DELAY_QUIZ: 2000,
   DRINKING_WHEEL_SPIN_COMPLETE_DELAY: 3000,
+  CONTESTANT_GUESS_POINTS_PER_CORRECT: 10,
 } as const;
 
 export function getGameName(type: string): string {
@@ -16,6 +18,8 @@ export function getGameName(type: string): string {
       return 'Would I Lie to You?';
     case 'ContestantGuess':
       return 'Contestant Guess';
+    case 'Quiz':
+      return 'Quiz of 2025';
     default:
       return type;
   }
@@ -38,15 +42,15 @@ export function shouldShowDrinkingWheel(gameNumber: number): boolean {
 }
 
 export function getNextGameType(currentGameNumber: number): string {
-  // Game sequence: 1=WouldILie, 2=ContestantGuess, 3=WouldILie, 4=ContestantGuess, 5=WouldILie
+  // Game sequence: 1=WouldILie, 2=ContestantGuess, 3=Quiz, 4=WouldILie, 5=ContestantGuess
   if (currentGameNumber === 1) {
     return 'contestantGuess';
   } else if (currentGameNumber === 2) {
-    return 'wouldILie';
+    return 'quiz';
   } else if (currentGameNumber === 3) {
-    return 'contestantGuess';
-  } else if (currentGameNumber === 4) {
     return 'wouldILie';
+  } else if (currentGameNumber === 4) {
+    return 'contestantGuess';
   } else {
     // Default to Would I Lie
     return 'wouldILie';

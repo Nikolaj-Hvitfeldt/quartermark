@@ -7,6 +7,7 @@ import { GAME_CONSTANTS } from '../utils/gameUtils';
 import signalRService from '../services/signalRService';
 import WouldILiePlayer from './WouldILiePlayer';
 import ContestantGuessPlayer from './ContestantGuessPlayer';
+import QuizPlayer from './QuizPlayer';
 import DrinkingWheelPlayer from './DrinkingWheelPlayer';
 import GameCompletionScreenPlayer from './GameCompletionScreenPlayer';
 import { PlayerScreenProps } from '../types';
@@ -22,7 +23,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       setCurrentGame(null);
     },
   });
-  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", or "drinkingWheel"
+  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", or "drinkingWheel"
 
   useEffect(() => {
     if (!connection) return;
@@ -37,6 +38,11 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       clearCompletedGame();
     };
 
+    const handleQuizRoundStarted = () => {
+      setCurrentGame("quiz");
+      clearCompletedGame();
+    };
+
     const handleShowDrinkingWheel = () => {
       setCurrentGame("drinkingWheel");
       clearCompletedGame();
@@ -44,14 +50,16 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
 
     signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
     signalRService.on('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
+    signalRService.on('QuizRoundStarted', handleQuizRoundStarted);
     signalRService.on('ShowDrinkingWheel', handleShowDrinkingWheel);
 
     return () => {
       signalRService.off('WouldILieRoundStarted', handleWouldILieRoundStarted);
       signalRService.off('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
+      signalRService.off('QuizRoundStarted', handleQuizRoundStarted);
       signalRService.off('ShowDrinkingWheel', handleShowDrinkingWheel);
     };
-  }, [connection]);
+  }, [connection, clearCompletedGame]);
 
   const handleJoinRoom = async () => {
     if (!roomCodeInput.trim() || !playerName.trim()) {
@@ -122,6 +130,13 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
         <ContestantGuessPlayer
           connection={connection}
           playerName={playerName}
+          onBack={() => setCurrentGame(null)}
+        />
+      ) : currentGame === "quiz" ? (
+        <QuizPlayer
+          connection={connection}
+          playerName={playerName}
+          players={players}
           onBack={() => setCurrentGame(null)}
         />
       ) : (

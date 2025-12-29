@@ -1,3 +1,4 @@
+using QuarterMark.Api.Application.Constants;
 using QuarterMark.Api.Application.Interfaces;
 using QuarterMark.Api.Domain.Entities;
 
@@ -72,14 +73,14 @@ public class ContestantGuessService : IContestantGuessService
 
         var correctAnswer = room.CurrentContestantGuessQuestion.CorrectAnswer;
 
-        // Award points: correct guess = 10 points
+        // Award points: correct guess = 10 points (matches Would I Lie to You? scoring)
         foreach (var guess in room.CurrentContestantGuessQuestion.Guesses)
         {
             if (guess.Value == correctAnswer)
             {
                 if (room.ContestantGuessRound.RoundScores.ContainsKey(guess.Key))
                 {
-                    room.ContestantGuessRound.RoundScores[guess.Key] += 10;
+                    room.ContestantGuessRound.RoundScores[guess.Key] += GameScoringConstants.BasePointsForCorrect;
                 }
             }
         }

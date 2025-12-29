@@ -1,0 +1,123 @@
+/* Shared styles for Quiz components */
+.quiz-host,
+.quiz-player {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.quiz-question-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.answer-progress {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.round-scores {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.round-scores h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.player-score {
+  font-weight: bold;
+  color: #3b82f6;
+}
+
+.waiting-message {
+  text-align: center;
+  padding: 4rem;
+}
+
+.waiting-message h2 {
+  color: #666;
+}
+
+.answer-submitted {
+  text-align: center;
+  padding: 2rem;
+  background: #f3f4f6;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  color: #059669;
+}
+
+.result-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.correct-message {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 15px;
+  padding: 2rem;
+}
+
+.correct-message h3 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.bonus-text {
+  margin: 0.5rem 0 0 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.incorrect-message {
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 15px;
+  padding: 2rem;
+}
+
+.incorrect-message h3 {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+}
+
+.quiz-input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
