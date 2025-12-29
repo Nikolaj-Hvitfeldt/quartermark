@@ -4,6 +4,7 @@ import { DrinkingWheelHostProps } from "../types";
 import { PieChartWheel } from "./PieChartWheel";
 import { Confetti } from "./Confetti";
 import { WheelHeader } from "./WheelHeader";
+import { FloatingBottles } from "./FloatingBottles";
 import { useDrinkingWheel } from "../hooks/useDrinkingWheel";
 import "./DrinkingWheel.css";
 import "./DrinkingWheelHost.css";
@@ -26,6 +27,7 @@ function DrinkingWheelHost({ players, onSpinComplete }: DrinkingWheelHostProps) 
 
   return (
     <div className="drinking-wheel-host">
+      <FloatingBottles />
       <Confetti active={showConfetti} />
       <div className="wheel-container">
         <WheelHeader selectedPlayer={selectedPlayer} isSpinning={isSpinning} subtitle="Time to spin the wheel!" />
