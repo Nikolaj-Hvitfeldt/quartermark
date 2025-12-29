@@ -21,7 +21,7 @@ A Jackbox-style party game for New Year's Eve 2025. Players join via their phone
 1. **Start the Backend**:
 
    ```bash
-   cd src/QuarterMark.Api
+   cd QuarterMark.Api
    dotnet run
    ```
 
@@ -30,7 +30,7 @@ A Jackbox-style party game for New Year's Eve 2025. Players join via their phone
 2. **Start the Frontend** (in a new terminal):
 
    ```bash
-   cd src/QuarterMark.Web
+   cd QuarterMark.Web
    npm install
    npm run dev
    ```
@@ -62,8 +62,7 @@ A Jackbox-style party game for New Year's Eve 2025. Players join via their phone
 
 ```
 QuarterMark/
-├── src/
-│   ├── QuarterMark.Api/     # ASP.NET Core backend with SignalR
-│   └── QuarterMark.Web/      # React frontend
+├── QuarterMark.Api/     # ASP.NET Core backend with SignalR
+├── QuarterMark.Web/    # React frontend
 └── README.md
 ```
