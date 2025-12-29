@@ -2,17 +2,26 @@ import { useState, useEffect } from "react";
 import { useGameRoom } from "../hooks/useGameRoom";
 import { useMutation } from "@tanstack/react-query";
 import { useGameSession } from "../hooks/useGameSession";
+import { useGameCompletion } from "../hooks/useGameCompletion";
+import { GAME_CONSTANTS, getNextGameType } from "../utils/gameUtils";
 import signalRService from "../services/signalRService";
 import WouldILieHost from "./WouldILieHost";
 import ContestantGuessHost from "./ContestantGuessHost";
 import DrinkingWheelHost from "./DrinkingWheelHost";
+import GameCompletionScreen from "./GameCompletionScreen";
 import { HostScreenProps } from "../types";
 import "./HostScreen.css";
 
 function HostScreen({ onBack }: HostScreenProps) {
   const { connection, roomCode, players, isConnected, createRoom } =
     useGameRoom();
-  const { isActive: sessionActive, currentGameNumber, showDrinkingWheel, setShowDrinkingWheel, startSession } = useGameSession(connection);
+  const { isActive: sessionActive, currentGameNumber, accumulatedScores, showDrinkingWheel, setShowDrinkingWheel, startSession } = useGameSession(connection);
+  const { completedGame, clearCompletedGame } = useGameCompletion({
+    connection,
+    onGameCompleted: () => {
+      setInGame(null);
+    },
+  });
   const [playerName, setPlayerName] = useState<string>("");
   const [dummyPlayerName, setDummyPlayerName] = useState<string>("");
   const [inGame, setInGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", or "drinkingWheel"
@@ -73,6 +82,30 @@ function HostScreen({ onBack }: HostScreenProps) {
     };
   }, [connection, sessionActive]);
 
+  // Auto-start first game when session starts
+  useEffect(() => {
+    if (sessionActive && currentGameNumber === 0 && !inGame && !completedGame) {
+      setInGame("wouldILie");
+    }
+  }, [sessionActive, currentGameNumber, inGame, completedGame]);
+
+  const handleStartSession = async () => {
+    await startSession();
+    // The useEffect above will handle starting the first game
+  };
+
+  const handleContinueToNextGame = () => {
+    clearCompletedGame();
+    const nextGameType = getNextGameType(currentGameNumber);
+    setInGame(nextGameType);
+  };
+
+  const handleEndGame = () => {
+    clearCompletedGame();
+    setInGame(null);
+    // Could add logic here to end the session if needed
+  };
+
   return (
     <div className="host-screen">
       <button className="btn btn-back" onClick={onBack}>
@@ -97,25 +130,42 @@ function HostScreen({ onBack }: HostScreenProps) {
             Create Room
           </button>
         </div>
+      ) : completedGame ? (
+        <GameCompletionScreen
+          gameType={completedGame.gameType}
+          gameNumber={completedGame.gameNumber}
+          totalGames={GAME_CONSTANTS.TOTAL_GAMES}
+          players={players}
+          accumulatedScores={accumulatedScores}
+          onContinue={handleContinueToNextGame}
+          onEndGame={handleEndGame}
+        />
       ) : showDrinkingWheel || inGame === "drinkingWheel" ? (
         <DrinkingWheelHost
           players={players}
           onSpinComplete={() => {
             setShowDrinkingWheel(false);
             setInGame(null);
+            // Completion screen will be shown automatically by useGameCompletion hook
           }}
         />
       ) : inGame === "wouldILie" ? (
         <WouldILieHost
           connection={connection}
           players={players}
-          onBack={() => setInGame(null)}
+          onBack={() => {
+            setInGame(null);
+            setCompletedGame(null);
+          }}
         />
       ) : inGame === "contestantGuess" ? (
         <ContestantGuessHost
           connection={connection}
           players={players}
-          onBack={() => setInGame(null)}
+          onBack={() => {
+            setInGame(null);
+            setCompletedGame(null);
+          }}
         />
       ) : (
         <div className="host-game">
@@ -188,31 +238,16 @@ function HostScreen({ onBack }: HostScreenProps) {
             {!sessionActive && (
               <button
                 className="btn btn-primary btn-large"
-                onClick={async () => {
-                  await startSession();
-                }}
+                onClick={handleStartSession}
               >
                 Start Game Session (5 Mini-Games)
               </button>
             )}
-            {sessionActive && (
-              <>
-                <div className="session-info">
-                  <p>Game {currentGameNumber} of 5</p>
-                </div>
-                <button
-                  className="btn btn-primary btn-large"
-                  onClick={() => setInGame("wouldILie")}
-                >
-                  Start "Would I Lie to You?" Round
-                </button>
-                <button
-                  className="btn btn-primary btn-large"
-                  onClick={() => setInGame("contestantGuess")}
-                >
-                  Start "Contestant Guess" Round
-                </button>
-              </>
+            {sessionActive && !inGame && !completedGame && (
+              <div className="session-info">
+                <p>Game {currentGameNumber} of 5</p>
+                <p className="session-hint">Game will start automatically...</p>
+              </div>
             )}
             
             {/* TEST BUTTONS - Remove these after testing */}

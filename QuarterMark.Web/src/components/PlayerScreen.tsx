@@ -1,16 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useGameRoom } from '../hooks/useGameRoom';
 import { usePlayerStore } from '../stores/playerStore';
+import { useGameSession } from '../hooks/useGameSession';
+import { useGameCompletion } from '../hooks/useGameCompletion';
+import { GAME_CONSTANTS } from '../utils/gameUtils';
 import signalRService from '../services/signalRService';
 import WouldILiePlayer from './WouldILiePlayer';
 import ContestantGuessPlayer from './ContestantGuessPlayer';
 import DrinkingWheelPlayer from './DrinkingWheelPlayer';
+import GameCompletionScreenPlayer from './GameCompletionScreenPlayer';
 import { PlayerScreenProps } from '../types';
 import './PlayerScreen.css';
 
 function PlayerScreen({ onBack }: PlayerScreenProps) {
   const { connection, roomCode, players, error, isConnected, joinRoom } = useGameRoom();
   const { playerName, roomCodeInput, setPlayerName, setRoomCodeInput } = usePlayerStore();
+  const { currentGameNumber, accumulatedScores } = useGameSession(connection);
+  const { completedGame, clearCompletedGame } = useGameCompletion({
+    connection,
+    onGameCompleted: () => {
+      setCurrentGame(null);
+    },
+  });
   const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", or "drinkingWheel"
 
   useEffect(() => {
@@ -18,14 +29,17 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
 
     const handleWouldILieRoundStarted = () => {
       setCurrentGame("wouldILie");
+      clearCompletedGame();
     };
 
     const handleContestantGuessRoundStarted = () => {
       setCurrentGame("contestantGuess");
+      clearCompletedGame();
     };
 
     const handleShowDrinkingWheel = () => {
       setCurrentGame("drinkingWheel");
+      clearCompletedGame();
     };
 
     signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
@@ -85,6 +99,15 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
             Join Room
           </button>
         </div>
+      ) : completedGame ? (
+        <GameCompletionScreenPlayer
+          gameType={completedGame.gameType}
+          gameNumber={completedGame.gameNumber}
+          totalGames={GAME_CONSTANTS.TOTAL_GAMES}
+          players={players}
+          accumulatedScores={accumulatedScores}
+          playerName={playerName}
+        />
       ) : currentGame === "drinkingWheel" ? (
         <DrinkingWheelPlayer
           playerName={playerName}

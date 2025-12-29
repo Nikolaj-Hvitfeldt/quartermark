@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import signalRService from "../services/signalRService";
+import { GAME_CONSTANTS } from "../utils/gameUtils";
 import { DrinkingWheelHostProps } from "../types";
 import { BottleSvg } from "./BottleSvg";
 import "./DrinkingWheel.css";
@@ -26,7 +27,7 @@ function DrinkingWheelHost({ players, onSpinComplete }: DrinkingWheelHostProps) 
         if (onSpinComplete) {
           onSpinComplete();
         }
-      }, 3000);
+      }, GAME_CONSTANTS.DRINKING_WHEEL_SPIN_COMPLETE_DELAY);
     };
 
     signalRService.on("DrinkingWheelResult", handleWheelResult);

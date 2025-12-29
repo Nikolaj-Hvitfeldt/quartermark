@@ -144,12 +144,7 @@ function WouldILieHost({
     }
   };
 
-  const handleContinueToNextGame = () => {
-    // Placeholder for future game selection
-    alert("Next game feature coming soon!");
-  };
-
-  const handleEndGame = () => {
+  const handleBackToMain = () => {
     setRoundEnded(false);
     setRoundActive(false);
     setCurrentQuestion(null);
@@ -177,17 +172,8 @@ function WouldILieHost({
               ))}
           </div>
           <div className="final-score-actions">
-            <button
-              className="btn btn-primary btn-large"
-              onClick={handleContinueToNextGame}
-            >
-              Continue to Next Game
-            </button>
-            <button
-              className="btn btn-secondary btn-large"
-              onClick={handleEndGame}
-            >
-              End Game
+            <button className="btn btn-primary btn-large" onClick={handleBackToMain}>
+              Continue
             </button>
           </div>
         </div>
