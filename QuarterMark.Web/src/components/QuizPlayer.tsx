@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useQuiz } from '../hooks/useQuiz';
-import { QuizPlayerProps, QuizQuestionShownData, QuizAnswerRevealedData } from '../types';
-import signalRService from '../services/signalRService';
-import { GAME_CONSTANTS } from '../utils/gameUtils';
+import { QuizPlayerProps } from '../types';
 import { getBonusMessage, calculatePointsEarned, QUIZ_SCORING } from '../utils/quizUtils';
 import { QuestionDisplay } from './QuestionDisplay';
 import { AnswerGrid } from './AnswerGrid';
@@ -20,93 +18,38 @@ function QuizPlayer({ connection, playerName, players, onBack }: QuizPlayerProps
     guesses,
     roundScores,
     submitAnswer,
-    setRoundState,
-    setCurrentQuestion,
-    setHasAnswered,
-    setAnswerRevealed,
-    setCorrectAnswer,
-    setGuesses,
-    setRoundScores,
   } = useQuiz(connection);
 
   const [previousRoundScores, setPreviousRoundScores] = useState<Record<string, number>>({});
   const [pointsEarned, setPointsEarned] = useState<number>(0);
+  const previousRoundStateRef = useRef<string>('');
 
+  // Track previous scores when a new question is shown to calculate points earned
   useEffect(() => {
-    if (!connection) return;
+    // When state changes from Waiting/Revealed to ShowingQuestion, store current scores
+    if (roundState === 'ShowingQuestion' && previousRoundStateRef.current !== 'ShowingQuestion') {
+      setPreviousRoundScores({ ...roundScores });
+    }
+    previousRoundStateRef.current = roundState;
+  }, [roundState, roundScores]);
 
-    const handleRoundStarted = () => {
-      setRoundState('Waiting');
-      setCurrentQuestion(null);
-      setHasAnswered(false);
-      setAnswerRevealed(false);
-      setRoundScores({});
+  // Calculate points earned when answer is revealed
+  useEffect(() => {
+    if (answerRevealed && roundScores) {
+      const previousScore = previousRoundScores[playerName] || 0;
+      const newScore = roundScores[playerName] || 0;
+      const points = calculatePointsEarned(previousScore, newScore);
+      setPointsEarned(points);
+    }
+  }, [answerRevealed, roundScores, playerName, previousRoundScores]);
+
+  // Reset when round starts
+  useEffect(() => {
+    if (roundState === 'Waiting') {
       setPreviousRoundScores({});
       setPointsEarned(0);
-    };
-
-    const handleQuestionShown = (data: QuizQuestionShownData) => {
-      setRoundState('ShowingQuestion');
-      setCurrentQuestion({
-        questionText: data.questionText,
-        imageUrl: data.imageUrl,
-        possibleAnswers: data.possibleAnswers,
-      });
-      setHasAnswered(false);
-      setAnswerRevealed(false);
-      // Store current scores before revealing answer to calculate points earned
-      setPreviousRoundScores({ ...roundScores });
-    };
-
-    const handleAnswerRevealed = (data: QuizAnswerRevealedData) => {
-      setCorrectAnswer(data.correctAnswer);
-      setGuesses(data.guesses);
-      setAnswerRevealed(true);
-      setRoundState('Revealed');
-      
-      // Calculate points earned for this question
-      const newScores = data.roundScores || {};
-      const previousScore = previousRoundScores[playerName] || 0;
-      const newScore = newScores[playerName] || 0;
-      const points = newScore - previousScore;
-      setPointsEarned(points);
-      
-      setRoundScores(newScores);
-    };
-
-    const handleRoundEnded = () => {
-      setRoundState('Waiting');
-      setRoundScores({});
-      setTimeout(() => {
-        onBack();
-      }, GAME_CONSTANTS.PLAYER_ROUND_END_DELAY_QUIZ);
-    };
-
-    signalRService.on('QuizRoundStarted', handleRoundStarted);
-    signalRService.on('QuizQuestionShown', handleQuestionShown);
-    signalRService.on('QuizAnswerRevealed', handleAnswerRevealed);
-    signalRService.on('QuizRoundEnded', handleRoundEnded);
-
-    return () => {
-      signalRService.off('QuizRoundStarted', handleRoundStarted);
-      signalRService.off('QuizQuestionShown', handleQuestionShown);
-      signalRService.off('QuizAnswerRevealed', handleAnswerRevealed);
-      signalRService.off('QuizRoundEnded', handleRoundEnded);
-    };
-  }, [
-    connection,
-    playerName,
-    setRoundState,
-    setCurrentQuestion,
-    setHasAnswered,
-    setAnswerRevealed,
-    setCorrectAnswer,
-    setGuesses,
-      setRoundScores,
-      onBack,
-      roundScores,
-      previousRoundScores,
-    ]);
+    }
+  }, [roundState]);
 
   const handleAnswerClick = async (answer: string) => {
     if (hasAnswered || answerRevealed) return;
