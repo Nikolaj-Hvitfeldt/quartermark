@@ -8,6 +8,7 @@ export const GAME_CONSTANTS = {
   PLAYER_ROUND_END_DELAY_WOULD_ILIE: 3000,
   PLAYER_ROUND_END_DELAY_CONTESTANT_GUESS: 2000,
   PLAYER_ROUND_END_DELAY_QUIZ: 2000,
+  PLAYER_ROUND_END_DELAY_SOCIAL_MEDIA_GUESS: 2000,
   DRINKING_WHEEL_SPIN_COMPLETE_DELAY: 3000,
   CONTESTANT_GUESS_POINTS_PER_CORRECT: 10,
 } as const;
@@ -20,6 +21,8 @@ export function getGameName(type: string): string {
       return 'Contestant Guess';
     case 'Quiz':
       return 'Quiz of 2025';
+    case 'SocialMediaGuess':
+      return 'Social Media Guess';
     default:
       return type;
   }

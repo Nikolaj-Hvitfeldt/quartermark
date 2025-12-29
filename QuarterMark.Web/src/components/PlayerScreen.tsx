@@ -8,6 +8,7 @@ import signalRService from '../services/signalRService';
 import WouldILiePlayer from './WouldILiePlayer';
 import ContestantGuessPlayer from './ContestantGuessPlayer';
 import QuizPlayer from './QuizPlayer';
+import SocialMediaGuessPlayer from './SocialMediaGuessPlayer';
 import DrinkingWheelPlayer from './DrinkingWheelPlayer';
 import GameCompletionScreenPlayer from './GameCompletionScreenPlayer';
 import { PlayerScreenProps } from '../types';
@@ -22,7 +23,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
     // Don't set currentGame to null here - let completedGame state handle the navigation
     // The completion screen will be shown when completedGame is set
   });
-  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", or "drinkingWheel"
+  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
 
   useEffect(() => {
     if (!connection) return;
@@ -42,6 +43,11 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       clearCompletedGame();
     };
 
+    const handleSocialMediaGuessRoundStarted = () => {
+      setCurrentGame("socialMediaGuess");
+      clearCompletedGame();
+    };
+
     const handleShowDrinkingWheel = () => {
       setCurrentGame("drinkingWheel");
       clearCompletedGame();
@@ -50,12 +56,14 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
     signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
     signalRService.on('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
     signalRService.on('QuizRoundStarted', handleQuizRoundStarted);
+    signalRService.on('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
     signalRService.on('ShowDrinkingWheel', handleShowDrinkingWheel);
 
     return () => {
       signalRService.off('WouldILieRoundStarted', handleWouldILieRoundStarted);
       signalRService.off('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
       signalRService.off('QuizRoundStarted', handleQuizRoundStarted);
+      signalRService.off('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
       signalRService.off('ShowDrinkingWheel', handleShowDrinkingWheel);
     };
   }, [connection, clearCompletedGame]);
@@ -134,6 +142,13 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
         />
       ) : currentGame === "quiz" ? (
         <QuizPlayer
+          connection={connection}
+          playerName={playerName}
+          players={players}
+          onBack={() => setCurrentGame(null)}
+        />
+      ) : currentGame === "socialMediaGuess" ? (
+        <SocialMediaGuessPlayer
           connection={connection}
           playerName={playerName}
           players={players}

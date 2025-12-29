@@ -87,6 +87,44 @@ export interface ContestantGuessAnswerRevealedData {
   roundScores: Record<string, number>;
 }
 
+export interface ContestantGuessReceivedData {
+  playerName: string;
+  guessedContestantName: string;
+  totalGuesses: number;
+  totalPlayers: number;
+}
+
+export interface SocialMediaGuessHostProps {
+  connection: any; // HubConnection from SignalR
+  players: PlayerDto[];
+  onBack: () => void;
+}
+
+export interface SocialMediaGuessPlayerProps {
+  connection: any; // HubConnection from SignalR
+  playerName: string;
+  players: PlayerDto[];
+  onBack: () => void;
+}
+
+export interface SocialMediaGuessQuestionShownData {
+  imageUrl: string;
+  possibleAnswers: string[];
+}
+
+export interface SocialMediaGuessAnswerRevealedData {
+  correctAnswer: string;
+  guesses: Record<string, string>;
+  roundScores: Record<string, number>;
+}
+
+export interface SocialMediaGuessReceivedData {
+  playerName: string;
+  guessedContestantName: string;
+  totalGuesses: number;
+  totalPlayers: number;
+}
+
 export interface QuizHostProps {
   connection: any; // HubConnection from SignalR
   players: PlayerDto[];
