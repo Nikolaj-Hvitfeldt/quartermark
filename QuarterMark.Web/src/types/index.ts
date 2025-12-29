@@ -86,6 +86,30 @@ export interface ContestantGuessAnswerRevealedData {
   roundScores: Record<string, number>;
 }
 
+export interface QuizHostProps {
+  connection: any; // HubConnection from SignalR
+  players: PlayerDto[];
+  onBack: () => void;
+}
+
+export interface QuizPlayerProps {
+  connection: any; // HubConnection from SignalR
+  playerName: string;
+  onBack: () => void;
+}
+
+export interface QuizQuestionShownData {
+  questionText: string;
+  imageUrl?: string;
+  possibleAnswers: string[];
+}
+
+export interface QuizAnswerRevealedData {
+  correctAnswer: string;
+  guesses: Record<string, string>;
+  roundScores: Record<string, number>;
+}
+
 export interface DrinkingWheelHostProps {
   players: PlayerDto[];
   onSpinComplete: () => void;

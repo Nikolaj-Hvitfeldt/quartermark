@@ -11,6 +11,7 @@ public class GameHub : Hub
     private readonly IGameRoomService _roomService;
     private readonly IWouldILieService _wouldILieService;
     private readonly IContestantGuessService _contestantGuessService;
+    private readonly IQuizService _quizService;
     private readonly IGameSessionService _gameSessionService;
     private readonly ISignalRNotificationService _notificationService;
 
@@ -18,12 +19,14 @@ public class GameHub : Hub
         IGameRoomService roomService,
         IWouldILieService wouldILieService,
         IContestantGuessService contestantGuessService,
+        IQuizService quizService,
         IGameSessionService gameSessionService,
         ISignalRNotificationService notificationService)
     {
         _roomService = roomService;
         _wouldILieService = wouldILieService;
         _contestantGuessService = contestantGuessService;
+        _quizService = quizService;
         _gameSessionService = gameSessionService;
         _notificationService = notificationService;
     }
@@ -329,6 +332,108 @@ public class GameHub : Hub
         await CompleteGameAndCheckDrinkingWheelAsync(roomCode, "ContestantGuess", roundScores);
     }
 
+    // Quiz Game Methods
+    public async Task StartQuizRound()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        await _quizService.StartRoundAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "QuizRoundStarted");
+    }
+
+    public async Task ShowQuizQuestion(string questionText, string? imageUrl, string correctAnswer, List<string> possibleAnswers)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        await _quizService.ShowQuestionAsync(roomCode, questionText, imageUrl, correctAnswer, possibleAnswers);
+        
+        await _notificationService.NotifyRoomAsync(roomCode, "QuizQuestionShown", new
+        {
+            questionText,
+            imageUrl,
+            possibleAnswers
+        });
+    }
+
+    public async Task SubmitQuizAnswer(string selectedAnswer)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var success = await _quizService.SubmitAnswerAsync(roomCode, Context.ConnectionId, selectedAnswer);
+        if (!success) return;
+
+        var question = GetCurrentQuizQuestion(roomCode);
+        if (question == null) return;
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var nonHostPlayers = players.Where(p => !p.IsHost).ToList();
+        var totalPlayers = nonHostPlayers.Count;
+        var answeredCount = question.Guesses.Count;
+
+        // Notify host about answer progress
+        await _notificationService.NotifyClientAsync(
+            await GetHostConnectionId(roomCode),
+            "QuizAnswerReceived",
+            new
+            {
+                answeredCount,
+                totalPlayers
+            });
+    }
+
+    public async Task RevealQuizAnswer()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var roundScores = await _quizService.RevealAnswerAsync(roomCode);
+        
+        var question = GetCurrentQuizQuestion(roomCode);
+        if (question != null)
+        {
+            await _notificationService.NotifyRoomAsync(roomCode, "QuizAnswerRevealed", new
+            {
+                correctAnswer = question.CorrectAnswer,
+                guesses = question.Guesses,
+                roundScores
+            });
+        }
+    }
+
+    public async Task EndQuizRound()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var roundScores = await _quizService.EndRoundAsync(roomCode);
+        
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "QuizRoundEnded", new
+        {
+            finalScores = players,
+            roundScores
+        });
+        
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+
+        await CompleteGameAndCheckDrinkingWheelAsync(roomCode, "Quiz", roundScores);
+    }
+
     public async Task CreateDummyPlayer(string playerName)
     {
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
@@ -426,6 +531,11 @@ public class GameHub : Hub
     private ContestantGuessQuestion? GetCurrentContestantGuessQuestion(string roomCode)
     {
         return _contestantGuessService.GetCurrentQuestion(roomCode);
+    }
+
+    private QuizQuestion? GetCurrentQuizQuestion(string roomCode)
+    {
+        return _quizService.GetCurrentQuestion(roomCode);
     }
 
     private async Task CompleteGameAndCheckDrinkingWheelAsync(string roomCode, string gameType, Dictionary<string, int> roundScores)
