@@ -80,11 +80,17 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
     }
   };
 
+  // Determine if we're in the lobby (not in any game or completion screen)
+  const isInLobby = isConnected && !currentGame && !completedGame;
+
   return (
     <div className="player-screen">
-      <button className="btn btn-back" onClick={onBack}>
-        ← Back
-      </button>
+      {/* Only show back button when in lobby or not connected */}
+      {(!isConnected || isInLobby) && (
+        <button className="btn btn-back" onClick={onBack}>
+          ← Back to Home
+        </button>
+      )}
 
       {!isConnected ? (
         <div className="player-join">

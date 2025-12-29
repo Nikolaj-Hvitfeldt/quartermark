@@ -5,7 +5,9 @@ import signalRService from "../services/signalRService";
 import { QuestionDisplay } from "./QuestionDisplay";
 import { AnswerGrid } from "./AnswerGrid";
 import { QuizRoundScores } from "./QuizRoundScores";
+import { GameRulesCard } from "./GameRulesCard";
 import { QUIZ_QUESTIONS_2025 } from "../data/quizQuestions";
+import { QUIZ_RULES, getQuestionCountText } from "../data/gameRules";
 import "./Quiz.css";
 import "./QuizHost.css";
 
@@ -100,18 +102,18 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
     }
   };
 
-  const nonHostPlayers = players.filter((p) => !p.isHost);
-
   if (!roundActive) {
+    const questionCount = getQuestionCountText(QUIZ_QUESTIONS_2025.length);
     return (
       <div className="quiz-host">
-        <button className="btn btn-back" onClick={onBack}>
-          ← Back
-        </button>
-        <h2>Quiz of 2025</h2>
-        <button className="btn btn-primary btn-large" onClick={handleStartRound}>
-          Start Quiz Round
-        </button>
+        <GameRulesCard
+          title={QUIZ_RULES.title}
+          subtitle={QUIZ_RULES.subtitle}
+          rules={QUIZ_RULES.rules}
+          pointsInfo={`${questionCount} • ${QUIZ_RULES.pointsInfo}`}
+          onStart={handleStartRound}
+          startButtonText={QUIZ_RULES.startButtonText}
+        />
       </div>
     );
   }

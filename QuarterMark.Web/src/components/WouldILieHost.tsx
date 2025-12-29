@@ -4,6 +4,8 @@ import { useWouldILie } from "../hooks/useWouldILie";
 import { useGameRoom } from "../hooks/useGameRoom";
 import signalRService from "../services/signalRService";
 import { WouldILieHostProps } from "../types";
+import { GameRulesCard } from "./GameRulesCard";
+import { WOULD_I_LIE_RULES } from "../data/gameRules";
 import "./WouldILieHost.css";
 
 function WouldILieHost({
@@ -184,19 +186,14 @@ function WouldILieHost({
   if (!roundActive) {
     return (
       <div className="would-i-lie-host">
-        <div className="round-setup">
-          <h2>Would I Lie to You? - Round Setup</h2>
-          <p>
-            Start a round where you'll show images and assign which players will
-            lie.
-          </p>
-          <button
-            className="btn btn-primary btn-large"
-            onClick={handleStartRound}
-          >
-            Start Round
-          </button>
-        </div>
+        <GameRulesCard
+          title={WOULD_I_LIE_RULES.title}
+          subtitle={WOULD_I_LIE_RULES.subtitle}
+          rules={WOULD_I_LIE_RULES.rules}
+          pointsInfo={WOULD_I_LIE_RULES.pointsInfo}
+          onStart={handleStartRound}
+          startButtonText={WOULD_I_LIE_RULES.startButtonText}
+        />
       </div>
     );
   }
