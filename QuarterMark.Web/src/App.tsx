@@ -10,19 +10,42 @@ function App() {
     <div className="app">
       {screen === 'home' && (
         <div className="home-screen">
+          {/* Floating decorations */}
+          <span className="floating-decoration">🥂</span>
+          <span className="floating-decoration">✨</span>
+          <span className="floating-decoration">🎆</span>
+          <span className="floating-decoration">🍾</span>
+          <span className="floating-decoration">⭐</span>
+          <span className="floating-decoration">🎉</span>
+          
+          {/* Confetti pieces */}
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          <div className="confetti-piece"></div>
+          
+          <p className="home-subtitle">Welcome to</p>
           <h1>QuarterMark</h1>
+          <p className="home-year">2025</p>
+          
           <div className="home-buttons">
             <button 
               className="btn btn-primary btn-large"
               onClick={() => setScreen('host')}
             >
-              Create Game (Host)
+              🎮 Create Game
             </button>
             <button 
               className="btn btn-secondary btn-large"
               onClick={() => setScreen('player')}
             >
-              Join Game (Player)
+              🎯 Join Game
             </button>
           </div>
         </div>

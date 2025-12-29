@@ -1,16 +1,75 @@
+/* ===== HOST SCREEN - NEW YEAR'S EVE LOBBY THEME ===== */
 .host-screen {
   min-height: 100vh;
   padding: 2rem;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(135deg, #0c1445 0%, #1a1a2e 40%, #16213e 70%, #0f0f23 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Starfield background */
+.host-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(2px 2px at 50px 50px, #ffd700, transparent),
+    radial-gradient(1px 1px at 100px 100px, #fff, transparent),
+    radial-gradient(2px 2px at 150px 30px, #ffd700, transparent),
+    radial-gradient(1px 1px at 200px 150px, #fff, transparent),
+    radial-gradient(2px 2px at 300px 80px, #ffd700, transparent),
+    radial-gradient(1px 1px at 400px 120px, #fff, transparent),
+    radial-gradient(2px 2px at 500px 50px, #ffd700, transparent),
+    radial-gradient(1px 1px at 600px 180px, #fff, transparent);
+  background-repeat: repeat;
+  background-size: 600px 200px;
+  animation: twinkleLobby 5s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+@keyframes twinkleLobby {
+  0% { opacity: 0.4; }
+  100% { opacity: 0.7; }
+}
+
+/* Golden accent glow */
+.host-screen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 300px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .btn-back {
-  background: #374151;
+  background: rgba(55, 65, 81, 0.8);
   color: white;
   padding: 0.75rem 1.5rem;
   margin-bottom: 2rem;
   align-self: flex-start;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-back:hover {
+  background: rgba(75, 85, 99, 0.9);
+  border-color: rgba(255, 215, 0, 0.6);
+  transform: translateX(-3px);
 }
 
 .host-setup {
@@ -22,74 +81,138 @@
   gap: 2rem;
   max-width: 500px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .host-setup h2 {
-  font-size: 2.5rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
   margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffd700 0%, #ffec8b 50%, #daa520 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
 }
 
 .input {
   width: 100%;
-  padding: 1rem;
+  padding: 1rem 1.5rem;
   font-size: 1.25rem;
-  border: 2px solid #374151;
-  border-radius: 8px;
-  background: #1f2937;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  background: rgba(31, 41, 55, 0.8);
   color: white;
   text-align: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: #4f46e5;
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .host-game {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  width: 100%;
 }
 
 .room-code-display {
   text-align: center;
-  padding: 2rem;
-  background: #1f2937;
-  border-radius: 12px;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.room-code-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+  animation: shimmerLine 3s linear infinite;
+}
+
+@keyframes shimmerLine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .room-code-display h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #9ca3af;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #c9b037;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
 }
 
 .room-code {
   font-size: 5rem;
   font-weight: bold;
-  letter-spacing: 1rem;
-  color: #4f46e5;
+  letter-spacing: 1.5rem;
+  background: linear-gradient(135deg, #ffd700 0%, #ffec8b 30%, #daa520 60%, #ffd700 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin: 1rem 0;
   font-family: 'Courier New', monospace;
+  animation: codeShimmer 2s linear infinite;
+  text-shadow: 0 0 60px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes codeShimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 
 .room-code-hint {
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 1rem;
   margin-top: 1rem;
 }
 
 .players-section {
-  background: #1f2937;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%);
+  border-radius: 20px;
   padding: 2rem;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .players-section h3 {
+  font-family: 'Playfair Display', serif;
   font-size: 2rem;
   margin-bottom: 1.5rem;
+  color: #ffd700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.players-section h3::before {
+  content: '👥';
 }
 
 .players-list {
@@ -99,33 +222,58 @@
 }
 
 .player-card {
-  background: #111827;
-  padding: 1.5rem;
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(31, 41, 55, 0.8) 100%);
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  transition: all 0.3s ease;
+  animation: playerSlideIn 0.5s ease-out;
+}
+
+@keyframes playerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.player-card:hover {
+  border-color: rgba(255, 215, 0, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.1);
 }
 
 .player-name {
   font-size: 1.25rem;
   font-weight: 600;
   flex: 1;
+  color: #fff;
 }
 
 .host-badge {
-  background: #4f46e5;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
+  color: #1a1a2e;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.4);
 }
 
 .player-score {
-  color: #9ca3af;
+  color: #c9b037;
   font-size: 1rem;
+  font-weight: 600;
 }
 
 .game-actions {
@@ -135,19 +283,21 @@
 }
 
 .dummy-players-section {
-  background: #1f2937;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.7) 0%, rgba(17, 24, 39, 0.8) 100%);
+  border-radius: 16px;
   padding: 1.5rem;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
+  border: 1px solid rgba(102, 126, 234, 0.3);
 }
 
 .dummy-players-section h3 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   margin-bottom: 0.5rem;
+  color: #8b9eff;
 }
 
 .dummy-hint {
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.875rem;
   margin-bottom: 1rem;
 }
@@ -160,17 +310,19 @@
 
 .dummy-player-controls .input {
   flex: 1;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 2px solid #374151;
-  border-radius: 8px;
-  background: #111827;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 10px;
+  background: rgba(17, 24, 39, 0.8);
   color: white;
+  text-align: left;
 }
 
 .dummy-player-controls .input:focus {
   outline: none;
-  border-color: #4f46e5;
+  border-color: #667eea;
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
 }
 
 .dummy-players-list {
@@ -183,22 +335,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background: #111827;
+  padding: 0.75rem 1rem;
+  background: rgba(17, 24, 39, 0.6);
   border-radius: 8px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .btn-small {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  background: #7f1d1d;
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .btn-small:hover {
-  background: #991b1b;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  transform: scale(1.05);
 }
 

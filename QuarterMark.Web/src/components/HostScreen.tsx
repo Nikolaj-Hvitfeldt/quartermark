@@ -104,11 +104,17 @@ function HostScreen({ onBack }: HostScreenProps) {
     // Could add logic here to end the session if needed
   };
 
+  // Determine if we're in the lobby (not in any game or completion screen)
+  const isInLobby = isConnected && !inGame && !completedGame && !showDrinkingWheel;
+
   return (
     <div className="host-screen">
-      <button className="btn btn-back" onClick={onBack}>
-        ← Back
-      </button>
+      {/* Only show back button when in lobby or not connected */}
+      {(!isConnected || isInLobby) && (
+        <button className="btn btn-back" onClick={onBack}>
+          ← Back to Home
+        </button>
+      )}
 
       {!isConnected ? (
         <div className="host-setup">
@@ -155,7 +161,7 @@ function HostScreen({ onBack }: HostScreenProps) {
           players={players}
           onBack={() => {
             setInGame(null);
-            setCompletedGame(null);
+            clearCompletedGame();
           }}
         />
       ) : inGame === "contestantGuess" ? (
@@ -164,7 +170,7 @@ function HostScreen({ onBack }: HostScreenProps) {
           players={players}
           onBack={() => {
             setInGame(null);
-            setCompletedGame(null);
+            clearCompletedGame();
           }}
         />
       ) : inGame === "quiz" ? (
@@ -173,7 +179,7 @@ function HostScreen({ onBack }: HostScreenProps) {
           players={players}
           onBack={() => {
             setInGame(null);
-            setCompletedGame(null);
+            clearCompletedGame();
           }}
         />
       ) : inGame === "socialMediaGuess" ? (
@@ -182,7 +188,7 @@ function HostScreen({ onBack }: HostScreenProps) {
           players={players}
           onBack={() => {
             setInGame(null);
-            setCompletedGame(null);
+            clearCompletedGame();
           }}
         />
       ) : (

@@ -1,20 +1,32 @@
+/* Uses shared dimensions from gameLayout.css */
 .image-display {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
-  padding: 2rem;
+  border-radius: var(--prompt-border-radius);
+  padding: var(--prompt-padding);
   text-align: center;
-  min-height: 400px;
+  min-height: var(--prompt-min-height);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.image-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
 }
 
 .contestant-image {
   max-width: 100%;
-  max-height: 500px;
-  border-radius: 10px;
+  max-height: var(--prompt-image-max-height);
+  border-radius: var(--radius-md);
   object-fit: contain;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }

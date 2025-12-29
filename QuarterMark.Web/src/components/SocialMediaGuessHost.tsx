@@ -5,7 +5,9 @@ import signalRService from "../services/signalRService";
 import { ImageDisplay } from "./ImageDisplay";
 import { AnswerGrid } from "./AnswerGrid";
 import { SocialMediaGuessRoundScores } from "./SocialMediaGuessRoundScores";
+import { GameRulesCard } from "./GameRulesCard";
 import { SOCIAL_MEDIA_GUESS_QUESTIONS } from "../data/socialMediaGuessQuestions";
+import { SOCIAL_MEDIA_RULES, getQuestionCountText } from "../data/gameRules";
 import "./SocialMediaGuess.css";
 import "./SocialMediaGuessHost.css";
 
@@ -97,15 +99,17 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
   };
 
   if (!roundActive) {
+    const questionCount = getQuestionCountText(SOCIAL_MEDIA_GUESS_QUESTIONS.length);
     return (
       <div className="social-media-guess-host">
-        <button className="btn btn-back" onClick={onBack}>
-          ← Back
-        </button>
-        <h2>Social Media Guess</h2>
-        <button className="btn btn-primary btn-large" onClick={handleStartRound}>
-          Start Social Media Guess Round
-        </button>
+        <GameRulesCard
+          title={SOCIAL_MEDIA_RULES.title}
+          subtitle={SOCIAL_MEDIA_RULES.subtitle}
+          rules={SOCIAL_MEDIA_RULES.rules}
+          pointsInfo={`${questionCount} • ${SOCIAL_MEDIA_RULES.pointsInfo}`}
+          onStart={handleStartRound}
+          startButtonText={SOCIAL_MEDIA_RULES.startButtonText}
+        />
       </div>
     );
   }

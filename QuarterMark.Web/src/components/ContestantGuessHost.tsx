@@ -5,7 +5,9 @@ import signalRService from "../services/signalRService";
 import { ImageDisplay } from "./ImageDisplay";
 import { AnswerGrid } from "./AnswerGrid";
 import { ContestantGuessRoundScores } from "./ContestantGuessRoundScores";
+import { GameRulesCard } from "./GameRulesCard";
 import { CONTESTANT_GUESS_QUESTIONS } from "../data/contestantGuessQuestions";
+import { CONTESTANT_GUESS_RULES, getQuestionCountText } from "../data/gameRules";
 import "./ContestantGuess.css";
 import "./ContestantGuessHost.css";
 
@@ -99,15 +101,17 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
   };
 
   if (!roundActive) {
+    const questionCount = getQuestionCountText(CONTESTANT_GUESS_QUESTIONS.length);
     return (
       <div className="contestant-guess-host">
-        <button className="btn btn-back" onClick={onBack}>
-          ← Back
-        </button>
-        <h2>Contestant Guess</h2>
-        <button className="btn btn-primary btn-large" onClick={handleStartRound}>
-          Start Contestant Guess Round
-        </button>
+        <GameRulesCard
+          title={CONTESTANT_GUESS_RULES.title}
+          subtitle={CONTESTANT_GUESS_RULES.subtitle}
+          rules={CONTESTANT_GUESS_RULES.rules}
+          pointsInfo={`${questionCount} • ${CONTESTANT_GUESS_RULES.pointsInfo}`}
+          onStart={handleStartRound}
+          startButtonText={CONTESTANT_GUESS_RULES.startButtonText}
+        />
       </div>
     );
   }

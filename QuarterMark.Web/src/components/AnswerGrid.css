@@ -1,24 +1,25 @@
+/* Uses shared dimensions from gameLayout.css */
 .answer-options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-top: 2rem;
+  gap: var(--answer-grid-gap);
+  margin-top: 1.5rem;
 }
 
 .answer-option {
-  border-radius: 15px;
-  padding: 2rem;
-  font-size: 1.5rem;
+  border-radius: var(--answer-option-border-radius);
+  padding: var(--answer-option-padding);
+  font-size: var(--answer-font-size);
   font-weight: 600;
   text-align: center;
-  transition: all 0.3s ease;
+  transition: var(--transition-normal);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  min-height: 120px;
+  min-height: var(--answer-option-min-height);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 4px solid transparent;
+  border: 3px solid transparent;
   color: white;
 }
 
@@ -84,7 +85,7 @@
 }
 
 .answer-text {
-  font-size: 1.5rem;
+  font-size: inherit;
   margin-bottom: 0.5rem;
   color: inherit;
 }
