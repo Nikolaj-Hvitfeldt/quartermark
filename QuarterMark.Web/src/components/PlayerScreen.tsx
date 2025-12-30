@@ -6,6 +6,11 @@ import { useGameSession } from '../hooks/useGameSession';
 import { useGameCompletion } from '../hooks/useGameCompletion';
 import { GAME_CONSTANTS } from '../utils/gameUtils';
 import signalRService from '../services/signalRService';
+import { useContestantGuessStore } from '../stores/contestantGuessStore';
+import { useQuizStore } from '../stores/quizStore';
+import { useWagerStore } from '../stores/wagerStore';
+import { usePlayerGameStore } from '../stores/playerGameStore';
+import { useSocialMediaGuessStore } from '../stores/socialMediaGuessStore';
 import WouldILiePlayer from './WouldILiePlayer';
 import ContestantGuessPlayer from './ContestantGuessPlayer';
 import QuizPlayer from './QuizPlayer';
@@ -18,7 +23,7 @@ import './PlayerScreen.css';
 
 function PlayerScreen({ onBack }: PlayerScreenProps) {
   const { t } = useTranslation();
-  const { connection, roomCode, players, error, isConnected, joinRoom } = useGameRoom();
+  const { connection, roomCode, players, error, isConnected, joinRoom, playerName: storedPlayerName, roomCode: storedRoomCode, connect } = useGameRoom();
   const { playerName, roomCodeInput, setPlayerName, setRoomCodeInput } = usePlayerStore();
   const { currentGameNumber, accumulatedScores } = useGameSession(connection);
   const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
@@ -27,32 +32,99 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
     // Don't set currentGame to null here - let completedGame state handle the navigation
     // The completion screen will be shown when completedGame is set
   });
+  const [hasRestored, setHasRestored] = useState(false);
+
+  // Restore connection and rejoin room on mount if we have stored room state
+  useEffect(() => {
+    if (hasRestored) return;
+    
+    const restoreRoom = async () => {
+      if (storedRoomCode && storedPlayerName && !isConnected) {
+        try {
+          setHasRestored(true);
+          await connect();
+          await joinRoom(storedRoomCode, storedPlayerName);
+          // Restore player name and room code input from storage
+          setPlayerName(storedPlayerName);
+          setRoomCodeInput(storedRoomCode);
+        } catch (error) {
+          console.error('Failed to restore room connection:', error);
+          setHasRestored(true);
+        }
+      } else {
+        setHasRestored(true);
+      }
+    };
+    restoreRoom();
+  }, [storedRoomCode, storedPlayerName, isConnected, hasRestored, connect, joinRoom, setPlayerName, setRoomCodeInput]);
+
+  // Handle reconnection when phone unlocks
+  useEffect(() => {
+    const handleReconnected = async () => {
+      if (storedRoomCode && storedPlayerName) {
+        try {
+          // Reset current game state on reconnection - we'll wait for the next RoundStarted event
+          // This prevents getting stuck in a "waiting" state if we missed a RoundStarted event
+          setCurrentGame(null);
+          clearCompletedGame();
+          
+          // Reset all game stores to clear any stale state
+          useContestantGuessStore.getState().reset();
+          useQuizStore.getState().reset();
+          useWagerStore.getState().reset();
+          usePlayerGameStore.getState().reset();
+          useSocialMediaGuessStore.getState().reset();
+          
+          // Rejoin the room after reconnection
+          await joinRoom(storedRoomCode, storedPlayerName);
+        } catch (error) {
+          console.error('Failed to rejoin room after reconnection:', error);
+        }
+      }
+    };
+
+    window.addEventListener('signalr-reconnected', handleReconnected);
+    
+    return () => {
+      window.removeEventListener('signalr-reconnected', handleReconnected);
+    };
+  }, [storedRoomCode, storedPlayerName, joinRoom, clearCompletedGame]);
 
   useEffect(() => {
     if (!connection) return;
 
     const handleWouldILieRoundStarted = () => {
       clearCompletedGame(); // Clear completion state first
+      // Reset store state before switching games to ensure clean state
+      usePlayerGameStore.getState().reset();
       setCurrentGame("wouldILie");
     };
 
     const handleContestantGuessRoundStarted = () => {
       clearCompletedGame(); // Clear completion state first
+      // Reset store state before switching games to ensure clean state
+      useContestantGuessStore.getState().reset();
       setCurrentGame("contestantGuess");
     };
 
     const handleQuizRoundStarted = () => {
       clearCompletedGame(); // Clear completion state first
+      // Reset store state before switching games to ensure clean state
+      useQuizStore.getState().reset();
       setCurrentGame("quiz");
     };
 
     const handleSocialMediaGuessRoundStarted = () => {
       clearCompletedGame(); // Clear completion state first
+      // Reset store state before switching games to ensure clean state
+      useSocialMediaGuessStore.getState().reset();
       setCurrentGame("socialMediaGuess");
     };
 
     const handleWagerRoundStarted = () => {
       clearCompletedGame(); // Clear completion state first
+      // Reset store state before switching games to ensure clean state
+      useWagerStore.getState().reset();
       setCurrentGame("wager");
     };
 

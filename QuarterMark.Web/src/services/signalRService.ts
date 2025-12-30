@@ -24,9 +24,11 @@ class SignalRService {
       console.log('SignalR reconnecting...');
     });
 
-    this.connection.onreconnected(() => {
-      console.log('SignalR reconnected');
+    this.connection.onreconnected((connectionId) => {
+      console.log('SignalR reconnected', connectionId);
       this.reregisterListeners();
+      // Dispatch custom event for components to handle reconnection
+      window.dispatchEvent(new CustomEvent('signalr-reconnected'));
     });
 
     await this.connection.start();

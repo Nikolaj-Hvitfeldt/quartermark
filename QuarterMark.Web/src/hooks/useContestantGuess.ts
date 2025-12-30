@@ -51,6 +51,7 @@ export function useContestantGuess(connection: any) {
       setAnswerRevealed(false);
       setRoundState('Waiting');
       setHasGuessed(false);
+      setIsRevealed(false);
     };
 
     const handleQuestionShown = (data: ContestantGuessQuestionShownData) => {
@@ -100,6 +101,9 @@ export function useContestantGuess(connection: any) {
     setRoundScores,
     setAnswerRevealed,
     setCorrectAnswer,
+    setRoundState,
+    setHasGuessed,
+    setIsRevealed,
   ]);
 
   const startRoundMutation = useMutation({
