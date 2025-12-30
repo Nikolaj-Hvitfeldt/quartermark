@@ -216,9 +216,8 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
             <button
               className="btn btn-primary"
               onClick={handleRevealAnswer}
-              disabled={!allAnswered}
             >
-              {allAnswered ? "Reveal Answer" : `Waiting for ${answerProgress.total - answerProgress.received} more answer(s)`}
+              {allAnswered ? t('wager.host.revealAnswer') : t('wager.host.revealAnswer') + ` (${answerProgress.received}/${answerProgress.total} answered)`}
             </button>
           </>
         )}

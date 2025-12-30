@@ -207,18 +207,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
           </div>
 
           <div className="waiting-message">
-            <p>Waiting for host to start the game...</p>
-          </div>
-          
-          {/* TEST BUTTONS - Remove these after testing */}
-          <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #374151' }}>
-            <h4 style={{ marginBottom: '1rem', color: '#9ca3af' }}>🧪 Test Mode</h4>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setCurrentGame("drinkingWheel")}
-            >
-              Test Drinking Wheel
-            </button>
+            <p>{t('playerScreen.waitingForHost')}</p>
           </div>
         </div>
       )}

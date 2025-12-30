@@ -203,9 +203,8 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
         <button
           className="btn btn-primary"
           onClick={handleRevealAnswer}
-          disabled={!allGuessed}
         >
-          {allGuessed ? t('common.revealAnswer') : t('common.waitingForGuesses', { count: guessProgress.total - guessProgress.received })}
+          {allGuessed ? t('common.revealAnswer') : t('common.revealAnswer') + ` (${guessProgress.received}/${guessProgress.total} answered)`}
         </button>
       </div>
     </div>

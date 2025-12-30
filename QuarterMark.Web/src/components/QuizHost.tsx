@@ -204,9 +204,8 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
           <button
             className="btn btn-primary"
             onClick={handleRevealAnswer}
-            disabled={!allAnswered}
           >
-            {allAnswered ? t('common.revealAnswer') : t('common.waitingForAnswers', { count: answerProgress.total - answerProgress.received })}
+            {allAnswered ? t('common.revealAnswer') : t('common.revealAnswer') + ` (${answerProgress.received}/${answerProgress.total} answered)`}
           </button>
         </div>
       </div>
