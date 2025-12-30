@@ -1,0 +1,147 @@
+.fireworks-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.firework {
+  position: absolute;
+  animation: firework-launch 3s ease-out forwards;
+}
+
+.firework-small .firework-burst {
+  width: 60px;
+  height: 60px;
+}
+
+.firework-medium .firework-burst {
+  width: 100px;
+  height: 100px;
+}
+
+.firework-large .firework-burst {
+  width: 140px;
+  height: 140px;
+}
+
+.firework-burst {
+  position: relative;
+  animation: firework-explode 1.5s ease-out forwards;
+  animation-delay: inherit;
+}
+
+.firework-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--firework-color, #ffd700), transparent);
+  transform-origin: center bottom;
+  animation: spark-fly 1.5s ease-out forwards;
+  animation-delay: inherit;
+  border-radius: 50%;
+  box-shadow: 
+    0 0 10px var(--firework-color, #ffd700),
+    0 0 20px var(--firework-color, #ffd700),
+    0 0 30px var(--firework-color, #ffd700);
+}
+
+.firework-small .firework-spark {
+  width: 3px;
+  height: 15px;
+}
+
+.firework-large .firework-spark {
+  width: 5px;
+  height: 25px;
+}
+
+@keyframes firework-launch {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes firework-explode {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes spark-fly {
+  0% {
+    transform: rotate(inherit) translateY(0) scaleY(0);
+    opacity: 1;
+  }
+  20% {
+    transform: rotate(inherit) translateY(-30px) scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(inherit) translateY(-60px) scaleY(0.3);
+    opacity: 0;
+  }
+}
+
+/* Additional sparkle effects */
+.firework::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: var(--firework-color, #ffd700);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: center-glow 1.5s ease-out forwards;
+  animation-delay: inherit;
+  box-shadow: 
+    0 0 20px var(--firework-color, #ffd700),
+    0 0 40px var(--firework-color, #ffd700),
+    0 0 60px var(--firework-color, #ffd700);
+}
+
+@keyframes center-glow {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(5);
+    opacity: 0;
+  }
+}
+

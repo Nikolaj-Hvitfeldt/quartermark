@@ -69,6 +69,20 @@ export const SOCIAL_MEDIA_RULES: GameRulesData = {
   startButtonText: "📲 Start Scrolling",
 };
 
+export const WAGER_RULES: GameRulesData = {
+  title: "All-In Wager",
+  subtitle: "Double or nothing on the host!",
+  rules: [
+    { emoji: '💰', text: 'Wager any amount of your points before each question' },
+    { emoji: '❓', text: 'Answer fun facts about the host' },
+    { emoji: '✅', text: 'Correct answer: Win double your wager!' },
+    { emoji: '❌', text: 'Wrong answer: Lose your wager' },
+    { emoji: '🎯', text: 'Risk it all or play it safe - your choice!' },
+  ],
+  pointsInfo: "3 questions • Double your wager or lose it all",
+  startButtonText: "🎲 Place Your Bets",
+};
+
 // Helper to get question count text
 export function getQuestionCountText(count: number): string {
   return `${count} question${count !== 1 ? 's' : ''}`;

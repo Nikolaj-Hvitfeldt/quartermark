@@ -9,6 +9,7 @@ import WouldILieHost from "./WouldILieHost";
 import ContestantGuessHost from "./ContestantGuessHost";
 import QuizHost from "./QuizHost";
 import SocialMediaGuessHost from "./SocialMediaGuessHost";
+import WagerHost from "./WagerHost";
 import DrinkingWheelHost from "./DrinkingWheelHost";
 import GameCompletionScreen from "./GameCompletionScreen";
 import { HostScreenProps } from "../types";
@@ -146,6 +147,7 @@ function HostScreen({ onBack }: HostScreenProps) {
         />
       ) : showDrinkingWheel || inGame === "drinkingWheel" ? (
         <DrinkingWheelHost
+          key={`drinking-wheel-${currentGameNumber}`} // Force remount for fresh state
           players={players}
           onSpinComplete={() => {
             // When host clicks "Continue" on drinking wheel, go to next game
@@ -184,6 +186,15 @@ function HostScreen({ onBack }: HostScreenProps) {
         />
       ) : inGame === "socialMediaGuess" ? (
         <SocialMediaGuessHost
+          connection={connection}
+          players={players}
+          onBack={() => {
+            setInGame(null);
+            clearCompletedGame();
+          }}
+        />
+      ) : inGame === "wager" ? (
+        <WagerHost
           connection={connection}
           players={players}
           onBack={() => {
@@ -268,23 +279,33 @@ function HostScreen({ onBack }: HostScreenProps) {
               </button>
             )}
             {sessionActive && !inGame && !completedGame && (
-              <div className="session-info">
-                <p>Game {currentGameNumber} of 5</p>
-                <p className="session-hint">Game will start automatically...</p>
+              <div className="session-status">
+                <div className="session-info">
+                  <p className="session-game-number">Game {currentGameNumber} of 5</p>
+                  <p className="session-hint">Game will start automatically...</p>
+                </div>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    const nextGameType = getNextGameType(currentGameNumber - 1);
+                    setInGame(nextGameType);
+                  }}
+                >
+                  Start Game Now →
+                </button>
               </div>
             )}
-            
-            {/* TEST BUTTONS - Remove these after testing */}
-            <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #374151' }}>
-              <h4 style={{ marginBottom: '1rem', color: '#9ca3af' }}>🧪 Test Mode</h4>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setInGame("drinkingWheel")}
-                style={{ marginRight: '1rem' }}
-              >
-                Test Drinking Wheel
-              </button>
-            </div>
+          </div>
+          
+          {/* TEST BUTTONS - Remove these after testing */}
+          <div className="test-mode-section">
+            <h4>🧪 Test Mode</h4>
+            <button
+              className="btn btn-secondary btn-test"
+              onClick={() => setInGame("drinkingWheel")}
+            >
+              Test Drinking Wheel
+            </button>
           </div>
         </div>
       )}

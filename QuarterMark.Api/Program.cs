@@ -23,6 +23,7 @@ builder.Services.AddScoped<IWouldILieService, WouldILieService>();
 builder.Services.AddScoped<IContestantGuessService, ContestantGuessService>();
 builder.Services.AddScoped<IQuizService, QuizService>();
 builder.Services.AddScoped<ISocialMediaGuessService, SocialMediaGuessService>();
+builder.Services.AddScoped<IWagerService, WagerService>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<ISignalRNotificationService, SignalRNotificationService>();
 

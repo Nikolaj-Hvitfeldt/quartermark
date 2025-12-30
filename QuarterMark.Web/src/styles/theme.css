@@ -25,6 +25,12 @@
   --gold-alpha-30: rgba(255, 215, 0, 0.3);
   --gold-alpha-40: rgba(255, 215, 0, 0.4);
   --gold-alpha-50: rgba(255, 215, 0, 0.5);
+  --gold-alpha-60: rgba(255, 215, 0, 0.6);
+  --gold-alpha-80: rgba(255, 215, 0, 0.8);
+  
+  /* Text Colors */
+  --text-light: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.7);
   
   /* Status Colors */
   --success: #10b981;
