@@ -316,17 +316,23 @@ function HostScreen({ onBack }: HostScreenProps) {
               <div className="session-status">
                 <div className="session-info">
                   <p className="session-game-number">Game {currentGameNumber + 1} of 5</p>
-                  <p className="session-hint">Continue to current game or start new series</p>
+                  <p className="session-hint">
+                    {currentGameNumber >= GAME_CONSTANTS.TOTAL_GAMES 
+                      ? "All games completed" 
+                      : "Continue to current game or start new series"}
+                  </p>
                 </div>
-                <button
-                  className="btn btn-primary btn-large"
-                  onClick={() => {
-                    const nextGameType = getNextGameType(currentGameNumber);
-                    setInGame(nextGameType);
-                  }}
-                >
-                  Continue Current Game →
-                </button>
+                {currentGameNumber < GAME_CONSTANTS.TOTAL_GAMES && (
+                  <button
+                    className="btn btn-primary btn-large"
+                    onClick={() => {
+                      const nextGameType = getNextGameType(currentGameNumber);
+                      setInGame(nextGameType);
+                    }}
+                  >
+                    Continue Current Game →
+                  </button>
+                )}
                 <button
                   className="btn btn-secondary"
                   onClick={async () => {

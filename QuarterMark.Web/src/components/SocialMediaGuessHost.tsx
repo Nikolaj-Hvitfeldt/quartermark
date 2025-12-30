@@ -6,7 +6,6 @@ import { ImageDisplay } from "./ImageDisplay";
 import { AnswerGrid } from "./AnswerGrid";
 import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
-import { STANDINGS_CONSTANTS } from "../utils/standingsUtils";
 import { SOCIAL_MEDIA_GUESS_QUESTIONS } from "../data/socialMediaGuessQuestions";
 import { SOCIAL_MEDIA_RULES, getQuestionCountText } from "../data/gameRules";
 import "./SocialMediaGuess.css";
@@ -29,6 +28,18 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [guessProgress, setGuessProgress] = useState({ total: 0, received: 0 });
   const [showStandings, setShowStandings] = useState(false);
+
+  // Auto-navigate to standings after 3 seconds when answer is revealed
+  useEffect(() => {
+    if (answerRevealed) {
+      const timer = setTimeout(() => {
+        setShowStandings(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowStandings(false);
+    }
+  }, [answerRevealed]);
 
   useEffect(() => {
     if (!connection) return;
@@ -60,10 +71,6 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     } catch (error) {
       console.error("Error starting round:", error);
     }
-  };
-
-  const handleShowStandings = () => {
-    setShowStandings(true);
   };
 
   const handleNextQuestion = async () => {
@@ -139,7 +146,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
   const allGuessed = guessProgress.received === guessProgress.total && guessProgress.total > 0;
   const isLastQuestion = currentQuestionIndex + 1 >= SOCIAL_MEDIA_GUESS_QUESTIONS.length;
 
-  // Show standings screen after answer is revealed and user clicks "View Standings"
+  // Show standings screen after 3 second delay when answer is revealed
   if (answerRevealed && showStandings) {
     return (
       <div className="social-media-guess-host">
@@ -154,6 +161,27 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     );
   }
 
+  // Show answer grid while waiting for auto-navigation
+  if (answerRevealed && !showStandings) {
+    return (
+      <div className="social-media-guess-host">
+        <button className="btn btn-back" onClick={onBack}>
+          ← Back
+        </button>
+        <h3 className="question-progress-header">Question {currentQuestionIndex + 1} of {SOCIAL_MEDIA_GUESS_QUESTIONS.length}</h3>
+        <div className="social-media-guess-question-container">
+          <ImageDisplay imageUrl={currentQuestion.imageUrl} title="Who posted this?" />
+          <AnswerGrid
+            answers={currentQuestion.possibleAnswers}
+            correctAnswer={revealedCorrectAnswer}
+            guesses={guesses}
+            revealed={true}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="social-media-guess-host">
       <button className="btn btn-back" onClick={onBack}>
@@ -163,35 +191,19 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
       <div className="social-media-guess-question-container">
         <ImageDisplay imageUrl={currentQuestion.imageUrl} title="Who posted this?" />
 
-        {!answerRevealed ? (
-          <>
-            <div className="guess-progress">
-              <p>
-                Guesses received: {guessProgress.received} / {guessProgress.total}
-              </p>
-            </div>
-            <AnswerGrid answers={currentQuestion.possibleAnswers} />
-            <button
-              className="btn btn-primary"
-              onClick={handleRevealAnswer}
-              disabled={!allGuessed}
-            >
-              {allGuessed ? "Reveal Answer" : `Waiting for ${guessProgress.total - guessProgress.received} more guess(es)`}
-            </button>
-          </>
-        ) : (
-          <>
-            <AnswerGrid
-              answers={currentQuestion.possibleAnswers}
-              correctAnswer={revealedCorrectAnswer}
-              guesses={guesses}
-              revealed={true}
-            />
-            <button className="btn btn-primary btn-large" onClick={handleShowStandings}>
-              {STANDINGS_CONSTANTS.BUTTONS.VIEW_STANDINGS}
-            </button>
-          </>
-        )}
+        <div className="guess-progress">
+          <p>
+            Guesses received: {guessProgress.received} / {guessProgress.total}
+          </p>
+        </div>
+        <AnswerGrid answers={currentQuestion.possibleAnswers} />
+        <button
+          className="btn btn-primary"
+          onClick={handleRevealAnswer}
+          disabled={!allGuessed}
+        >
+          {allGuessed ? "Reveal Answer" : `Waiting for ${guessProgress.total - guessProgress.received} more guess(es)`}
+        </button>
       </div>
     </div>
   );
