@@ -1,25 +1,12 @@
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
-
-# Visual Studio cache/options
-.vs/
-.vscode/
-*.suo
+# .NET
+bin/
+obj/
 *.user
-*.userosscache
-*.sln.docstates
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
 
 # Node
 node_modules/
@@ -31,13 +18,18 @@ yarn-error.log*
 # Build outputs
 dist/
 build/
+*.tsbuildinfo
 
 # Environment
 .env
 .env.local
 .env.*.local
+# But keep .env.example files
+!.env.example
 
 # IDE
+.vs/
+.vscode/
 .idea/
 *.swp
 *.swo
@@ -47,3 +39,6 @@ build/
 .DS_Store
 Thumbs.db
 
+# Logs
+logs/
+*.log
