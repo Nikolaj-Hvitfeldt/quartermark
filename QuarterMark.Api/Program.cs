@@ -10,7 +10,22 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://127.0.0.1:3000")
+        // Try to get from environment variable first (comma-separated)
+        var allowedOriginsEnv = Environment.GetEnvironmentVariable("AllowedOrigins");
+        string[] allowedOrigins;
+        
+        if (!string.IsNullOrEmpty(allowedOriginsEnv))
+        {
+            allowedOrigins = allowedOriginsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        }
+        else
+        {
+            // Fall back to configuration or defaults
+            allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+                ?? new[] { "http://localhost:3000", "http://127.0.0.1:3000" };
+        }
+        
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -35,5 +50,14 @@ app.UseRouting();
 
 app.MapHub<GameHub>("/gamehub");
 
-app.Run();
+// Get port from environment variable (Render sets PORT)
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    app.Run($"http://0.0.0.0:{port}");
+}
+else
+{
+    app.Run();
+}
 

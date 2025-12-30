@@ -6,13 +6,16 @@ class SignalRService {
   private connection: HubConnection | null = null;
   private listeners: Map<string, ListenerCallback[]> = new Map();
 
-  async connect(url: string = 'http://localhost:5000/gamehub'): Promise<HubConnection> {
+  async connect(url?: string): Promise<HubConnection> {
     if (this.connection?.state === 'Connected') {
       return this.connection;
     }
 
+    const apiUrl = url || import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const hubUrl = `${apiUrl}/gamehub`;
+
     this.connection = new HubConnectionBuilder()
-      .withUrl(url)
+      .withUrl(hubUrl)
       .withAutomaticReconnect()
       .build();
 
