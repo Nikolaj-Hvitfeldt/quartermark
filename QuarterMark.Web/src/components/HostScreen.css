@@ -338,6 +338,38 @@
   opacity: 1;
 }
 
+/* Pre-game actions */
+.pre-game-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.config-btn {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.5);
+}
+
+.config-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 1) 0%, rgba(118, 75, 162, 1) 100%);
+  border-color: rgba(102, 126, 234, 0.8);
+}
+
+.config-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.config-reminder {
+  color: var(--gold-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  animation: pulse 2s ease-in-out infinite;
+}
+
 .dummy-players-section {
   background: linear-gradient(135deg, rgba(31, 41, 55, 0.7) 0%, rgba(17, 24, 39, 0.8) 100%);
   border-radius: 16px;

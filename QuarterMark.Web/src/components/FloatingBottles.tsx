@@ -2,10 +2,10 @@ import React from 'react';
 import './FloatingBottles.css';
 
 const BOTTLE_IMAGES = [
-  '/images/smirnoff-citrus.jpg',
-  '/images/smirnoff-colorful.jpg',
-  '/images/smirnoff-original.jpg',
-  '/images/smirnoff-red.jpg',
+  '/images/smirnoff-images/smirnoff-citrus.jpg',
+  '/images/smirnoff-images/smirnoff-colorful.jpg',
+  '/images/smirnoff-images/smirnoff-original.jpg',
+  '/images/smirnoff-images/smirnoff-red.jpg',
 ];
 
 export function FloatingBottles() {

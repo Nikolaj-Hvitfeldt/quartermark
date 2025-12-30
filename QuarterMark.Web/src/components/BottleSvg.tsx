@@ -7,7 +7,7 @@ interface BottleSvgProps {
 export const BottleSvg: React.FC<BottleSvgProps> = ({ className = '' }) => {
   return (
     <img 
-      src="/images/smirnoff-bottle.svg" 
+      src="/images/smirnoff-images/smirnoff-bottle.svg" 
       alt="Smirnoff Ice Bottle" 
       className={className}
     />

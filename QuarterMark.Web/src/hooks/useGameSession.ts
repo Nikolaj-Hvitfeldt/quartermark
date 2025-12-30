@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import signalRService from '../services/signalRService';
 import { useGameSessionStore } from '../stores/gameSessionStore';
+import { WouldILieRoundConfig } from '../data/wouldILieImages';
 
 interface GameCompletedData {
   gameType: string;
@@ -16,10 +17,12 @@ export function useGameSession(connection: any) {
     currentGameNumber,
     accumulatedScores,
     showDrinkingWheel,
+    wouldILieConfig,
     setActive,
     setCurrentGameNumber,
     setAccumulatedScores,
     setShowDrinkingWheel,
+    setWouldILieConfig,
   } = useGameSessionStore();
 
   useEffect(() => {
@@ -79,7 +82,9 @@ export function useGameSession(connection: any) {
     currentGameNumber,
     accumulatedScores,
     showDrinkingWheel,
+    wouldILieConfig,
     setShowDrinkingWheel,
+    setWouldILieConfig,
     startSession,
     completeGame,
     isLoading: startSessionMutation.isPending || completeGameMutation.isPending,

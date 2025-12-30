@@ -17,7 +17,7 @@ export function WheelHeader({ selectedPlayer, isSpinning, subtitle }: WheelHeade
           <p className="wheel-subtitle congratulations-subtitle">
             Enjoy your{' '}
             <img
-              src="/images/smirnoff-logo.png"
+              src="/images/smirnoff-images/smirnoff-logo.png"
               alt="Smirnoff Ice"
               className="smirnoff-logo-inline"
             />

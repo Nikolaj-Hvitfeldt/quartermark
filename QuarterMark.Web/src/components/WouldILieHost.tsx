@@ -2,10 +2,16 @@ import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useWouldILie } from "../hooks/useWouldILie";
 import { useGameRoom } from "../hooks/useGameRoom";
+import { useGameSession } from "../hooks/useGameSession";
 import signalRService from "../services/signalRService";
 import { WouldILieHostProps } from "../types";
 import { GameRulesCard } from "./GameRulesCard";
+import { ImageDisplay } from "./ImageDisplay";
+import { WouldILieAnswerGrid } from "./WouldILieAnswerGrid";
+import { WouldILieStandings } from "./WouldILieStandings";
 import { WOULD_I_LIE_RULES } from "../data/gameRules";
+import { WOULD_I_LIE_TITLES, WOULD_I_LIE_MESSAGES } from "../utils/wouldILieUtils";
+import "./WouldILie.css";
 import "./WouldILieHost.css";
 
 function WouldILieHost({
@@ -18,7 +24,6 @@ function WouldILieHost({
     currentQuestion,
     claims,
     voteProgress,
-    roundScores,
     answerRevealed,
     setAnswerRevealed,
     setCurrentQuestion,
@@ -26,99 +31,68 @@ function WouldILieHost({
     startRound,
     showQuestion,
     startVoting,
-    revealAnswer,
     endRound,
   } = useWouldILie(connection);
 
   const { players } = useGameRoom();
+  const { wouldILieConfig } = useGameSession(connection);
 
-  const [truthTeller, setTruthTeller] = useState<string>("");
-  const [selectedLiar, setSelectedLiar] = useState<string>("");
-  const [questionNumber, setQuestionNumber] = useState<number>(0);
-  const [dummyVotePlayer, setDummyVotePlayer] = useState<string>("");
-  const [dummyVoteFor, setDummyVoteFor] = useState<string>("");
-  const [isLoadingImage, setIsLoadingImage] = useState<boolean>(false);
-  const [roundEnded, setRoundEnded] = useState<boolean>(false);
-  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+  const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
+  const [dummyVotePlayer, setDummyVotePlayer] = useState("");
+  const [dummyVoteFor, setDummyVoteFor] = useState("");
+  const [roundEnded, setRoundEnded] = useState(false);
 
-  const nonHostPlayers = players.filter((p) => !p.isHost).map((p) => p.name);
+  const currentConfig = wouldILieConfig[currentRoundIndex];
+  const isLastRound = currentRoundIndex >= wouldILieConfig.length - 1;
+  const hasConfig = wouldILieConfig.length > 0;
+  const totalRounds = wouldILieConfig.length;
 
   const submitDummyVoteMutation = useMutation({
-    mutationFn: async ({
-      playerName,
-      votedFor,
-    }: {
-      playerName: string;
-      votedFor: string;
-    }) => {
-      await signalRService.invoke(
-        "SubmitDummyPlayerVote",
-        playerName,
-        votedFor
-      );
+    mutationFn: async ({ playerName, votedFor }: { playerName: string; votedFor: string }) => {
+      await signalRService.invoke("SubmitDummyPlayerVote", playerName, votedFor);
     },
   });
 
   const handleStartRound = async () => {
     try {
       await startRound();
-      setQuestionNumber(0);
+      setCurrentRoundIndex(0);
     } catch (error) {
       console.error("Error starting round:", error);
     }
   };
 
-  // Fetch preview image when setup screen appears
+  // Auto-show question when round starts
   useEffect(() => {
-    if (
-      roundActive &&
-      !currentQuestion &&
-      !previewImageUrl &&
-      !isLoadingImage
-    ) {
-      const fetchPreviewImage = async () => {
-        setIsLoadingImage(true);
+    if (roundActive && !currentQuestion && hasConfig && currentConfig) {
+      const autoShowQuestion = async () => {
         try {
-          const image = (await signalRService.invoke("GetRandomImage")) as
-            | string
-            | null;
-          if (!image) {
-            // No more images available - end the round and show final score screen
-            await endRound();
-            setRoundEnded(true);
-          } else {
-            setPreviewImageUrl(image);
-          }
+          await showQuestion(
+            currentConfig.imageUrl,
+            currentConfig.truthTeller,
+            [currentConfig.liar]
+          );
         } catch (error) {
-          console.error("Error fetching preview image:", error);
-        } finally {
-          setIsLoadingImage(false);
+          console.error("Error auto-showing question:", error);
         }
       };
-      fetchPreviewImage();
+      const timer = setTimeout(autoShowQuestion, 500);
+      return () => clearTimeout(timer);
     }
-  }, [roundActive, currentQuestion, previewImageUrl, isLoadingImage, endRound]);
+  }, [roundActive, currentQuestion, hasConfig, currentConfig, showQuestion]);
 
-  const handleShowQuestion = async () => {
-    if (!truthTeller || !selectedLiar) {
-      alert("Please select truth teller and one liar");
-      return;
-    }
-
-    if (!previewImageUrl) {
-      alert("No image available. Please try again.");
-      return;
-    }
-
-    try {
-      await showQuestion(previewImageUrl, truthTeller, [selectedLiar]);
-      setQuestionNumber((prev) => prev + 1);
-      setTruthTeller("");
-      setSelectedLiar("");
-      setPreviewImageUrl(null); // Clear preview for next question
-    } catch (error) {
-      console.error("Error showing question:", error);
-      alert("Failed to show question. Please try again.");
+  const handleNextQuestion = async () => {
+    if (isLastRound) {
+      try {
+        await endRound();
+        setRoundEnded(true);
+      } catch (error) {
+        console.error("Error ending round:", error);
+      }
+    } else {
+      setCurrentRoundIndex(prev => prev + 1);
+      setAnswerRevealed(false);
+      setCurrentQuestion(null);
     }
   };
 
@@ -130,22 +104,6 @@ function WouldILieHost({
     }
   };
 
-  const handleEndRound = async () => {
-    if (
-      window.confirm(
-        "End the round? Host will receive points equal to lowest scoring player."
-      )
-    ) {
-      try {
-        await endRound();
-        setQuestionNumber(0);
-        setRoundEnded(true);
-      } catch (error) {
-        console.error("Error ending round:", error);
-      }
-    }
-  };
-
   const handleBackToMain = () => {
     setRoundEnded(false);
     setRoundActive(false);
@@ -154,25 +112,25 @@ function WouldILieHost({
     onBack();
   };
 
-  // Show final score screen when round ends (no more images)
+  const handleDummyVoteSubmit = () => {
+    if (dummyVotePlayer && dummyVoteFor) {
+      submitDummyVoteMutation.mutate({
+        playerName: dummyVotePlayer,
+        votedFor: dummyVoteFor,
+      });
+      setDummyVotePlayer("");
+      setDummyVoteFor("");
+    }
+  };
+
+  // Final score screen
   if (roundEnded) {
     return (
       <div className="would-i-lie-host">
         <div className="score-screen final-score-screen">
-          <h2>Final Standings</h2>
-          <p className="round-complete-message">Round complete - SKÅL!</p>
-          <div className="standings-list">
-            {players
-              .filter((p) => !p.isHost)
-              .sort((a, b) => b.score - a.score)
-              .map((player, index) => (
-                <div key={player.name} className="standing-item">
-                  <span className="standing-rank">#{index + 1}</span>
-                  <span className="standing-name">{player.name}</span>
-                  <span className="standing-score">{player.score} pts</span>
-                </div>
-              ))}
-          </div>
+          <h2>{WOULD_I_LIE_TITLES.FINAL_STANDINGS}</h2>
+          <p className="round-complete-message">{WOULD_I_LIE_MESSAGES.ROUND_COMPLETE_SKAAL}</p>
+          <WouldILieStandings players={players} title="" />
           <div className="final-score-actions">
             <button className="btn btn-primary btn-large" onClick={handleBackToMain}>
               Continue
@@ -183,6 +141,7 @@ function WouldILieHost({
     );
   }
 
+  // Pre-round screen
   if (!roundActive) {
     return (
       <div className="would-i-lie-host">
@@ -194,207 +153,106 @@ function WouldILieHost({
           onStart={handleStartRound}
           startButtonText={WOULD_I_LIE_RULES.startButtonText}
         />
+        {hasConfig && (
+          <div className="config-preview">
+            <p>📋 {totalRounds} rounds configured</p>
+          </div>
+        )}
       </div>
     );
   }
 
+  // Loading question
   if (!currentQuestion) {
     return (
       <div className="would-i-lie-host">
         <div className="round-controls">
-          <h2>Question {questionNumber + 1}</h2>
-
-          {/* Preview image for host */}
-          {isLoadingImage && (
-            <div className="image-preview">
-              <p>Loading image...</p>
-            </div>
-          )}
-          {previewImageUrl && !isLoadingImage && (
-            <div className="image-preview">
-              <img src={previewImageUrl} alt="Preview" />
-              <p className="preview-note">
-                Preview: Assign roles based on this image
-              </p>
-            </div>
-          )}
-
-          <div className="setup-form">
-            <div className="form-group">
-              <label>Who actually knows this person? (Truth Teller):</label>
-              <select
-                value={truthTeller}
-                onChange={(e) => setTruthTeller(e.target.value)}
-                className="input"
-              >
-                <option value="">Select truth teller...</option>
-                {nonHostPlayers.map((name) => (
-                  <option key={name} value={name}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Who will lie? (Select one):</label>
-              <select
-                value={selectedLiar}
-                onChange={(e) => setSelectedLiar(e.target.value)}
-                className="input"
-              >
-                <option value="">Select liar...</option>
-                {nonHostPlayers
-                  .filter((name) => name !== truthTeller)
-                  .map((name) => (
-                    <option key={name} value={name}>
-                      {name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          </div>
-          
-          <div className="action-buttons">
-            <button
-              className="btn btn-primary btn-large"
-              onClick={handleShowQuestion}
-              disabled={
-                !truthTeller ||
-                !selectedLiar ||
-                isLoadingImage ||
-                !previewImageUrl
-              }
-            >
-              {isLoadingImage ? "Loading image..." : "Show Question to Players"}
-            </button>
-            <button className="btn btn-secondary" onClick={handleEndRound}>
-              End Round
-            </button>
-          </div>
-          
-          {Object.keys(roundScores).length > 0 && (
-            <div className="round-scores">
-              <h3>Round Scores (so far)</h3>
-              <div className="scores-list">
-                {Object.entries(roundScores)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([name, score]) => (
-                    <div key={name} className="score-item">
-                      {name}: {score} pts
-                    </div>
-                  ))}
+          <h2>Question {currentRoundIndex + 1} of {totalRounds}</h2>
+          <div className="loading-question">
+            <p>Loading question...</p>
+            {currentConfig && (
+              <div className="config-info">
+                <p>Truth Teller: <strong>{currentConfig.truthTeller}</strong></p>
+                <p>Liar: <strong>{currentConfig.liar}</strong></p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
-  // Show standings screen when answer is revealed
+  // Standings screen after answer revealed
   if (answerRevealed) {
     return (
       <div className="would-i-lie-host">
         <div className="score-screen">
-          <h2>Current Standings</h2>
-          <div className="standings-list">
-            {players
-              .filter((p) => !p.isHost)
-              .sort((a, b) => b.score - a.score)
-              .map((player, index) => (
-                <div key={player.name} className="standing-item">
-                  <span className="standing-rank">#{index + 1}</span>
-                  <span className="standing-name">{player.name}</span>
-                  <span className="standing-score">{player.score} pts</span>
-                </div>
-              ))}
-          </div>
-          <button
-            className="btn btn-primary btn-large"
-            onClick={() => {
-              // Reset state to allow setting up next question
-              setAnswerRevealed(false);
-              setCurrentQuestion(null);
-            }}
-          >
-            Next Question
+          <h2>{WOULD_I_LIE_TITLES.CURRENT_STANDINGS}</h2>
+          <p className="question-progress">
+            Question {currentRoundIndex + 1} of {totalRounds} complete
+          </p>
+          <WouldILieStandings players={players} title="" />
+          <button className="btn btn-primary btn-large" onClick={handleNextQuestion}>
+            {isLastRound ? "End Round" : "Next Question →"}
           </button>
         </div>
       </div>
     );
   }
 
+  // Active question screen
+  const answerOptions = claims.map(claim => ({
+    playerName: claim.playerName,
+  }));
+
+  const eligibleDummyPlayers = players.filter(
+    p => !p.isHost && p.isDummy && 
+    !currentQuestion.assignedPlayers.includes(p.name) &&
+    !claims.some(c => c.playerName === p.name)
+  );
+
   return (
     <div className="would-i-lie-host">
-      <div className="question-display">
-        <h2>Question {questionNumber}</h2>
+      <div className="wil-game-container">
+        <h2 className="wil-game-title">{WOULD_I_LIE_TITLES.WHO_KNOWS}</h2>
+        
         {currentQuestion.imageUrl && (
-          <div className="image-preview">
-            <img src={currentQuestion.imageUrl} alt="Question" />
-            {currentQuestion.truthTellerName && (
-              <div className="truth-teller-info">
-                <p className="truth-teller-label">Truth Teller:</p>
-                <p className="truth-teller-name">
-                  {currentQuestion.truthTellerName}
-                </p>
-              </div>
-            )}
-          </div>
+          <ImageDisplay imageUrl={currentQuestion.imageUrl} altText="Mystery Person" />
         )}
 
-        <div className="claims-display">
-          <h3>Players who claim to know this person:</h3>
-          {claims.map((claim, index) => (
-            <div key={index} className="claim-card">
-              <h4>{claim.playerName}</h4>
-            </div>
-          ))}
-        </div>
-        <button
-          className="btn btn-primary btn-large"
-          onClick={handleStartVoting}
-        >
+        <WouldILieAnswerGrid options={answerOptions} />
+
+        <button className="btn btn-primary btn-large" onClick={handleStartVoting}>
           Start Voting
         </button>
 
         {voteProgress.received > 0 && (
-          <div className="voting-progress">
-            <p>
+          <div className="wil-voting-progress">
+            <p className="wil-vote-count">
               Votes: {voteProgress.received}/{voteProgress.total}
             </p>
 
-            {/* Dummy player vote submission for testing */}
-            {voteProgress.received < voteProgress.total && (
+            {voteProgress.received < voteProgress.total && eligibleDummyPlayers.length > 0 && (
               <div className="dummy-player-actions">
                 <h4>Submit vote for dummy player (testing):</h4>
                 <div className="dummy-action-controls">
                   <select
                     value={dummyVotePlayer}
-                    onChange={(e) => setDummyVotePlayer(e.target.value)}
+                    onChange={e => setDummyVotePlayer(e.target.value)}
                     className="input"
                   >
                     <option value="">Select dummy player...</option>
-                    {players
-                      .filter(
-                        (p) =>
-                          !p.isHost &&
-                          p.isDummy &&
-                          !currentQuestion.assignedPlayers.includes(p.name) &&
-                          !claims.some((c) => c.playerName === p.name)
-                      )
-                      .map((p) => (
-                        <option key={p.name} value={p.name}>
-                          {p.name}
-                        </option>
-                      ))}
+                    {eligibleDummyPlayers.map(p => (
+                      <option key={p.name} value={p.name}>{p.name}</option>
+                    ))}
                   </select>
                   <select
                     value={dummyVoteFor}
-                    onChange={(e) => setDummyVoteFor(e.target.value)}
+                    onChange={e => setDummyVoteFor(e.target.value)}
                     className="input"
                   >
                     <option value="">Select who to vote for...</option>
-                    {claims.map((claim) => (
+                    {claims.map(claim => (
                       <option key={claim.playerName} value={claim.playerName}>
                         {claim.playerName}
                       </option>
@@ -402,16 +260,7 @@ function WouldILieHost({
                   </select>
                   <button
                     className="btn btn-secondary"
-                    onClick={() => {
-                      if (dummyVotePlayer && dummyVoteFor) {
-                        submitDummyVoteMutation.mutate({
-                          playerName: dummyVotePlayer,
-                          votedFor: dummyVoteFor,
-                        });
-                        setDummyVotePlayer("");
-                        setDummyVoteFor("");
-                      }
-                    }}
+                    onClick={handleDummyVoteSubmit}
                     disabled={!dummyVotePlayer || !dummyVoteFor}
                   >
                     Submit Vote

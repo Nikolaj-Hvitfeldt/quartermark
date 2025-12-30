@@ -1,169 +1,69 @@
+/* Would I Lie Host - Component-specific styles */
+/* Shared styles are in WouldILie.css */
+
 .would-i-lie-host {
   min-height: 100vh;
   padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  align-items: center;
 }
 
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  width: 100%;
-}
-
-.action-buttons .btn-primary {
-  width: 100%;
-}
-
-.action-buttons .btn-secondary {
-  width: 100%;
-  background: rgba(55, 65, 81, 0.8);
-  border: 1px solid rgba(255, 215, 0, 0.2);
-}
-
-.action-buttons .btn-secondary:hover {
-  background: rgba(75, 85, 99, 0.9);
-  border-color: rgba(255, 215, 0, 0.4);
-}
-
+/* Round controls */
 .round-controls {
-  background: #1f2937;
+  background: var(--gradient-card-dark);
   border-radius: 12px;
   padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
-}
-
-.player-checkboxes {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.checkbox-label:hover {
-  background: #111827;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 1.25rem;
-  height: 1.25rem;
-  cursor: pointer;
-}
-
-.image-preview {
-  max-width: 500px;
-  margin: 2rem auto;
   text-align: center;
+  border: 1px solid var(--border-gold-subtle);
 }
 
-.image-preview img {
-  width: 100%;
-  border-radius: 12px;
-  border: 4px solid #4f46e5;
-}
-
-.preview-note {
-  margin-top: 1rem;
-  color: #9ca3af;
-  font-size: 0.875rem;
-  font-style: italic;
-}
-
-.truth-teller-info {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: #065f46;
-  border-radius: 8px;
-  border: 2px solid #10b981;
-}
-
-.truth-teller-label {
-  font-size: 0.875rem;
-  color: #9ca3af;
-  margin-bottom: 0.25rem;
-}
-
-.truth-teller-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #10b981;
-  margin: 0;
-}
-
-.waiting-claims {
-  text-align: center;
-  padding: 2rem;
-  background: #1f2937;
-  border-radius: 8px;
-  margin: 2rem 0;
-}
-
-.round-scores {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: #1f2937;
-  border-radius: 8px;
-}
-
-.round-scores h3 {
+.round-controls h2 {
+  font-family: var(--font-display);
+  color: var(--gold-primary);
   margin-bottom: 1rem;
 }
 
-.scores-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.score-item {
-  padding: 0.75rem;
-  background: #111827;
-  border-radius: 4px;
-  font-size: 1.125rem;
-}
-
-.question-display {
-  max-width: 1200px;
-  margin: 0 auto;
+/* Loading question screen */
+.loading-question {
   text-align: center;
+  padding: 2rem;
 }
 
-.image-selector {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
+.loading-question p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
 }
 
-.selected-image {
+.config-info {
+  background: rgba(31, 41, 55, 0.8);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--gold-alpha-20);
   margin-top: 1rem;
 }
 
-.image-preview-small {
-  margin-top: 0.5rem;
+.config-info p {
+  margin: 0.5rem 0;
+  color: var(--text-muted);
 }
 
-.image-preview-small img {
-  max-width: 200px;
-  max-height: 200px;
-  border-radius: 8px;
-  border: 2px solid #374151;
+.config-info strong {
+  color: var(--gold-primary);
 }
 
+/* Config preview on start screen */
+.config-preview {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--gold-muted);
+  font-size: 0.95rem;
+}
+
+/* Score screen */
 .score-screen {
   flex: 1;
   display: flex;
@@ -173,12 +73,15 @@
   text-align: center;
   min-height: 60vh;
   gap: 2rem;
+  width: 100%;
+  max-width: 800px;
 }
 
 .score-screen h2 {
+  font-family: var(--font-display);
   font-size: 2.5rem;
+  color: var(--gold-primary);
   margin-bottom: 1rem;
-  color: white;
 }
 
 .final-score-screen {
@@ -188,7 +91,13 @@
 
 .round-complete-message {
   font-size: 1.25rem;
-  color: #9ca3af;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.question-progress {
+  color: var(--gold-muted);
+  font-size: 0.95rem;
   margin-bottom: 1rem;
 }
 
@@ -200,59 +109,20 @@
   max-width: 400px;
 }
 
-.standings-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 700px;
-  margin: 0 auto 2rem;
-  width: 100%;
-}
-
-.standing-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 2rem;
-  background: #1f2937;
-  border-radius: 8px;
-  border: 2px solid #374151;
-  min-width: 100%;
-}
-
-.standing-rank {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #9ca3af;
-  min-width: 50px;
-}
-
-.standing-name {
-  font-size: 1.25rem;
-  font-weight: 500;
-  flex: 1;
-  text-align: left;
-  margin-left: 1rem;
-}
-
-.standing-score {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #4f46e5;
-}
-
+/* Dummy player testing section */
 .dummy-player-actions {
   margin-top: 2rem;
   padding: 1.5rem;
-  background: #111827;
-  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.8);
+  border-radius: 12px;
+  border: 1px dashed var(--border-gold-subtle);
   text-align: left;
 }
 
 .dummy-player-actions h4 {
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin-bottom: 1rem;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .dummy-action-controls {
@@ -264,148 +134,14 @@
 .dummy-action-controls .input {
   padding: 0.75rem;
   font-size: 1rem;
-  border: 2px solid #374151;
+  border: 2px solid rgba(55, 65, 81, 0.8);
   border-radius: 8px;
-  background: #1f2937;
+  background: rgba(31, 41, 55, 0.8);
   color: white;
   font-family: inherit;
 }
 
-.dummy-action-controls textarea.input {
-  resize: vertical;
-  min-height: 80px;
-}
-
 .dummy-action-controls .input:focus {
   outline: none;
-  border-color: #4f46e5;
-}
-
-.round-setup {
-  background: #1f2937;
-  border-radius: 12px;
-  padding: 2rem;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.round-setup h2 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-}
-
-.setup-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
-  font-size: 1.125rem;
-  color: #9ca3af;
-}
-
-.form-group .input {
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 2px solid #374151;
-  border-radius: 8px;
-  background: #111827;
-  color: white;
-}
-
-.form-group select.input {
-  cursor: pointer;
-}
-
-.round-display {
-  background: #1f2937;
-  border-radius: 12px;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.round-display h3 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-}
-
-.claims-display {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin: 2rem 0;
-}
-
-.claim-card {
-  background: #111827;
-  padding: 1.5rem;
-  border-radius: 8px;
-  text-align: left;
-}
-
-.claim-card h4 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #4f46e5;
-}
-
-.claim-card p {
-  font-size: 1.125rem;
-  line-height: 1.6;
-  color: #d1d5db;
-}
-
-.reveal-section {
-  text-align: left;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.correct-answer {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: #065f46;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.correct-answer strong {
-  color: #10b981;
-  font-size: 1.75rem;
-}
-
-.votes-display {
-  margin-top: 2rem;
-}
-
-.votes-display h4 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.vote-item {
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-  border-radius: 8px;
-  background: #111827;
-}
-
-.vote-item.correct {
-  background: #065f46;
-  border-left: 4px solid #10b981;
-}
-
-.vote-item.incorrect {
-  background: #7f1d1d;
-  border-left: 4px solid #ef4444;
+  border-color: var(--gold-primary);
 }
