@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { PlayerDto } from "../types";
-import { getGameName, sortPlayersByScore, GAME_CONSTANTS } from "../utils/gameUtils";
+import { getGameName, sortPlayersByScore } from "../utils/gameUtils";
+import { FINAL_RESULTS_AUTO_SHOW_DELAY_MS } from "../utils/finalResultsConstants";
 import { Leaderboard } from "./Leaderboard";
+import { FinalResultsScreen } from "./FinalResultsScreen";
 import "./GameCompletionScreen.css";
 
 interface GameCompletionScreenPlayerProps {
@@ -21,10 +23,33 @@ function GameCompletionScreenPlayer({
   accumulatedScores,
   playerName,
 }: GameCompletionScreenPlayerProps) {
+  const [showFinalResults, setShowFinalResults] = useState(false);
   const sortedPlayers = sortPlayersByScore(players, accumulatedScores);
   const playerRank = sortedPlayers.findIndex((p) => p.name === playerName) + 1;
   const playerScore = accumulatedScores[playerName] || 0;
   const isLastGame = gameNumber >= totalGames;
+
+  // Auto-show final results for the last game after a short delay
+  useEffect(() => {
+    if (isLastGame) {
+      const timer = setTimeout(() => {
+        setShowFinalResults(true);
+      }, FINAL_RESULTS_AUTO_SHOW_DELAY_MS);
+      return () => clearTimeout(timer);
+    }
+  }, [isLastGame]);
+
+  // Show the final results podium screen
+  if (showFinalResults) {
+    return (
+      <FinalResultsScreen
+        players={players}
+        accumulatedScores={accumulatedScores}
+        onClose={() => {}}
+        isHost={false}
+      />
+    );
+  }
 
   return (
     <div className="game-completion-screen">
@@ -56,7 +81,15 @@ function GameCompletionScreenPlayer({
 
         <div className="completion-message">
           {isLastGame ? (
-            <p className="final-message">🏆 Final Results! 🏆</p>
+            <>
+              <p className="final-message">🏆 Final Results! 🏆</p>
+              <button 
+                className="btn btn-primary view-final-btn-player" 
+                onClick={() => setShowFinalResults(true)}
+              >
+                View Podium →
+              </button>
+            </>
           ) : (
             <p className="waiting-message">
               Waiting for host to continue to next game...

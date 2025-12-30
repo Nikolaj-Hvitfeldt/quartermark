@@ -9,6 +9,7 @@ import WouldILieHost from "./WouldILieHost";
 import ContestantGuessHost from "./ContestantGuessHost";
 import QuizHost from "./QuizHost";
 import SocialMediaGuessHost from "./SocialMediaGuessHost";
+import WagerHost from "./WagerHost";
 import DrinkingWheelHost from "./DrinkingWheelHost";
 import GameCompletionScreen from "./GameCompletionScreen";
 import { HostScreenProps } from "../types";
@@ -184,6 +185,15 @@ function HostScreen({ onBack }: HostScreenProps) {
         />
       ) : inGame === "socialMediaGuess" ? (
         <SocialMediaGuessHost
+          connection={connection}
+          players={players}
+          onBack={() => {
+            setInGame(null);
+            clearCompletedGame();
+          }}
+        />
+      ) : inGame === "wager" ? (
+        <WagerHost
           connection={connection}
           players={players}
           onBack={() => {

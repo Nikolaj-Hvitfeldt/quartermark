@@ -9,6 +9,7 @@ import WouldILiePlayer from './WouldILiePlayer';
 import ContestantGuessPlayer from './ContestantGuessPlayer';
 import QuizPlayer from './QuizPlayer';
 import SocialMediaGuessPlayer from './SocialMediaGuessPlayer';
+import WagerPlayer from './WagerPlayer';
 import DrinkingWheelPlayer from './DrinkingWheelPlayer';
 import GameCompletionScreenPlayer from './GameCompletionScreenPlayer';
 import { PlayerScreenProps } from '../types';
@@ -18,45 +19,51 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
   const { connection, roomCode, players, error, isConnected, joinRoom } = useGameRoom();
   const { playerName, roomCodeInput, setPlayerName, setRoomCodeInput } = usePlayerStore();
   const { currentGameNumber, accumulatedScores } = useGameSession(connection);
+  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
   const { completedGame, clearCompletedGame } = useGameCompletion({
     connection,
     // Don't set currentGame to null here - let completedGame state handle the navigation
     // The completion screen will be shown when completedGame is set
   });
-  const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
 
   useEffect(() => {
     if (!connection) return;
 
     const handleWouldILieRoundStarted = () => {
+      clearCompletedGame(); // Clear completion state first
       setCurrentGame("wouldILie");
-      clearCompletedGame();
     };
 
     const handleContestantGuessRoundStarted = () => {
+      clearCompletedGame(); // Clear completion state first
       setCurrentGame("contestantGuess");
-      clearCompletedGame();
     };
 
     const handleQuizRoundStarted = () => {
+      clearCompletedGame(); // Clear completion state first
       setCurrentGame("quiz");
-      clearCompletedGame();
     };
 
     const handleSocialMediaGuessRoundStarted = () => {
+      clearCompletedGame(); // Clear completion state first
       setCurrentGame("socialMediaGuess");
-      clearCompletedGame();
+    };
+
+    const handleWagerRoundStarted = () => {
+      clearCompletedGame(); // Clear completion state first
+      setCurrentGame("wager");
     };
 
     const handleShowDrinkingWheel = () => {
+      clearCompletedGame(); // Clear completion state first
       setCurrentGame("drinkingWheel");
-      clearCompletedGame();
     };
 
     signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
     signalRService.on('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
     signalRService.on('QuizRoundStarted', handleQuizRoundStarted);
     signalRService.on('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
+    signalRService.on('WagerRoundStarted', handleWagerRoundStarted);
     signalRService.on('ShowDrinkingWheel', handleShowDrinkingWheel);
 
     return () => {
@@ -64,6 +71,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       signalRService.off('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
       signalRService.off('QuizRoundStarted', handleQuizRoundStarted);
       signalRService.off('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
+      signalRService.off('WagerRoundStarted', handleWagerRoundStarted);
       signalRService.off('ShowDrinkingWheel', handleShowDrinkingWheel);
     };
   }, [connection, clearCompletedGame]);
@@ -155,6 +163,13 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
         />
       ) : currentGame === "socialMediaGuess" ? (
         <SocialMediaGuessPlayer
+          connection={connection}
+          playerName={playerName}
+          players={players}
+          onBack={() => setCurrentGame(null)}
+        />
+      ) : currentGame === "wager" ? (
+        <WagerPlayer
           connection={connection}
           playerName={playerName}
           players={players}

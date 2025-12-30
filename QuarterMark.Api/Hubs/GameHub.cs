@@ -13,6 +13,7 @@ public class GameHub : Hub
     private readonly IContestantGuessService _contestantGuessService;
     private readonly IQuizService _quizService;
     private readonly ISocialMediaGuessService _socialMediaGuessService;
+    private readonly IWagerService _wagerService;
     private readonly IGameSessionService _gameSessionService;
     private readonly ISignalRNotificationService _notificationService;
 
@@ -22,6 +23,7 @@ public class GameHub : Hub
         IContestantGuessService contestantGuessService,
         IQuizService quizService,
         ISocialMediaGuessService socialMediaGuessService,
+        IWagerService wagerService,
         IGameSessionService gameSessionService,
         ISignalRNotificationService notificationService)
     {
@@ -30,6 +32,7 @@ public class GameHub : Hub
         _contestantGuessService = contestantGuessService;
         _quizService = quizService;
         _socialMediaGuessService = socialMediaGuessService;
+        _wagerService = wagerService;
         _gameSessionService = gameSessionService;
         _notificationService = notificationService;
     }
@@ -648,6 +651,136 @@ public class GameHub : Hub
     private SocialMediaGuessQuestion? GetCurrentSocialMediaGuessQuestion(string roomCode)
     {
         return _socialMediaGuessService.GetCurrentQuestion(roomCode);
+    }
+
+    // Wager Game Methods
+    public async Task StartWagerRound()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        await _wagerService.StartRoundAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "WagerRoundStarted");
+    }
+
+    public async Task ShowWagerQuestion(string questionText, string correctAnswer, List<string> possibleAnswers)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        await _wagerService.ShowQuestionAsync(roomCode, questionText, correctAnswer, possibleAnswers);
+        
+        await _notificationService.NotifyRoomAsync(roomCode, "WagerQuestionShown", new
+        {
+            questionText,
+            possibleAnswers
+        });
+    }
+
+    public async Task SubmitWager(int wagerAmount)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var success = await _wagerService.SubmitWagerAsync(roomCode, Context.ConnectionId, wagerAmount);
+        if (!success) return;
+
+        var question = GetCurrentWagerQuestion(roomCode);
+        if (question == null) return;
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var totalPlayers = players.Where(p => !p.IsHost).Count();
+        var totalWagers = question.Wagers.Count;
+
+        await _notificationService.NotifyClientAsync(
+            await GetHostConnectionId(roomCode),
+            "WagerReceived",
+            new
+            {
+                totalWagers,
+                totalPlayers
+            });
+    }
+
+    public async Task SubmitWagerAnswer(string selectedAnswer)
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var success = await _wagerService.SubmitAnswerAsync(roomCode, Context.ConnectionId, selectedAnswer);
+        if (!success) return;
+
+        var question = GetCurrentWagerQuestion(roomCode);
+        if (question == null) return;
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var totalPlayers = players.Where(p => !p.IsHost).Count();
+        var totalAnswers = question.Guesses.Count;
+
+        await _notificationService.NotifyClientAsync(
+            await GetHostConnectionId(roomCode),
+            "WagerAnswerReceived",
+            new
+            {
+                totalAnswers,
+                totalPlayers
+            });
+    }
+
+    public async Task RevealWagerAnswer()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var roundScores = await _wagerService.RevealAnswerAsync(roomCode);
+        
+        var question = GetCurrentWagerQuestion(roomCode);
+        if (question != null)
+        {
+            await _notificationService.NotifyRoomAsync(roomCode, "WagerAnswerRevealed", new
+            {
+                correctAnswer = question.CorrectAnswer,
+                guesses = question.Guesses,
+                wagers = question.Wagers,
+                roundScores
+            });
+        }
+    }
+
+    public async Task EndWagerRound()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var roundScores = await _wagerService.EndRoundAsync(roomCode);
+        
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "WagerRoundEnded", new
+        {
+            finalScores = players,
+            roundScores
+        });
+        
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+
+        await CompleteGameAndCheckDrinkingWheelAsync(roomCode, "Wager", roundScores);
+    }
+
+    private WagerQuestion? GetCurrentWagerQuestion(string roomCode)
+    {
+        return _wagerService.GetCurrentQuestion(roomCode);
     }
 
     private async Task CompleteGameAndCheckDrinkingWheelAsync(string roomCode, string gameType, Dictionary<string, int> roundScores)

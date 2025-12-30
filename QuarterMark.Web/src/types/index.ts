@@ -158,6 +158,19 @@ export interface DrinkingWheelPlayerProps {
   players: PlayerDto[];
 }
 
+export interface WagerHostProps {
+  connection: any; // HubConnection from SignalR
+  players: PlayerDto[];
+  onBack: () => void;
+}
+
+export interface WagerPlayerProps {
+  connection: any; // HubConnection from SignalR
+  playerName: string;
+  players: PlayerDto[];
+  onBack: () => void;
+}
+
 // Game State
 export interface CurrentQuestion {
   imageUrl: string;

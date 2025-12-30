@@ -1,0 +1,408 @@
+.final-results-screen {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-midnight);
+  background-size: 400% 400%;
+  animation: midnightShift 20s ease infinite;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+/* Starfield overlay */
+.final-results-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(2px 2px at 30px 40px, var(--gold-primary), transparent),
+    radial-gradient(2px 2px at 80px 80px, #fff, transparent),
+    radial-gradient(1px 1px at 130px 30px, var(--gold-primary), transparent),
+    radial-gradient(2px 2px at 180px 120px, #fff, transparent),
+    radial-gradient(1px 1px at 240px 60px, var(--gold-primary), transparent),
+    radial-gradient(2px 2px at 300px 100px, #fff, transparent),
+    radial-gradient(1px 1px at 360px 140px, var(--gold-primary), transparent),
+    radial-gradient(2px 2px at 420px 50px, #fff, transparent),
+    radial-gradient(1px 1px at 500px 90px, var(--gold-primary), transparent),
+    radial-gradient(2px 2px at 550px 130px, #fff, transparent);
+  background-repeat: repeat;
+  background-size: 600px 200px;
+  animation: twinkle 4s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.final-results-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 900px;
+  width: 100%;
+}
+
+.final-results-title {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title-text {
+  background: var(--gradient-gold);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+.sparkle {
+  animation: sparkle-dance 1s ease-in-out infinite;
+  font-size: 3rem;
+}
+
+@keyframes sparkle-dance {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.2) rotate(10deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1) rotate(-5deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.9;
+  }
+}
+
+.final-results-subtitle {
+  font-size: 1.5rem;
+  color: var(--gold-light);
+  margin-bottom: 3rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Podium Container */
+.podium-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.podium-position {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Player Info */
+.player-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.player-avatar.gold {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-light), var(--gold-dark));
+  box-shadow: 0 0 30px var(--gold-alpha-60);
+}
+
+.player-avatar.silver {
+  background: linear-gradient(135deg, var(--medal-silver), #e8e8e8, #a8a8a8);
+  box-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
+}
+
+.player-avatar.bronze {
+  background: linear-gradient(135deg, var(--medal-bronze), #e8a860, #8b4513);
+  box-shadow: 0 0 20px rgba(205, 127, 50, 0.5);
+}
+
+.winner-glow {
+  animation: winner-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes winner-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 30px var(--gold-alpha-60);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 
+      0 0 50px var(--gold-alpha-80),
+      0 0 80px var(--gold-alpha-50),
+      0 0 120px var(--gold-alpha-30);
+  }
+}
+
+.medal {
+  font-size: 2.5rem;
+}
+
+.medal.crown {
+  font-size: 3rem;
+  animation: crown-bounce 1s ease-in-out infinite;
+}
+
+@keyframes crown-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.player-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 0.25rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.winner-name {
+  font-size: 1.5rem;
+  color: var(--gold-primary);
+  animation: name-glow 2s ease-in-out infinite;
+}
+
+@keyframes name-glow {
+  0%, 100% {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px var(--gold-alpha-50);
+  }
+  50% {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px var(--gold-alpha-80), 0 0 30px var(--gold-alpha-50);
+  }
+}
+
+.player-score {
+  font-size: 1rem;
+  color: var(--gold-muted);
+  margin-bottom: 0.5rem;
+}
+
+.winner-score {
+  font-size: 1.25rem;
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+/* Podium Blocks */
+.podium-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.podium-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-shine);
+}
+
+.first-block {
+  width: 140px;
+  height: 160px;
+  background: linear-gradient(180deg, var(--gold-primary) 0%, var(--gold-dark) 50%, var(--gold-darker) 100%);
+  box-shadow: 
+    0 0 40px var(--gold-alpha-40),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.second-block {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(180deg, #c0c0c0 0%, #a8a8a8 50%, #808080 100%);
+  box-shadow: 
+    0 0 30px rgba(192, 192, 192, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.third-block {
+  width: 120px;
+  height: 90px;
+  background: linear-gradient(180deg, #cd7f32 0%, #a0522d 50%, #8b4513 100%);
+  box-shadow: 
+    0 0 25px rgba(205, 127, 50, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.podium-number {
+  font-size: 3rem;
+  font-weight: 900;
+  font-family: var(--font-display);
+  color: rgba(255, 255, 255, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.first-block .podium-number {
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Winner Announcement */
+.winner-announcement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 1.8rem;
+  color: var(--text-light);
+  padding: 1.5rem 3rem;
+  background: var(--gradient-card);
+  border-radius: var(--radius-xl);
+  border: var(--border-gold);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 2rem;
+  animation: announcement-glow 2s ease-in-out infinite;
+}
+
+@keyframes announcement-glow {
+  0%, 100% {
+    box-shadow: var(--shadow-card);
+  }
+  50% {
+    box-shadow: 
+      var(--shadow-card),
+      0 0 30px var(--gold-alpha-40);
+  }
+}
+
+.trophy {
+  font-size: 2.5rem;
+  animation: trophy-spin 3s ease-in-out infinite;
+}
+
+@keyframes trophy-spin {
+  0%, 100% {
+    transform: rotate(-5deg) scale(1);
+  }
+  50% {
+    transform: rotate(5deg) scale(1.1);
+  }
+}
+
+.winner-text {
+  font-family: var(--font-display);
+}
+
+.winner-text strong {
+  color: var(--gold-primary);
+  font-size: 2rem;
+}
+
+.prize-text {
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--gold-muted);
+  margin-top: 0.75rem;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+/* Buttons */
+.return-btn {
+  margin-top: 1rem;
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+}
+
+.waiting-text {
+  color: var(--gold-muted);
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .final-results-title {
+    font-size: 2.5rem;
+  }
+
+  .sparkle {
+    font-size: 2rem;
+  }
+
+  .podium-container {
+    gap: 0.25rem;
+  }
+
+  .player-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .medal {
+    font-size: 2rem;
+  }
+
+  .medal.crown {
+    font-size: 2.5rem;
+  }
+
+  .first-block {
+    width: 100px;
+    height: 120px;
+  }
+
+  .second-block {
+    width: 85px;
+    height: 90px;
+  }
+
+  .third-block {
+    width: 85px;
+    height: 70px;
+  }
+
+  .winner-announcement {
+    flex-direction: column;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+  }
+
+  .trophy {
+    font-size: 2rem;
+  }
+
+  .winner-text strong {
+    font-size: 1.5rem;
+  }
+}
+

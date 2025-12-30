@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { PlayerDto } from "../types";
-import { getGameName, sortPlayersByScore, GAME_CONSTANTS } from "../utils/gameUtils";
+import { getGameName, sortPlayersByScore } from "../utils/gameUtils";
 import { Leaderboard } from "./Leaderboard";
+import { FinalResultsScreen } from "./FinalResultsScreen";
 import "./GameCompletionScreen.css";
 
 interface GameCompletionScreenProps {
@@ -23,8 +24,21 @@ function GameCompletionScreen({
   onContinue,
   onEndGame,
 }: GameCompletionScreenProps) {
+  const [showFinalResults, setShowFinalResults] = useState(false);
   const sortedPlayers = sortPlayersByScore(players, accumulatedScores);
   const isLastGame = gameNumber >= totalGames;
+
+  // Show the final results podium screen
+  if (showFinalResults) {
+    return (
+      <FinalResultsScreen
+        players={players}
+        accumulatedScores={accumulatedScores}
+        onClose={onEndGame}
+        isHost={true}
+      />
+    );
+  }
 
   return (
     <div className="game-completion-screen">
@@ -54,9 +68,8 @@ function GameCompletionScreen({
             </>
           ) : (
             <>
-              <h3>🏆 Final Results 🏆</h3>
-              <button className="btn btn-primary btn-large" onClick={onEndGame}>
-                Return to Main Menu
+              <button className="btn btn-primary btn-large view-final-btn" onClick={() => setShowFinalResults(true)}>
+                🏆 View Final Results 🏆
               </button>
             </>
           )}

@@ -23,6 +23,8 @@ export function getGameName(type: string): string {
       return 'Quiz of 2025';
     case 'SocialMediaGuess':
       return 'Social Media Guess';
+    case 'Wager':
+      return 'All-In Wager';
     default:
       return type;
   }
@@ -45,7 +47,7 @@ export function shouldShowDrinkingWheel(gameNumber: number): boolean {
 }
 
 export function getNextGameType(currentGameNumber: number): string {
-  // Game sequence: 1=WouldILie, 2=ContestantGuess, 3=Quiz, 4=SocialMediaGuess, 5=WouldILie
+  // Game sequence: 1=WouldILie, 2=ContestantGuess, 3=Quiz, 4=SocialMediaGuess, 5=Wager
   if (currentGameNumber === 1) {
     return 'contestantGuess';
   } else if (currentGameNumber === 2) {
@@ -53,7 +55,7 @@ export function getNextGameType(currentGameNumber: number): string {
   } else if (currentGameNumber === 3) {
     return 'socialMediaGuess';
   } else if (currentGameNumber === 4) {
-    return 'wouldILie';
+    return 'wager';
   } else {
     // Default to Would I Lie
     return 'wouldILie';
