@@ -33,7 +33,7 @@ export const CONTESTANT_GUESS_RULES: GameRulesData = {
   rules: [
     { emoji: '🖼️', text: 'A morphed photo combining a contestant with a celebrity will appear' },
     { emoji: '🤔', text: 'Study the image carefully - who is hiding in there?' },
-    { emoji: '👆', text: 'Choose from 4 possible contestants - but be quick!' },
+    { emoji: '👆', text: 'Choose from 4 possible contestants' },
     { emoji: '⏱️', text: 'All players must answer before the reveal' },
     { emoji: '🎯', text: 'Only correct guesses earn points!' },
   ],
@@ -79,7 +79,7 @@ export const WAGER_RULES: GameRulesData = {
     { emoji: '❌', text: 'Wrong answer: Lose your wager' },
     { emoji: '🎯', text: 'Risk it all or play it safe - your choice!' },
   ],
-  pointsInfo: "3 questions • Double your wager or lose it all",
+  pointsInfo: "Double your wager or lose it all",
   startButtonText: "🎲 Place Your Bets",
 };
 
