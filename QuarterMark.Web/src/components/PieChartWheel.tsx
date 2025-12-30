@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PlayerDto } from '../types';
 import { BottleSvg } from './BottleSvg';
 import './PieChartWheel.css';
@@ -12,7 +12,7 @@ interface PieChartWheelProps {
 export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartWheelProps) {
   const spinnerRef = useRef<HTMLDivElement>(null);
   const [spinnerRotation, setSpinnerRotation] = useState(-90); // Start pointing up
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [, setIsAnimating] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
   const hasStartedSpinningRef = useRef(false);
   const hasResultBeenShownRef = useRef(false); // Track if we've shown a result to prevent restarting

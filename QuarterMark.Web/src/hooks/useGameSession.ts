@@ -2,7 +2,6 @@ import { useCallback, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import signalRService from '../services/signalRService';
 import { useGameSessionStore } from '../stores/gameSessionStore';
-import { WouldILieRoundConfig } from '../data/wouldILieImages';
 
 interface GameCompletedData {
   gameType: string;

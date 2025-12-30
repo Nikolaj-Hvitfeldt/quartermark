@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Fireworks.css';
 import { FIREWORK_COLORS, FIREWORK_SIZES, FIREWORKS_CONFIG, FireworkSize } from '../utils/finalResultsConstants';
 

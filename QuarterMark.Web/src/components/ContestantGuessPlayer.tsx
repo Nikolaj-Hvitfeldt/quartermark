@@ -7,7 +7,7 @@ import { ContestantGuessRoundScores } from './ContestantGuessRoundScores';
 import './ContestantGuess.css';
 import './ContestantGuessPlayer.css';
 
-function ContestantGuessPlayer({ connection, playerName, players, onBack }: ContestantGuessPlayerProps) {
+function ContestantGuessPlayer({ connection, playerName, players }: ContestantGuessPlayerProps) {
   const {
     roundState,
     currentQuestion,

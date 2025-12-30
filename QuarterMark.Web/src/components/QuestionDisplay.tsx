@@ -1,4 +1,3 @@
-import React from 'react';
 import './QuestionDisplay.css';
 
 interface QuestionDisplayProps {

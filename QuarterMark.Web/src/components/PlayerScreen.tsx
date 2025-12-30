@@ -241,7 +241,6 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
         <QuizPlayer
           connection={connection}
           playerName={playerName}
-          players={players}
           onBack={() => setCurrentGame(null)}
         />
       ) : currentGame === "socialMediaGuess" ? (

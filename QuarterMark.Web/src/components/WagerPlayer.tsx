@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWager } from '../hooks/useWager';
 import { WagerPlayerProps } from '../types';
 import { QuestionDisplay } from './QuestionDisplay';
 import { AnswerGrid } from './AnswerGrid';
 import { WagerRoundScores } from './WagerRoundScores';
-import { calculateWinnings, WAGER_CONSTANTS } from '../utils/wagerUtils';
+import { calculateWinnings } from '../utils/wagerUtils';
+import { getWagerQuestions } from '../data/wagerQuestions';
 import './Wager.css';
 import './WagerPlayer.css';
 
-function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerProps) {
+function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
   const { t } = useTranslation();
   const WAGER_QUESTIONS = getWagerQuestions(t);
   const {
@@ -32,7 +33,7 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
     if (!currentQuestion || !currentQuestion.questionId) {
       return currentQuestion; // Fallback to received text if no ID
     }
-    const question = WAGER_QUESTIONS.find(q => q.id === currentQuestion.questionId);
+    const question = WAGER_QUESTIONS.find((q: { id: string }) => q.id === currentQuestion.questionId);
     if (!question) {
       return currentQuestion; // Fallback if question not found
     }
@@ -42,7 +43,7 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
       questionId: question.id,
       correctAnswer: question.correctAnswer,
     };
-  }, [currentQuestion, WAGER_QUESTIONS]);
+  }, [currentQuestion, WAGER_QUESTIONS, t]);
 
   // Translate correctAnswer when revealed (map from original to translated)
   const translatedCorrectAnswer = useMemo(() => {
@@ -145,7 +146,6 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
   const isPlayerCorrect = playerGuess === correctAnswer; // Compare original texts
   // Use playerWager from store during wagering phase, wagers[playerName] after reveal
   const playerWagerAmount = answerRevealed ? (wagers[playerName] || 0) : playerWager;
-  const netChange = roundScores[playerName] || 0;
 
   return (
     <div className="wager-player">

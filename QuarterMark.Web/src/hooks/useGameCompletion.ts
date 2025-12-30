@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import signalRService from '../services/signalRService';
-import { GAME_CONSTANTS, shouldShowDrinkingWheel } from '../utils/gameUtils';
 
 interface GameCompletedData {
   gameType: string;

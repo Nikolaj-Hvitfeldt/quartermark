@@ -1,4 +1,3 @@
-import React from 'react';
 import './FloatingBottles.css';
 
 const BOTTLE_IMAGES = [

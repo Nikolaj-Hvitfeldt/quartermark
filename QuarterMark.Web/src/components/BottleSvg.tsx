@@ -1,10 +1,8 @@
-import React from 'react';
-
 interface BottleSvgProps {
   className?: string;
 }
 
-export const BottleSvg: React.FC<BottleSvgProps> = ({ className = '' }) => {
+export const BottleSvg = ({ className = '' }: BottleSvgProps) => {
   return (
     <img 
       src="/images/smirnoff-images/smirnoff-bottle.svg" 

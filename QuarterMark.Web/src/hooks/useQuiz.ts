@@ -64,7 +64,7 @@ export function useQuiz(connection: any) {
       setRoundState('ShowingQuestion');
     };
 
-    const handleAnswerReceived = (data: QuizAnswerReceivedData) => {
+    const handleAnswerReceived = (_data: QuizAnswerReceivedData) => {
       // Host can track progress
     };
 

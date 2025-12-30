@@ -1,4 +1,3 @@
-import React from 'react';
 import { getOptionColorClass } from '../utils/wouldILieUtils';
 import './WouldILie.css';
 
@@ -22,7 +21,7 @@ export function WouldILieAnswerGrid({
   options,
   onOptionClick,
   clickable = false,
-  revealed = false,
+  revealed: _revealed = false,
 }: WouldILieAnswerGridProps) {
   const handleClick = (playerName: string) => {
     if (clickable && onOptionClick) {

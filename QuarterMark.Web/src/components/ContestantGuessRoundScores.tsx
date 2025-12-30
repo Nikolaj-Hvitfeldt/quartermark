@@ -1,4 +1,3 @@
-import React from 'react';
 import { Leaderboard } from './Leaderboard';
 import { PlayerDto } from '../types';
 import { sortPlayersByScore } from '../utils/gameUtils';

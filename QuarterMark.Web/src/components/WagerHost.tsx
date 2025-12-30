@@ -83,6 +83,7 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
       if (WAGER_QUESTIONS.length > 0) {
         const firstQuestion = WAGER_QUESTIONS[0];
         await showQuestion(
+          firstQuestion.id,
           firstQuestion.questionText,
           firstQuestion.correctAnswer,
           [...firstQuestion.answers]

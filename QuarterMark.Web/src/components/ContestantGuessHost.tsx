@@ -18,7 +18,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
     roundActive,
     currentQuestion,
     guesses,
-    roundScores,
+    roundScores: _roundScores,
     answerRevealed,
     correctAnswer: revealedCorrectAnswer,
     startRound,

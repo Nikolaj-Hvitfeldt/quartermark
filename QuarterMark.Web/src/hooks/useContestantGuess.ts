@@ -51,7 +51,6 @@ export function useContestantGuess(connection: any) {
       setAnswerRevealed(false);
       setRoundState('Waiting');
       setHasGuessed(false);
-      setIsRevealed(false);
     };
 
     const handleQuestionShown = (data: ContestantGuessQuestionShownData) => {
@@ -66,7 +65,7 @@ export function useContestantGuess(connection: any) {
       setHasGuessed(false);
     };
 
-    const handleGuessReceived = (data: ContestantGuessReceivedData) => {
+    const handleGuessReceived = (_data: ContestantGuessReceivedData) => {
       // This is mainly for host to track progress
       // Actual guesses will be sent in the reveal event
     };
@@ -103,7 +102,6 @@ export function useContestantGuess(connection: any) {
     setCorrectAnswer,
     setRoundState,
     setHasGuessed,
-    setIsRevealed,
   ]);
 
   const startRoundMutation = useMutation({

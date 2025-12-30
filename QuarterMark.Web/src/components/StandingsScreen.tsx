@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { PlayerDto } from '../types';
 import { sortPlayersByScore, getStandingsConstants } from '../utils/standingsUtils';

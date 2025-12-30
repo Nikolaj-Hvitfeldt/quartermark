@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useWouldILie } from "../hooks/useWouldILie";
-import { useGameRoom } from "../hooks/useGameRoom";
 import { useGameSession } from "../hooks/useGameSession";
 import signalRService from "../services/signalRService";
 import { WouldILieHostProps } from "../types";
@@ -17,7 +16,7 @@ import "./WouldILieHost.css";
 
 function WouldILieHost({
   connection,
-  players: initialPlayers,
+  players,
   onBack,
 }: WouldILieHostProps) {
   const { t } = useTranslation();
@@ -36,7 +35,6 @@ function WouldILieHost({
     endRound,
   } = useWouldILie(connection);
 
-  const { players } = useGameRoom();
   const { wouldILieConfig } = useGameSession(connection);
 
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
