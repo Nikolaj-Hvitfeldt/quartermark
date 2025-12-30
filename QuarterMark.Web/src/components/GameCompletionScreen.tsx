@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PlayerDto } from "../types";
 import { getGameName, sortPlayersByScore } from "../utils/gameUtils";
 import { Leaderboard } from "./Leaderboard";
@@ -24,6 +25,7 @@ function GameCompletionScreen({
   onContinue,
   onEndGame,
 }: GameCompletionScreenProps) {
+  const { t } = useTranslation();
   const [showFinalResults, setShowFinalResults] = useState(false);
   const sortedPlayers = sortPlayersByScore(players, accumulatedScores);
   const isLastGame = gameNumber >= totalGames;
@@ -43,13 +45,13 @@ function GameCompletionScreen({
   return (
     <div className="game-completion-screen">
       <div className="completion-content">
-        <h2>🎉 {getGameName(gameType)} Complete! 🎉</h2>
+        <h2>🎉 {t('gameCompletion.title', { gameName: getGameName(gameType, t) })} 🎉</h2>
         <p className="game-progress">
-          Game {gameNumber} of {totalGames}
+          {t('hostScreen.gameProgress', { current: gameNumber, total: totalGames })}
         </p>
 
         <div className="scores-section">
-          <h3>Current Leaderboard</h3>
+          <h3>{t('standings.title')}</h3>
           <Leaderboard
             players={sortedPlayers}
             accumulatedScores={accumulatedScores}
@@ -60,16 +62,16 @@ function GameCompletionScreen({
           {!isLastGame ? (
             <>
               <button className="btn btn-primary btn-large" onClick={onContinue}>
-                Continue to Next Game →
+                {t('gameCompletion.continueToNext', 'Continue to Next Game')} →
               </button>
               <button className="btn btn-secondary" onClick={onEndGame}>
-                End Game Session
+                {t('gameCompletion.endGameSession', 'End Game Session')}
               </button>
             </>
           ) : (
             <>
               <button className="btn btn-primary btn-large view-final-btn" onClick={() => setShowFinalResults(true)}>
-                🏆 View Final Results 🏆
+                🏆 {t('gameCompletion.viewFinalResults')} 🏆
               </button>
             </>
           )}

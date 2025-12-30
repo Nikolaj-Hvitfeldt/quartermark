@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useGameRoom } from "../hooks/useGameRoom";
 import { useMutation } from "@tanstack/react-query";
 import { useGameSession } from "../hooks/useGameSession";
@@ -18,6 +19,7 @@ import { HostScreenProps } from "../types";
 import "./HostScreen.css";
 
 function HostScreen({ onBack }: HostScreenProps) {
+  const { t } = useTranslation();
   const { connection, roomCode, players, isConnected, createRoom } =
     useGameRoom();
   const { isActive: sessionActive, currentGameNumber, accumulatedScores, showDrinkingWheel, wouldILieConfig, setShowDrinkingWheel, setWouldILieConfig, startSession } = useGameSession(connection);
@@ -121,16 +123,16 @@ function HostScreen({ onBack }: HostScreenProps) {
       {/* Only show back button when in lobby or not connected */}
       {(!isConnected || isInLobby) && (
         <button className="btn btn-back" onClick={onBack}>
-          ← Back to Home
+          ← {t('hostScreen.backToHome', 'Back to Home')}
         </button>
       )}
 
       {!isConnected ? (
         <div className="host-setup">
-          <h2>Create Game Room</h2>
+          <h2>{t('hostScreen.createGameRoom')}</h2>
           <input
             type="text"
-            placeholder="Enter your name"
+            placeholder={t('hostScreen.enterYourName')}
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
             className="input"
@@ -140,7 +142,7 @@ function HostScreen({ onBack }: HostScreenProps) {
             className="btn btn-primary btn-large"
             onClick={handleCreateRoom}
           >
-            Create Room
+            {t('hostScreen.createRoom')}
           </button>
         </div>
       ) : completedGame ? (
@@ -297,7 +299,7 @@ function HostScreen({ onBack }: HostScreenProps) {
                   onClick={() => setShowWouldILieConfig(true)}
                   disabled={players.filter(p => !p.isHost).length < 2}
                 >
-                  🎭 Configure "Would I Lie" Rounds {wouldILieConfig.length > 0 ? `(${wouldILieConfig.length} configured)` : ''}
+                  🎭 {t('hostScreen.configureWouldILieLabel', 'Configure "Would I Lie" Rounds')} {wouldILieConfig.length > 0 ? `(${wouldILieConfig.length} ${t('common.configured', 'configured')})` : ''}
                 </button>
                 <button
                   className="btn btn-primary btn-large"
@@ -315,11 +317,11 @@ function HostScreen({ onBack }: HostScreenProps) {
             {sessionActive && !inGame && !completedGame && (
               <div className="session-status">
                 <div className="session-info">
-                  <p className="session-game-number">Game {currentGameNumber + 1} of 5</p>
+                  <p className="session-game-number">{t('hostScreen.sessionGameNumber', { number: currentGameNumber + 1 })}</p>
                   <p className="session-hint">
                     {currentGameNumber >= GAME_CONSTANTS.TOTAL_GAMES 
-                      ? "All games completed" 
-                      : "Continue to current game or start new series"}
+                      ? t('hostScreen.allGamesCompleted') 
+                      : t('hostScreen.continueHint')}
                   </p>
                 </div>
                 {currentGameNumber < GAME_CONSTANTS.TOTAL_GAMES && (
@@ -330,7 +332,7 @@ function HostScreen({ onBack }: HostScreenProps) {
                       setInGame(nextGameType);
                     }}
                   >
-                    Continue Current Game →
+                    {t('hostScreen.continueCurrentGame')}
                   </button>
                 )}
                 <button
@@ -346,7 +348,7 @@ function HostScreen({ onBack }: HostScreenProps) {
                     setInGame(null);
                   }}
                 >
-                  Start New 5-Game Series
+                  {t('hostScreen.startNewSeries')}
                 </button>
               </div>
             )}

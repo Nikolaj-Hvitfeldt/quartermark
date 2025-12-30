@@ -7,11 +7,13 @@ import { AnswerGrid } from "./AnswerGrid";
 import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
 import { SOCIAL_MEDIA_GUESS_QUESTIONS } from "../data/socialMediaGuessQuestions";
-import { SOCIAL_MEDIA_RULES, getQuestionCountText } from "../data/gameRules";
+import { getSocialMediaRules, getQuestionCountText } from "../data/gameRules";
+import { useTranslation } from "react-i18next";
 import "./SocialMediaGuess.css";
 import "./SocialMediaGuessHost.css";
 
 function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessHostProps) {
+  const { t } = useTranslation();
   const {
     roundActive,
     currentQuestion,
@@ -113,16 +115,17 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
   };
 
   if (!roundActive) {
-    const questionCount = getQuestionCountText(SOCIAL_MEDIA_GUESS_QUESTIONS.length);
+    const socialMediaGuessRules = getSocialMediaRules(t);
+    const questionCount = getQuestionCountText(SOCIAL_MEDIA_GUESS_QUESTIONS.length, t);
     return (
       <div className="social-media-guess-host">
         <GameRulesCard
-          title={SOCIAL_MEDIA_RULES.title}
-          subtitle={SOCIAL_MEDIA_RULES.subtitle}
-          rules={SOCIAL_MEDIA_RULES.rules}
-          pointsInfo={`${questionCount} • ${SOCIAL_MEDIA_RULES.pointsInfo}`}
+          title={socialMediaGuessRules.title}
+          subtitle={socialMediaGuessRules.subtitle}
+          rules={socialMediaGuessRules.rules}
+          pointsInfo={`${questionCount} • ${socialMediaGuessRules.pointsInfo}`}
           onStart={handleStartRound}
-          startButtonText={SOCIAL_MEDIA_RULES.startButtonText}
+          startButtonText={socialMediaGuessRules.startButtonText}
         />
       </div>
     );
@@ -132,12 +135,12 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     return (
       <div className="social-media-guess-host">
         <button className="btn btn-back" onClick={onBack}>
-          ← Back
+          ← {t('common.back')}
         </button>
-        <h2>Social Media Guess</h2>
-        <p>Round active, but no question currently displayed. This should not happen.</p>
+        <h2>{t('gameNames.socialMediaGuess')}</h2>
+        <p>{t('common.errorMessage')}</p>
         <button className="btn btn-secondary" onClick={handleEndRound}>
-          End Round
+          {t('standings.endRound')}
         </button>
       </div>
     );
@@ -166,9 +169,9 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     return (
       <div className="social-media-guess-host">
         <button className="btn btn-back" onClick={onBack}>
-          ← Back
+          ← {t('common.back')}
         </button>
-        <h3 className="question-progress-header">Question {currentQuestionIndex + 1} of {SOCIAL_MEDIA_GUESS_QUESTIONS.length}</h3>
+        <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: SOCIAL_MEDIA_GUESS_QUESTIONS.length })}</h3>
         <div className="social-media-guess-question-container">
           <ImageDisplay imageUrl={currentQuestion.imageUrl} title="Who posted this?" />
           <AnswerGrid
@@ -185,9 +188,9 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
   return (
     <div className="social-media-guess-host">
       <button className="btn btn-back" onClick={onBack}>
-        ← Back
+        ← {t('common.back')}
       </button>
-      <h3 className="question-progress-header">Question {currentQuestionIndex + 1} of {SOCIAL_MEDIA_GUESS_QUESTIONS.length}</h3>
+      <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: SOCIAL_MEDIA_GUESS_QUESTIONS.length })}</h3>
       <div className="social-media-guess-question-container">
         <ImageDisplay imageUrl={currentQuestion.imageUrl} title="Who posted this?" />
 
@@ -202,7 +205,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
           onClick={handleRevealAnswer}
           disabled={!allGuessed}
         >
-          {allGuessed ? "Reveal Answer" : `Waiting for ${guessProgress.total - guessProgress.received} more guess(es)`}
+          {allGuessed ? t('common.revealAnswer') : t('common.waitingForGuesses', { count: guessProgress.total - guessProgress.received })}
         </button>
       </div>
     </div>

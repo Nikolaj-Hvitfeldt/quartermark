@@ -1,0 +1,288 @@
+{
+  "common": {
+    "back": "Back",
+    "backToHome": "Back to Home",
+    "continue": "Continue",
+    "start": "Start",
+    "starting": "Starting...",
+    "submit": "Submit",
+    "waiting": "Waiting",
+    "loading": "Loading...",
+    "error": "Error",
+    "points": "points",
+    "pts": "pts",
+    "of": "of",
+    "question": "question",
+    "questions": "questions",
+    "Question": "Question",
+    "player": "player",
+    "players": "players",
+    "answer": "answer",
+    "answers": "answers",
+    "howToPlay": "How to Play",
+    "configured": "configured",
+    "to": "to",
+    "next": "Next",
+    "questionProgress": "Question {{current}} of {{total}}",
+    "revealAnswer": "Reveal Answer",
+    "waitingForAnswers": "Waiting for {{count}} more answer(s)",
+    "waitingForGuesses": "Waiting for {{count}} more guess(es)",
+    "errorMessage": "Round active, but no question currently displayed. This should not happen."
+  },
+  "hostScreen": {
+    "createGameRoom": "Create Game Room",
+    "enterYourName": "Enter your name",
+    "createRoom": "Create Room",
+    "startGameSession": "Start Game Session (5 Mini-Games)",
+    "configureWouldILie": "⚠️ Configure \"Would I Lie\" rounds before starting",
+    "configureWouldILieFirst": "Configure Would I Lie rounds first",
+    "gameProgress": "Game {{current}} of {{total}}",
+    "continueCurrentGame": "Continue Current Game →",
+    "startNewSeries": "Start New 5-Game Series",
+    "continueHint": "Continue to current game or start new series",
+    "allGamesCompleted": "All games completed",
+    "sessionGameNumber": "Game {{number}} of 5",
+    "backToHome": "Back to Home",
+    "configureWouldILieLabel": "Configure \"Would I Lie\" Rounds"
+  },
+  "gameRules": {
+    "wouldILie": {
+      "title": "Would I Lie to You?",
+      "subtitle": "The classic bluffing game!",
+      "rule1": "A photo will be shown to all players",
+      "rule2": "The host secretly assigns one player as the \"truth teller\" who actually knows the person, and one as the \"liar\"",
+      "rule3": "Both players must convince others that THEY are the one who knows the person",
+      "rule4": "Other players vote on who they think is telling the truth",
+      "rule5": "Correct votes earn points! Wrong votes give points to the liar",
+      "pointsInfo": "10 points for correct guesses • Liar earns points for each fooled player",
+      "startButton": "🎬 Start Round"
+    },
+    "contestantGuess": {
+      "title": "Contestant Guess",
+      "subtitle": "Can you spot who's hiding in the morph?",
+      "rule1": "A morphed photo combining a contestant with a celebrity will appear",
+      "rule2": "Study the image carefully - who is hiding in there?",
+      "rule3": "Choose from 4 possible contestants",
+      "rule4": "All players must answer before the reveal",
+      "rule5": "Only correct guesses earn points!",
+      "pointsInfo": "10 points per correct answer",
+      "startButton": "🔍 Start Guessing"
+    },
+    "quiz": {
+      "title": "Quiz of 2025",
+      "subtitle": "How well do you remember this year?",
+      "rule1": "Test your knowledge of what happened in 2025!",
+      "rule2": "Each question has 4 possible answers - pick wisely",
+      "rule3": "Speed matters! First 2 correct answers get bonus points",
+      "rule4": "1st place: +10 bonus points • 2nd place: +5 bonus points",
+      "rule5": "Everyone who answers correctly gets base points",
+      "pointsInfo": "10 base points + speed bonuses",
+      "startButton": "🧠 Start Quiz"
+    },
+    "socialMediaGuess": {
+      "title": "Social Media Deep Dive",
+      "subtitle": "Who posted THAT?!",
+      "rule1": "A social media post will be shown - but who posted it?",
+      "rule2": "Look for clues in the writing style, content, and context",
+      "rule3": "Choose from 4 possible contestants",
+      "rule4": "These are REAL posts from the contestants!",
+      "rule5": "Prepare for some embarrassing throwbacks...",
+      "pointsInfo": "10 points per correct guess",
+      "startButton": "📲 Start Scrolling"
+    },
+    "wager": {
+      "title": "All-In Wager",
+      "subtitle": "Double or nothing on the host!",
+      "rule1": "Wager any amount of your points before each question",
+      "rule2": "Answer fun facts about the host",
+      "rule3": "Correct answer: Win double your wager!",
+      "rule4": "Wrong answer: Lose your wager",
+      "rule5": "Risk it all or play it safe - your choice!",
+      "pointsInfo": "Double your wager or lose it all",
+      "startButton": "🎲 Place Your Bets"
+    }
+  },
+  "gameNames": {
+    "wouldILie": "Would I Lie to You?",
+    "contestantGuess": "Contestant Guess",
+    "quiz": "Quiz of 2025",
+    "socialMediaGuess": "Social Media Guess",
+    "wager": "All-In Wager"
+  },
+  "wager": {
+    "blindWager": {
+      "title": "🎲 Place Your Wager",
+      "subtitle": "How confident are you? Bet before you see the question!",
+      "howManyPoints": "How many points do you want to wager?",
+      "placeWager": "Place Wager",
+      "wagerHint": "Wager up to {{max}} points. Correct answer wins double!",
+      "yourWager": "Your wager: {{amount}} pts (Win: +{{win}}, Lose: -{{lose}})",
+      "waitingForWagers": "⏳ Waiting for all players to place their wagers...",
+      "revealHint": "The question will be revealed once everyone has wagered!",
+      "resetWagers": "🔄 Reset All Wagers"
+    },
+    "host": {
+      "blindWageringPhase": "🎲 Blind Wagering Phase",
+      "playersPlacingBets": "Players are placing their wagers without seeing the question!",
+      "wagersReceived": "Wagers received: {{received}} / {{total}}",
+      "waitingForAll": "Waiting for all players to place their wagers...",
+      "answersReceived": "Answers received: {{received}} / {{total}}",
+      "revealAnswer": "Reveal Answer",
+      "waitingForAnswers": "Waiting for {{count}} more answer(s)",
+      "nextQuestion": "Next Question →",
+      "endRound": "End Round"
+    },
+    "player": {
+      "yourCurrentScore": "Your current score: {{score}} pts",
+      "answerSubmitted": "✓ Answer submitted! Waiting for other players...",
+      "correct": "🎉 Correct!",
+      "youWon": "You won {{points}} points!",
+      "incorrect": "❌ Incorrect",
+      "youLost": "You lost {{points}} points",
+      "correctAnswerWas": "The correct answer was: {{answer}}"
+    },
+    "questions": {
+      "q1": {
+        "question": "What does Niko's artist name SLSH stand for?",
+        "answer1": "Store Lår Sexet Hår",
+        "answer2": "Spastisk Lam? Sikkert Ham",
+        "answer3": "Stort Lem Sent Hjem",
+        "answer4": "SLum SHeik"
+      },
+      "q2": {
+        "question": "In what video game is Niko in the top 1% of the world leaderboard?",
+        "answer1": "CounterStrike: Global Offensive",
+        "answer2": "CounterStrike 1.6",
+        "answer3": "CounterStrike Source",
+        "answer4": "CounterStrike 2"
+      },
+      "q3": {
+        "question": "Against popular belief, what is Niko's favorite drink?",
+        "answer1": "Gin Hass",
+        "answer2": "Vodka Redbull",
+        "answer3": "Strawberry Daiquiri",
+        "answer4": "Pink Pussy"
+      }
+    }
+  },
+  "gameCompletion": {
+    "title": "🎉 {{gameName}} Complete! 🎉",
+    "viewFinalResults": "View Final Results",
+    "viewPodium": "View Podium →",
+    "returnToMenu": "Return to Menu",
+    "finalResultText": "You win a firm handshake from the host"
+  },
+  "standings": {
+    "currentStandings": "Current Standings",
+    "finalStandings": "Final Standings",
+    "nextQuestion": "Next Question →",
+    "endRound": "End Round",
+    "viewStandings": "View Standings →",
+    "progressFormat": "Question {{current}} of {{total}} complete",
+    "title": "Current Standings",
+    "questionProgress": "Question {{current}} of {{total}}",
+    "continueButton": "Continue →"
+  },
+  "wouldILie": {
+    "whoKnowsThisPerson": "Who knows this person?",
+    "claimsToKnow": "Claims to know them",
+    "voteForThisPerson": "Vote for this person",
+    "truthTeller": "Truth Teller",
+    "liar": "Liar",
+    "roundComplete": "Round Complete"
+  },
+  "playerScreen": {
+    "joinGame": "Join Game",
+    "enterRoomCode": "Enter room code",
+    "join": "Join",
+    "waitingForHost": "Waiting for host to start the game...",
+    "waitingForHostEndGame": "Waiting for host to end the game..."
+  },
+  "app": {
+    "welcome": "Welcome to",
+    "createGame": "Create Game",
+    "joinGame": "Join Game"
+  },
+  "quiz": {
+    "questions": {
+      "q1": {
+        "question": "What Prominent religious figure died in 2025?",
+        "answer1": "The Pope",
+        "answer2": "The Dalai Lama",
+        "answer3": "The Prophet Muhammad",
+        "answer4": "Anders"
+      },
+      "q2": {
+        "question": "How many men did Bonnie Blue take on in her infamous record-breaking fuckfest?",
+        "answer1": "10 men",
+        "answer2": "100 men",
+        "answer3": "1000 men",
+        "answer4": "10000 men"
+      },
+      "q3": {
+        "question": "According to the Headliner of this years superbowl: Who of these 4 people likes them young, and should never go to cell block 1? (He also likes the a-minor Chord, allegedly)",
+        "answer1": "Serena Williams",
+        "answer2": "Jeffrey Epstein",
+        "answer3": "Drake",
+        "answer4": "King Frederik the 5th of Denmark"
+      },
+      "q4": {
+        "question": "Which social media platform had the most users in 2025?",
+        "answer1": "TikTok",
+        "answer2": "Instagram",
+        "answer3": "Facebook",
+        "answer4": "Twitter/X"
+      },
+      "q5": {
+        "question": "What was the most popular TV show of 2025 according to IMDB?",
+        "answer1": "The White Lotus",
+        "answer2": "Stranger Things",
+        "answer3": "The Last of Us",
+        "answer4": "Severance"
+      },
+      "q6": {
+        "question": "What happened when Trump and Zelenskyy met in February in front of the world's press in the Oval Office?",
+        "answer1": "Nothing",
+        "answer2": "A journalist made Trump burst out laughing",
+        "answer3": "The meeting ended in a heated argument",
+        "answer4": "Trump gave Zelenskyy a handwritten letter from Putin"
+      },
+      "q7": {
+        "question": "Which popstar traveled to space in 2025?",
+        "answer1": "Beyonce",
+        "answer2": "Katy Perry",
+        "answer3": "Ed Sheeran",
+        "answer4": "Johnny Deluxe"
+      },
+      "q8": {
+        "question": "Which celebrity had the most Instagram followers in 2025?",
+        "answer1": "Cristiano Ronaldo",
+        "answer2": "Lionel Messi",
+        "answer3": "Selena Gomez",
+        "answer4": "Kylie Jenner"
+      },
+      "q9": {
+        "question": "Why was all air traffic grounded in Kastrup Airport on the 22nd of September?",
+        "answer1": "The workers went on a strike",
+        "answer2": "Sightings of drones",
+        "answer3": "A bird was blocking the runway",
+        "answer4": "The pilots had coronavirus"
+      },
+      "q10": {
+        "question": "In October, what was stolen from the famoust art musseum Louvre in Paris?",
+        "answer1": "Mona Lisa",
+        "answer2": "A 3000 year old mummy",
+        "answer3": "The Starry Night",
+        "answer4": "Jewels"
+      },
+      "q11": {
+        "question": "Objectively, which Artist has the most bangers?",
+        "answer1": "The Weeknd",
+        "answer2": "Post Malone",
+        "answer3": "Bruno Mars",
+        "answer4": "LDLD x SLSH"
+      }
+    }
+  }
+}
+

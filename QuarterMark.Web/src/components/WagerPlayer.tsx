@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWager } from '../hooks/useWager';
 import { WagerPlayerProps } from '../types';
 import { QuestionDisplay } from './QuestionDisplay';
@@ -9,6 +10,7 @@ import './Wager.css';
 import './WagerPlayer.css';
 
 function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerProps) {
+  const { t } = useTranslation();
   const {
     roundState,
     currentQuestion,
@@ -97,18 +99,18 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
     <div className="wager-player">
       <div className="wager-question-container">
         <div className="player-score-display">
-          <p>Your current score: <strong>{availableScore} pts</strong></p>
+          <p>{t('wager.player.yourCurrentScore', { score: availableScore })}</p>
         </div>
         
         {/* Blind wagering phase - question hidden */}
         {roundState === 'Wagering' && !hasWagered && (
           <>
             <div className="blind-wager-header">
-              <h2>🎲 Place Your Wager</h2>
-              <p className="blind-wager-subtitle">How confident are you? Bet before you see the question!</p>
+              <h2>{t('wager.blindWager.title')}</h2>
+              <p className="blind-wager-subtitle">{t('wager.blindWager.subtitle')}</p>
             </div>
             <div className="wager-input-section">
-              <label htmlFor="wager-input">How many points do you want to wager?</label>
+              <label htmlFor="wager-input">{t('wager.blindWager.howManyPoints')}</label>
               <div className="wager-input-group">
                 <input
                   id="wager-input"
@@ -125,11 +127,11 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
                   onClick={handleWagerSubmit}
                   disabled={!wagerInput || parseInt(wagerInput, 10) < 0 || parseInt(wagerInput, 10) > availableScore}
                 >
-                  Place Wager
+                  {t('wager.blindWager.placeWager')}
                 </button>
               </div>
               <p className="wager-hint">
-                Wager up to {availableScore} points. Correct answer wins double!
+                {t('wager.blindWager.wagerHint', { max: availableScore })}
               </p>
             </div>
           </>
@@ -139,11 +141,11 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
         {roundState === 'Wagering' && hasWagered && !hasAnswered && (
           <div className="wager-waiting">
             <div className="wager-reminder">
-              <p>Your wager: <strong>{playerWagerAmount} pts</strong> (Win: +{calculateWinnings(playerWagerAmount)}, Lose: -{playerWagerAmount})</p>
+              <p>{t('wager.blindWager.yourWager', { amount: playerWagerAmount, win: calculateWinnings(playerWagerAmount), lose: playerWagerAmount })}</p>
             </div>
             <div className="waiting-for-wagers">
-              <p>⏳ Waiting for all players to place their wagers...</p>
-              <p className="waiting-hint">The question will be revealed once everyone has wagered!</p>
+              <p>{t('wager.blindWager.waitingForWagers')}</p>
+              <p className="waiting-hint">{t('wager.blindWager.revealHint')}</p>
             </div>
           </div>
         )}
@@ -152,12 +154,12 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
         {roundState === 'Answering' && !answerRevealed && (
           <>
             <div className="wager-reminder">
-              <p>Your wager: <strong>{playerWagerAmount} pts</strong> (Win: +{calculateWinnings(playerWagerAmount)}, Lose: -{playerWagerAmount})</p>
+              <p>{t('wager.blindWager.yourWager', { amount: playerWagerAmount, win: calculateWinnings(playerWagerAmount), lose: playerWagerAmount })}</p>
             </div>
             <QuestionDisplay questionText={currentQuestion.questionText} />
             {hasAnswered ? (
               <div className="answer-submitted">
-                <p>✓ Answer submitted! Waiting for other players...</p>
+                <p>{t('wager.player.answerSubmitted')}</p>
               </div>
             ) : (
               <AnswerGrid
@@ -183,14 +185,14 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
             <div className="result-message">
               {isPlayerCorrect ? (
                 <div className="correct-message">
-                  <h3>🎉 Correct!</h3>
-                  <p>You won {calculateWinnings(playerWagerAmount)} points!</p>
+                  <h3>{t('wager.player.correct')}</h3>
+                  <p>{t('wager.player.youWon', { points: calculateWinnings(playerWagerAmount) })}</p>
                 </div>
               ) : (
                 <div className="incorrect-message">
-                  <h3>❌ Incorrect</h3>
-                  <p>You lost {playerWagerAmount} points</p>
-                  <p>The correct answer was: {correctAnswer}</p>
+                  <h3>{t('wager.player.incorrect')}</h3>
+                  <p>{t('wager.player.youLost', { points: playerWagerAmount })}</p>
+                  <p>{t('wager.player.correctAnswerWas', { answer: correctAnswer })}</p>
                 </div>
               )}
             </div>

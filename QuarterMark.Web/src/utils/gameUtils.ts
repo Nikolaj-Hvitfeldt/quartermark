@@ -13,7 +13,27 @@ export const GAME_CONSTANTS = {
   CONTESTANT_GUESS_POINTS_PER_CORRECT: 10,
 } as const;
 
-export function getGameName(type: string): string {
+import { TFunction } from 'i18next';
+
+export function getGameName(type: string, t?: TFunction): string {
+  if (t) {
+    switch (type) {
+      case 'WouldILie':
+        return t('gameNames.wouldILie');
+      case 'ContestantGuess':
+        return t('gameNames.contestantGuess');
+      case 'Quiz':
+        return t('gameNames.quiz');
+      case 'SocialMediaGuess':
+        return t('gameNames.socialMediaGuess');
+      case 'Wager':
+        return t('gameNames.wager');
+      default:
+        return type;
+    }
+  }
+  
+  // Fallback to English if translation not available
   switch (type) {
     case 'WouldILie':
       return 'Would I Lie to You?';

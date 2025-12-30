@@ -1,5 +1,7 @@
 // Game rules data for pre-game screens
 
+import { TFunction } from 'i18next';
+
 export interface GameRule {
   emoji: string;
   text: string;
@@ -13,78 +15,130 @@ export interface GameRulesData {
   startButtonText: string;
 }
 
+// Helper functions to get translated game rules
+export function getWouldILieRules(t: TFunction): GameRulesData {
+  return {
+    title: t('gameRules.wouldILie.title'),
+    subtitle: t('gameRules.wouldILie.subtitle'),
+    rules: [
+      { emoji: '🖼️', text: t('gameRules.wouldILie.rule1') },
+      { emoji: '🎭', text: t('gameRules.wouldILie.rule2') },
+      { emoji: '🗣️', text: t('gameRules.wouldILie.rule3') },
+      { emoji: '🗳️', text: t('gameRules.wouldILie.rule4') },
+      { emoji: '✅', text: t('gameRules.wouldILie.rule5') },
+    ],
+    pointsInfo: t('gameRules.wouldILie.pointsInfo'),
+    startButtonText: t('gameRules.wouldILie.startButton'),
+  };
+}
+
+export function getContestantGuessRules(t: TFunction): GameRulesData {
+  return {
+    title: t('gameRules.contestantGuess.title'),
+    subtitle: t('gameRules.contestantGuess.subtitle'),
+    rules: [
+      { emoji: '🖼️', text: t('gameRules.contestantGuess.rule1') },
+      { emoji: '🤔', text: t('gameRules.contestantGuess.rule2') },
+      { emoji: '👆', text: t('gameRules.contestantGuess.rule3') },
+      { emoji: '⏱️', text: t('gameRules.contestantGuess.rule4') },
+      { emoji: '🎯', text: t('gameRules.contestantGuess.rule5') },
+    ],
+    pointsInfo: t('gameRules.contestantGuess.pointsInfo'),
+    startButtonText: t('gameRules.contestantGuess.startButton'),
+  };
+}
+
+export function getQuizRules(t: TFunction): GameRulesData {
+  return {
+    title: t('gameRules.quiz.title'),
+    subtitle: t('gameRules.quiz.subtitle'),
+    rules: [
+      { emoji: '📅', text: t('gameRules.quiz.rule1') },
+      { emoji: '❓', text: t('gameRules.quiz.rule2') },
+      { emoji: '⚡', text: t('gameRules.quiz.rule3') },
+      { emoji: '🥇', text: t('gameRules.quiz.rule4') },
+      { emoji: '🎯', text: t('gameRules.quiz.rule5') },
+    ],
+    pointsInfo: t('gameRules.quiz.pointsInfo'),
+    startButtonText: t('gameRules.quiz.startButton'),
+  };
+}
+
+export function getSocialMediaRules(t: TFunction): GameRulesData {
+  return {
+    title: t('gameRules.socialMediaGuess.title'),
+    subtitle: t('gameRules.socialMediaGuess.subtitle'),
+    rules: [
+      { emoji: '📱', text: t('gameRules.socialMediaGuess.rule1') },
+      { emoji: '🕵️', text: t('gameRules.socialMediaGuess.rule2') },
+      { emoji: '👥', text: t('gameRules.socialMediaGuess.rule3') },
+      { emoji: '🤫', text: t('gameRules.socialMediaGuess.rule4') },
+      { emoji: '😂', text: t('gameRules.socialMediaGuess.rule5') },
+    ],
+    pointsInfo: t('gameRules.socialMediaGuess.pointsInfo'),
+    startButtonText: t('gameRules.socialMediaGuess.startButton'),
+  };
+}
+
+export function getWagerRules(t: TFunction): GameRulesData {
+  return {
+    title: t('gameRules.wager.title'),
+    subtitle: t('gameRules.wager.subtitle'),
+    rules: [
+      { emoji: '💰', text: t('gameRules.wager.rule1') },
+      { emoji: '❓', text: t('gameRules.wager.rule2') },
+      { emoji: '✅', text: t('gameRules.wager.rule3') },
+      { emoji: '❌', text: t('gameRules.wager.rule4') },
+      { emoji: '🎯', text: t('gameRules.wager.rule5') },
+    ],
+    pointsInfo: t('gameRules.wager.pointsInfo'),
+    startButtonText: t('gameRules.wager.startButton'),
+  };
+}
+
+// Helper to get question count text
+export function getQuestionCountText(count: number, t: TFunction): string {
+  const questionWord = count === 1 ? t('common.question') : t('common.questions');
+  return `${count} ${questionWord}`;
+}
+
+// Legacy constants for backward compatibility (will be removed after migration)
 export const WOULD_I_LIE_RULES: GameRulesData = {
   title: "Would I Lie to You?",
   subtitle: "The classic bluffing game!",
-  rules: [
-    { emoji: '🖼️', text: 'A photo will be shown to all players' },
-    { emoji: '🎭', text: 'The host secretly assigns one player as the "truth teller" who actually knows the person, and one as the "liar"' },
-    { emoji: '🗣️', text: 'Both players must convince others that THEY are the one who knows the person' },
-    { emoji: '🗳️', text: 'Other players vote on who they think is telling the truth' },
-    { emoji: '✅', text: 'Correct votes earn points! Wrong votes give points to the liar' },
-  ],
-  pointsInfo: "10 points for correct guesses • Liar earns points for each fooled player",
+  rules: [],
+  pointsInfo: "",
   startButtonText: "🎬 Start Round",
 };
 
 export const CONTESTANT_GUESS_RULES: GameRulesData = {
   title: "Ai Morph",
   subtitle: "Can you spot who's hiding in the morph?",
-  rules: [
-    { emoji: '🖼️', text: 'A morphed photo combining a contestant with a celebrity will appear' },
-    { emoji: '🤔', text: 'Study the image carefully - who is hiding in there?' },
-    { emoji: '👆', text: 'Choose from 4 possible contestants' },
-    { emoji: '⏱️', text: 'All players must answer before the reveal' },
-    { emoji: '🎯', text: 'Only correct guesses earn points!' },
-  ],
-  pointsInfo: "10 points per correct answer",
+  rules: [],
+  pointsInfo: "",
   startButtonText: "🔍 Start Guessing",
 };
 
 export const QUIZ_RULES: GameRulesData = {
   title: "Quiz of 2025",
   subtitle: "How well do you remember this year?",
-  rules: [
-    { emoji: '📅', text: 'Test your knowledge of what happened in 2025!' },
-    { emoji: '❓', text: 'Each question has 4 possible answers - pick wisely' },
-    { emoji: '⚡', text: 'Speed matters! First 2 correct answers get bonus points' },
-    { emoji: '🥇', text: '1st place: +10 bonus points • 2nd place: +5 bonus points' },
-    { emoji: '🎯', text: 'Everyone who answers correctly gets base points' },
-  ],
-  pointsInfo: "10 base points + speed bonuses",
+  rules: [],
+  pointsInfo: "",
   startButtonText: "🧠 Start Quiz",
 };
 
 export const SOCIAL_MEDIA_RULES: GameRulesData = {
   title: "Social Media Deep Dive",
   subtitle: "Who posted THAT?!",
-  rules: [
-    { emoji: '📱', text: 'A social media post will be shown - but who posted it?' },
-    { emoji: '🕵️', text: 'Look for clues in the writing style, content, and context' },
-    { emoji: '👥', text: 'Choose from 4 possible contestants' },
-    { emoji: '🤫', text: 'These are REAL posts from the contestants!' },
-    { emoji: '😂', text: 'Prepare for some embarrassing throwbacks...' },
-  ],
-  pointsInfo: "10 points per correct guess",
+  rules: [],
+  pointsInfo: "",
   startButtonText: "📲 Start Scrolling",
 };
 
 export const WAGER_RULES: GameRulesData = {
   title: "All-In Wager",
   subtitle: "Double or nothing on the host!",
-  rules: [
-    { emoji: '💰', text: 'Wager any amount of your points before each question' },
-    { emoji: '❓', text: 'Answer fun facts about the host' },
-    { emoji: '✅', text: 'Correct answer: Win double your wager!' },
-    { emoji: '❌', text: 'Wrong answer: Lose your wager' },
-    { emoji: '🎯', text: 'Risk it all or play it safe - your choice!' },
-  ],
-  pointsInfo: "Double your wager or lose it all",
+  rules: [],
+  pointsInfo: "",
   startButtonText: "🎲 Place Your Bets",
 };
-
-// Helper to get question count text
-export function getQuestionCountText(count: number): string {
-  return `${count} question${count !== 1 ? 's' : ''}`;
-}
-

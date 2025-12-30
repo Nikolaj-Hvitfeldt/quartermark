@@ -6,12 +6,15 @@ import { QuestionDisplay } from "./QuestionDisplay";
 import { AnswerGrid } from "./AnswerGrid";
 import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
-import { QUIZ_QUESTIONS_2025 } from "../data/quizQuestions";
-import { QUIZ_RULES, getQuestionCountText } from "../data/gameRules";
+import { getQuizQuestions } from "../data/quizQuestions";
+import { getQuizRules, getQuestionCountText } from "../data/gameRules";
+import { useTranslation } from "react-i18next";
 import "./Quiz.css";
 import "./QuizHost.css";
 
 function QuizHost({ connection, players, onBack }: QuizHostProps) {
+  const { t } = useTranslation();
+  const QUIZ_QUESTIONS_2025 = getQuizQuestions(t);
   const {
     roundActive,
     currentQuestion,
@@ -117,16 +120,17 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
   };
 
   if (!roundActive) {
-    const questionCount = getQuestionCountText(QUIZ_QUESTIONS_2025.length);
+    const quizRules = getQuizRules(t);
+    const questionCount = getQuestionCountText(QUIZ_QUESTIONS_2025.length, t);
     return (
       <div className="quiz-host">
         <GameRulesCard
-          title={QUIZ_RULES.title}
-          subtitle={QUIZ_RULES.subtitle}
-          rules={QUIZ_RULES.rules}
-          pointsInfo={`${questionCount} • ${QUIZ_RULES.pointsInfo}`}
+          title={quizRules.title}
+          subtitle={quizRules.subtitle}
+          rules={quizRules.rules}
+          pointsInfo={`${questionCount} • ${quizRules.pointsInfo}`}
           onStart={handleStartRound}
-          startButtonText={QUIZ_RULES.startButtonText}
+          startButtonText={quizRules.startButtonText}
         />
       </div>
     );
@@ -156,11 +160,11 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
       return (
         <div className="quiz-host">
           <button className="btn btn-back" onClick={onBack}>
-            ← Back
+            ← {t('common.back')}
           </button>
           <div className="quiz-question-container">
             <div className="question-progress-header">
-              <h2>Question {currentQuestionIndex + 1} of {QUIZ_QUESTIONS_2025.length}</h2>
+              <h2>{t('common.questionProgress', { current: currentQuestionIndex + 1, total: QUIZ_QUESTIONS_2025.length })}</h2>
             </div>
             <QuestionDisplay
               questionText={currentQuestion.questionText}
@@ -180,11 +184,11 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
     return (
       <div className="quiz-host">
         <button className="btn btn-back" onClick={onBack}>
-          ← Back
+          ← {t('common.back')}
         </button>
         <div className="quiz-question-container">
           <div className="question-progress-header">
-            <h2>Question {currentQuestionIndex + 1} of {QUIZ_QUESTIONS_2025.length}</h2>
+            <h2>{t('common.questionProgress', { current: currentQuestionIndex + 1, total: QUIZ_QUESTIONS_2025.length })}</h2>
           </div>
           <QuestionDisplay
             questionText={currentQuestion.questionText}
@@ -202,7 +206,7 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
             onClick={handleRevealAnswer}
             disabled={!allAnswered}
           >
-            {allAnswered ? "Reveal Answer" : `Waiting for ${answerProgress.total - answerProgress.received} more answer(s)`}
+            {allAnswered ? t('common.revealAnswer') : t('common.waitingForAnswers', { count: answerProgress.total - answerProgress.received })}
           </button>
         </div>
       </div>
