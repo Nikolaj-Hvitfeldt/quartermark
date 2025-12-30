@@ -162,20 +162,14 @@ function WouldILieHost({
     );
   }
 
-  // Loading question
+  // Loading question - simple loading state without revealing roles
   if (!currentQuestion) {
     return (
       <div className="would-i-lie-host">
         <div className="round-controls">
           <h2>Question {currentRoundIndex + 1} of {totalRounds}</h2>
           <div className="loading-question">
-            <p>Loading question...</p>
-            {currentConfig && (
-              <div className="config-info">
-                <p>Truth Teller: <strong>{currentConfig.truthTeller}</strong></p>
-                <p>Liar: <strong>{currentConfig.liar}</strong></p>
-              </div>
-            )}
+            <p>Loading...</p>
           </div>
         </div>
       </div>

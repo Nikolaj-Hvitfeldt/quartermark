@@ -854,6 +854,21 @@ public class GameHub : Hub
         });
     }
 
+    public async Task ReturnToLobby()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        // Reset game session state
+        await _gameSessionService.ResetSessionAsync(roomCode);
+
+        // Notify all players (including host) to return to the lobby
+        await _notificationService.NotifyRoomAsync(roomCode, "ReturnToLobby");
+    }
+
     private async Task<string> GetHostConnectionId(string roomCode)
     {
         return await _roomService.GetHostConnectionIdAsync(roomCode);

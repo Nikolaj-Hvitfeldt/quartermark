@@ -102,10 +102,15 @@ function HostScreen({ onBack }: HostScreenProps) {
     }
   };
 
-  const handleEndGame = () => {
+  const handleEndGame = async () => {
+    // Notify all players to return to the lobby
+    try {
+      await signalRService.invoke("ReturnToLobby");
+    } catch (error) {
+      console.error("Error returning to lobby:", error);
+    }
     clearCompletedGame();
     setInGame(null);
-    // Could add logic here to end the session if needed
   };
 
   // Determine if we're in the lobby (not in any game or completion screen)
@@ -310,17 +315,32 @@ function HostScreen({ onBack }: HostScreenProps) {
             {sessionActive && !inGame && !completedGame && (
               <div className="session-status">
                 <div className="session-info">
-                  <p className="session-game-number">Game {currentGameNumber} of 5</p>
-                  <p className="session-hint">Game will start automatically...</p>
+                  <p className="session-game-number">Game {currentGameNumber + 1} of 5</p>
+                  <p className="session-hint">Continue to current game or start new series</p>
                 </div>
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-large"
                   onClick={() => {
-                    const nextGameType = getNextGameType(currentGameNumber - 1);
+                    const nextGameType = getNextGameType(currentGameNumber);
                     setInGame(nextGameType);
                   }}
                 >
-                  Start Game Now →
+                  Continue Current Game →
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={async () => {
+                    // Notify all players and reset session
+                    try {
+                      await signalRService.invoke("ReturnToLobby");
+                    } catch (error) {
+                      console.error("Error resetting session:", error);
+                    }
+                    clearCompletedGame();
+                    setInGame(null);
+                  }}
+                >
+                  Start New 5-Game Series
                 </button>
               </div>
             )}
