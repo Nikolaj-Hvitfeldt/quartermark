@@ -252,6 +252,9 @@ function WouldILieHost({
                   ))}
               </select>
             </div>
+          </div>
+          
+          <div className="action-buttons">
             <button
               className="btn btn-primary btn-large"
               onClick={handleShowQuestion}
@@ -264,7 +267,11 @@ function WouldILieHost({
             >
               {isLoadingImage ? "Loading image..." : "Show Question to Players"}
             </button>
+            <button className="btn btn-secondary" onClick={handleEndRound}>
+              End Round
+            </button>
           </div>
+          
           {Object.keys(roundScores).length > 0 && (
             <div className="round-scores">
               <h3>Round Scores (so far)</h3>
@@ -279,9 +286,6 @@ function WouldILieHost({
               </div>
             </div>
           )}
-          <button className="btn btn-secondary" onClick={handleEndRound}>
-            End Round
-          </button>
         </div>
       </div>
     );

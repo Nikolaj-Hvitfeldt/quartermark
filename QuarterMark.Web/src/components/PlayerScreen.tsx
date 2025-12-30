@@ -139,6 +139,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
         />
       ) : currentGame === "drinkingWheel" ? (
         <DrinkingWheelPlayer
+          key={`drinking-wheel-player-${currentGameNumber}`} // Force remount for fresh state
           players={players}
         />
       ) : currentGame === "wouldILie" ? (
