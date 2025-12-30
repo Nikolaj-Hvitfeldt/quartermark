@@ -100,10 +100,13 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
           <p>Your current score: <strong>{availableScore} pts</strong></p>
         </div>
         
-        <QuestionDisplay questionText={currentQuestion.questionText} />
-
+        {/* Blind wagering phase - question hidden */}
         {roundState === 'Wagering' && !hasWagered && (
           <>
+            <div className="blind-wager-header">
+              <h2>🎲 Place Your Wager</h2>
+              <p className="blind-wager-subtitle">How confident are you? Bet before you see the question!</p>
+            </div>
             <div className="wager-input-section">
               <label htmlFor="wager-input">How many points do you want to wager?</label>
               <div className="wager-input-group">
@@ -129,15 +132,29 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
                 Wager up to {availableScore} points. Correct answer wins double!
               </p>
             </div>
-            <AnswerGrid answers={currentQuestion.possibleAnswers} />
           </>
         )}
 
-        {roundState === 'Wagering' && hasWagered && !answerRevealed && (
-              <>
-                <div className="wager-reminder">
-                  <p>Your wager: <strong>{playerWagerAmount} pts</strong> (Win: +{calculateWinnings(playerWagerAmount)}, Lose: -{playerWagerAmount})</p>
-                </div>
+        {/* Waiting for others to wager */}
+        {roundState === 'Wagering' && hasWagered && !hasAnswered && (
+          <div className="wager-waiting">
+            <div className="wager-reminder">
+              <p>Your wager: <strong>{playerWagerAmount} pts</strong> (Win: +{calculateWinnings(playerWagerAmount)}, Lose: -{playerWagerAmount})</p>
+            </div>
+            <div className="waiting-for-wagers">
+              <p>⏳ Waiting for all players to place their wagers...</p>
+              <p className="waiting-hint">The question will be revealed once everyone has wagered!</p>
+            </div>
+          </div>
+        )}
+
+        {/* Answering phase - question visible after all wagers are in */}
+        {roundState === 'Answering' && !answerRevealed && (
+          <>
+            <div className="wager-reminder">
+              <p>Your wager: <strong>{playerWagerAmount} pts</strong> (Win: +{calculateWinnings(playerWagerAmount)}, Lose: -{playerWagerAmount})</p>
+            </div>
+            <QuestionDisplay questionText={currentQuestion.questionText} />
             {hasAnswered ? (
               <div className="answer-submitted">
                 <p>✓ Answer submitted! Waiting for other players...</p>
@@ -154,6 +171,7 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
 
         {answerRevealed && (
           <>
+            <QuestionDisplay questionText={currentQuestion.questionText} />
             <AnswerGrid
               answers={currentQuestion.possibleAnswers}
               correctAnswer={correctAnswer}

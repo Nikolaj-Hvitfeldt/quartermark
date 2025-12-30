@@ -33,7 +33,7 @@ export const SOCIAL_MEDIA_GUESS_QUESTIONS: SocialMediaGuessQuestion[] = [
   {
     id: 'smg5',
     imageUrl: '/images/deep-dive-images/SebDeepDive1.jpg',
-    answers: [ 'Eline', 'Frederikke', 'Martin', 'Sebastian'],
+    answers: [ 'Niko', 'Anders', 'Martin', 'Sebastian'],
     correctAnswer: 'Sebastian',
   },
   {

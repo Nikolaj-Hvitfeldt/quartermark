@@ -183,6 +183,16 @@ public class WagerService : IWagerService
         return room?.CurrentWagerQuestion;
     }
 
+    public Task<bool> ResetWagersAsync(string roomCode)
+    {
+        var room = GetRoom(roomCode);
+        if (room == null || room.CurrentWagerQuestion == null) return Task.FromResult(false);
+
+        // Clear all wagers for the current question
+        room.CurrentWagerQuestion.Wagers.Clear();
+        return Task.FromResult(true);
+    }
+
     private GameRoom? GetRoom(string roomCode)
     {
         var service = _roomService as GameRoomService;

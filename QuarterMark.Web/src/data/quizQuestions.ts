@@ -58,7 +58,7 @@ export const QUIZ_QUESTIONS_2025: QuizQuestion[] = [
   {
     id: '9',
     questionText: 'Why was all air traffic grounded in Kastrup Airport on the 22nd of September?',
-    answers: ['The workers went on a strike', 'Sightings of illegal drones', 'A bird was blocking the runway', 'The pilots had coronavirus'],
+    answers: ['The workers went on a strike', 'Sightings of drones', 'A bird was blocking the runway', 'The pilots had coronavirus'],
     correctAnswer: 'Sightings of illegal drones',
   },
   {
