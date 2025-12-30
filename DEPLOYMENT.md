@@ -21,8 +21,8 @@ This guide explains how to deploy QuarterMark to Render (backend) and Vercel (fr
    - **Region**: Choose closest to your users
    - **Branch**: `main` (or your default branch)
    - **Root Directory**: `QuarterMark.Api`
-   - **Dockerfile Path**: `./Dockerfile` (or `Dockerfile`)
-     - Note: When Root Directory is set to `QuarterMark.Api`, the Dockerfile Path is relative to that directory, so use `./Dockerfile` since the Dockerfile is inside `QuarterMark.Api/`
+   - **Dockerfile Path**: `./Dockerfile` (or just `Dockerfile`)
+     - Note: When Root Directory is set to `QuarterMark.Api`, the Dockerfile Path should be relative to that directory, so use `./Dockerfile` or `Dockerfile`
 
 3. **Environment Variables**:
    - Add `ASPNETCORE_ENVIRONMENT` = `Production`
