@@ -1,0 +1,6 @@
+@import './SocialMediaGuess.css';
+
+.social-media-guess-player {
+  /* Specific player styles if any, otherwise inherits from SocialMediaGuess.css */
+}
+

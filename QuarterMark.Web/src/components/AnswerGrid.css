@@ -1,0 +1,115 @@
+/* Uses shared dimensions from gameLayout.css */
+.answer-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--answer-grid-gap);
+  margin-top: 1.5rem;
+}
+
+.answer-option {
+  border-radius: var(--answer-option-border-radius);
+  padding: var(--answer-option-padding);
+  font-size: var(--answer-font-size);
+  font-weight: 600;
+  text-align: center;
+  transition: var(--transition-normal);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  min-height: var(--answer-option-min-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid transparent;
+  color: white;
+}
+
+.answer-option.clickable {
+  cursor: pointer;
+}
+
+/* Blue answer option */
+.answer-option-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.answer-option-blue.clickable:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Purple answer option */
+.answer-option-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.answer-option-purple.clickable:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Red answer option */
+.answer-option-red {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.answer-option-red.clickable:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* Orange answer option */
+.answer-option-orange {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.answer-option-orange.clickable:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+}
+
+.answer-option.correct {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+  border-color: #047857 !important;
+  box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5) !important;
+}
+
+.answer-option.player-choice {
+  border: 4px solid #ffd700;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+  transform: scale(1.02);
+}
+
+.answer-text {
+  font-size: inherit;
+  margin-bottom: 0.5rem;
+  color: inherit;
+}
+
+.correct-badge {
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin-top: 0.5rem;
+}
+
+.player-badge {
+  font-size: 0.9rem;
+  background: rgba(59, 130, 246, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin-top: 0.5rem;
+}
+
+.guess-count {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+

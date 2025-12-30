@@ -1,0 +1,37 @@
+@import './DrinkingWheel.css';
+
+.wheel-container {
+  max-width: 400px;
+}
+
+.wheel-container h2 {
+  font-size: 2rem;
+}
+
+.wheel-subtitle {
+  font-size: 1.25rem;
+}
+
+.bottle-wheel {
+  width: 150px;
+  height: 300px;
+}
+
+.selected-player {
+  padding: 1.5rem;
+}
+
+.selected-player h3 {
+  font-size: 1.5rem;
+}
+
+.drink-message {
+  font-size: 1.25rem;
+}
+
+.waiting-message {
+  font-size: 1.125rem;
+  opacity: 0.8;
+  margin-top: 2rem;
+}
+

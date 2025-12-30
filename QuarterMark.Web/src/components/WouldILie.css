@@ -1,0 +1,298 @@
+/* Shared Would I Lie styles for both host and player */
+
+/* Game container - matching other games */
+.wil-game-container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.wil-game-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--gold-primary);
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+}
+
+/* 2-column answer grid */
+.wil-answer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--answer-grid-gap);
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* Base answer option styles */
+.wil-answer-option {
+  border-radius: var(--answer-option-border-radius);
+  padding: var(--answer-option-padding);
+  min-height: var(--answer-option-min-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: var(--transition-normal);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 3px solid transparent;
+  color: white;
+  gap: 0.5rem;
+}
+
+.wil-answer-option.clickable {
+  cursor: pointer;
+}
+
+.wil-answer-option.clickable:hover {
+  transform: translateY(-5px);
+}
+
+/* Blue option */
+.wil-answer-option.option-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.wil-answer-option.option-blue.clickable:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Purple option */
+.wil-answer-option.option-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.wil-answer-option.option-purple.clickable:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Correct answer */
+.wil-answer-option.correct {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border-color: #047857 !important;
+  box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Player's choice highlight */
+.wil-answer-option.player-choice {
+  border: 4px solid #ffd700;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+  transform: scale(1.02);
+}
+
+.wil-player-name {
+  font-size: var(--answer-font-size);
+  font-weight: 700;
+}
+
+.wil-option-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Badges */
+.wil-correct-badge {
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin-top: 0.5rem;
+}
+
+.wil-player-badge {
+  font-size: 0.9rem;
+  background: rgba(255, 215, 0, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin-top: 0.5rem;
+}
+
+/* Status and result messages */
+.wil-status-message {
+  background: var(--gradient-card-dark);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-gold-subtle);
+  text-align: center;
+}
+
+.wil-status-message p {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.wil-answer-submitted {
+  background: var(--gradient-card-dark);
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-gold-subtle);
+  text-align: center;
+}
+
+.wil-answer-submitted p {
+  color: var(--gold-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* Result box */
+.wil-result-message {
+  width: 100%;
+}
+
+.wil-result-box {
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.wil-result-box.correct {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%);
+  border: 2px solid #10b981;
+}
+
+.wil-result-box.correct h3 {
+  color: #10b981;
+}
+
+.wil-result-box.incorrect {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+  border: 2px solid #ef4444;
+}
+
+.wil-result-box.incorrect h3 {
+  color: #ef4444;
+}
+
+/* Standings */
+.wil-standings {
+  width: 100%;
+  background: var(--gradient-card-dark);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-gold-subtle);
+  box-shadow: var(--shadow-card-medium);
+}
+
+.wil-standings h3 {
+  font-family: var(--font-display);
+  color: var(--gold-primary);
+  font-size: 1.25rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.wil-standings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.wil-standing-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: var(--transition-fast);
+}
+
+.wil-standing-item.highlight {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: var(--gold-primary);
+}
+
+.wil-standing-rank {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  min-width: 40px;
+}
+
+.wil-standing-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  flex: 1;
+  text-align: left;
+  margin-left: 1rem;
+}
+
+.wil-standing-score {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--gold-primary);
+}
+
+.wil-round-complete-message {
+  font-size: 1.5rem;
+  color: var(--gold-primary);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Waiting message */
+.wil-waiting-message {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 2rem;
+  color: white;
+  min-height: 50vh;
+}
+
+.wil-waiting-message h2 {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+}
+
+/* Voting progress */
+.wil-voting-progress {
+  width: 100%;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.wil-vote-count {
+  font-size: 1.25rem;
+  color: var(--gold-primary);
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .wil-game-title {
+    font-size: 1.5rem;
+  }
+
+  .wil-answer-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .wil-answer-option {
+    min-height: 80px;
+    padding: 1rem;
+  }
+
+  .wil-player-name {
+    font-size: 1.25rem;
+  }
+
+  .wil-standing-item {
+    padding: 0.75rem 1rem;
+  }
+}
+

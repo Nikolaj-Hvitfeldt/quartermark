@@ -1,0 +1,58 @@
+.pie-chart-wheel-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  margin: 2rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pie-wheel {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  z-index: 1;
+  /* Pie chart stays static, doesn't rotate */
+}
+
+.slice {
+  transition: fill 0.3s ease;
+}
+
+
+.slice-label {
+  pointer-events: none;
+  user-select: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+
+.bottle-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transform-origin: center center;
+}
+
+.bottle-spinner {
+  width: 120px;
+  height: 120px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  transform: rotate(-90deg); /* Point the bottle upward */
+}
+
+

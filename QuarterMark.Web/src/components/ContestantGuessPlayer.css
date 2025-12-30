@@ -1,0 +1,5 @@
+@import './ContestantGuess.css';
+
+.contestant-guess-player {
+  /* Specific player styles if any, otherwise inherits from ContestantGuess.css */
+}

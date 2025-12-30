@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap');
+@import './styles/theme.css';
+@import './styles/gameLayout.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-dark-3);
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+

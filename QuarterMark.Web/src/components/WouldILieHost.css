@@ -1,0 +1,147 @@
+/* Would I Lie Host - Component-specific styles */
+/* Shared styles are in WouldILie.css */
+
+.would-i-lie-host {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Round controls */
+.round-controls {
+  background: var(--gradient-card-dark);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  border: 1px solid var(--border-gold-subtle);
+}
+
+.round-controls h2 {
+  font-family: var(--font-display);
+  color: var(--gold-primary);
+  margin-bottom: 1rem;
+}
+
+/* Loading question screen */
+.loading-question {
+  text-align: center;
+  padding: 2rem;
+}
+
+.loading-question p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.config-info {
+  background: rgba(31, 41, 55, 0.8);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--gold-alpha-20);
+  margin-top: 1rem;
+}
+
+.config-info p {
+  margin: 0.5rem 0;
+  color: var(--text-muted);
+}
+
+.config-info strong {
+  color: var(--gold-primary);
+}
+
+/* Config preview on start screen */
+.config-preview {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--gold-muted);
+  font-size: 0.95rem;
+}
+
+/* Score screen */
+.score-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 60vh;
+  gap: 2rem;
+  width: 100%;
+  max-width: 800px;
+}
+
+.score-screen h2 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--gold-primary);
+  margin-bottom: 1rem;
+}
+
+.final-score-screen {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.round-complete-message {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.question-progress {
+  color: var(--gold-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.final-score-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Dummy player testing section */
+.dummy-player-actions {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(17, 24, 39, 0.8);
+  border-radius: 12px;
+  border: 1px dashed var(--border-gold-subtle);
+  text-align: left;
+}
+
+.dummy-player-actions h4 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+
+.dummy-action-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dummy-action-controls .input {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 2px solid rgba(55, 65, 81, 0.8);
+  border-radius: 8px;
+  background: rgba(31, 41, 55, 0.8);
+  color: white;
+  font-family: inherit;
+}
+
+.dummy-action-controls .input:focus {
+  outline: none;
+  border-color: var(--gold-primary);
+}

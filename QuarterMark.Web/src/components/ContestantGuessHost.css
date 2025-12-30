@@ -1,0 +1,5 @@
+@import './ContestantGuess.css';
+
+.contestant-guess-host {
+  /* Specific host styles if any, otherwise inherits from ContestantGuess.css */
+}

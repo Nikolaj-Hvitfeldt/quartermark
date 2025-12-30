@@ -1,0 +1,56 @@
+/* Uses shared dimensions from gameLayout.css */
+.question-display {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--prompt-border-radius);
+  padding: var(--prompt-padding);
+  text-align: center;
+  min-height: var(--prompt-min-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.question-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.question-image {
+  max-width: 100%;
+  max-height: var(--prompt-image-max-height);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  object-fit: contain;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.question-text {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .question-text {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .question-text {
+    font-size: 1.25rem;
+  }
+}
+

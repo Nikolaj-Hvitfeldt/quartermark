@@ -1,0 +1,133 @@
+/* ===== SHARED GAME LAYOUT - Consistent dimensions for prompt + 2x2 answer grid games ===== */
+
+/* 
+ * This file defines consistent dimensions for games using:
+ * - A prompt/question rectangle (image or text)
+ * - A 2x2 grid of answer rectangles
+ * 
+ * Used by: Quiz, Contestant Guess, Social Media Guess
+ */
+
+:root {
+  /* Prompt/Question Display Dimensions */
+  --prompt-min-height: 350px;
+  --prompt-max-height: 450px;
+  --prompt-padding: 2rem;
+  --prompt-border-radius: var(--radius-xl);
+  --prompt-image-max-height: 380px;
+  
+  /* Answer Grid Dimensions */
+  --answer-grid-gap: 1rem;
+  --answer-option-min-height: 100px;
+  --answer-option-padding: 1.5rem;
+  --answer-option-border-radius: var(--radius-lg);
+  --answer-font-size: 1.25rem;
+  
+  /* Container Max Width */
+  --game-container-max-width: 900px;
+}
+
+/* ===== SHARED PROMPT/DISPLAY CONTAINER ===== */
+.game-prompt-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--prompt-border-radius);
+  padding: var(--prompt-padding);
+  text-align: center;
+  min-height: var(--prompt-min-height);
+  max-height: var(--prompt-max-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  position: relative;
+}
+
+.game-prompt-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.game-prompt-image {
+  max-width: 100%;
+  max-height: var(--prompt-image-max-height);
+  border-radius: var(--radius-md);
+  object-fit: contain;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.game-prompt-text {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ===== SHARED ANSWER GRID ===== */
+.game-answer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--answer-grid-gap);
+  margin-top: 1.5rem;
+  max-width: var(--game-container-max-width);
+}
+
+.game-answer-option {
+  border-radius: var(--answer-option-border-radius);
+  padding: var(--answer-option-padding);
+  font-size: var(--answer-font-size);
+  font-weight: 600;
+  text-align: center;
+  transition: var(--transition-normal);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  min-height: var(--answer-option-min-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid transparent;
+  color: white;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+  :root {
+    --prompt-min-height: 280px;
+    --prompt-max-height: 380px;
+    --prompt-padding: 1.5rem;
+    --prompt-image-max-height: 300px;
+    
+    --answer-grid-gap: 0.75rem;
+    --answer-option-min-height: 80px;
+    --answer-option-padding: 1rem;
+    --answer-font-size: 1rem;
+  }
+  
+  .game-prompt-text {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --prompt-min-height: 220px;
+    --prompt-max-height: 300px;
+    --prompt-image-max-height: 220px;
+    
+    --answer-option-min-height: 70px;
+    --answer-font-size: 0.9rem;
+  }
+  
+  .game-prompt-text {
+    font-size: 1.25rem;
+  }
+}
+

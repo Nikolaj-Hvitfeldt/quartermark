@@ -1,0 +1,250 @@
+/* Shared styles for Wager components */
+.wager-host,
+.wager-player {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--text-light);
+}
+
+.wager-question-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.wager-progress,
+.answer-progress {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--gold-dark);
+}
+
+.wager-hint {
+  font-size: 0.9rem;
+  color: var(--text-light-alpha-medium);
+  margin-top: 0.5rem;
+}
+
+.round-scores {
+  background: var(--gradient-card-dark);
+  border-radius: var(--border-radius-medium);
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border: var(--border-gold-subtle);
+  box-shadow: var(--shadow-card-medium);
+}
+
+.round-scores h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--gold-primary);
+  font-family: var(--font-display);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.round-scores h3::before {
+  content: '💰';
+}
+
+.wager-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.wager-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--gradient-card-item-dark-alpha);
+  border-radius: var(--border-radius-small);
+  border: var(--border-gold-subtle-alpha);
+  transition: var(--transition-medium);
+}
+
+.wager-result-item.current-player {
+  border-color: var(--gold-primary-alpha-strong);
+  background: var(--gradient-player-highlight-item);
+}
+
+.wager-result-item.correct {
+  border-left: 4px solid var(--green-primary);
+}
+
+.wager-result-item.incorrect {
+  border-left: 4px solid var(--red-primary);
+}
+
+.wager-result-item .player-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.wager-result-item .wager-amount {
+  color: var(--gold-dark);
+  margin-right: 1rem;
+}
+
+.wager-result-item .net-change {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.wager-result-item .net-change.gain {
+  color: var(--success-light);
+}
+
+.wager-result-item .net-change.loss {
+  color: var(--red-primary);
+}
+
+.waiting-message {
+  text-align: center;
+  padding: 4rem;
+  background: var(--gradient-card-dark-alpha);
+  border-radius: var(--border-radius-medium);
+  border: var(--border-gold-subtle);
+}
+
+.waiting-message h2 {
+  color: var(--gold-dark);
+}
+
+.answer-submitted,
+.wager-submitted {
+  text-align: center;
+  padding: 2rem;
+  background: var(--gradient-success-alpha);
+  border-radius: var(--border-radius-medium);
+  font-size: 1.2rem;
+  color: var(--success-light);
+  border: var(--border-success-subtle);
+}
+
+.result-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.correct-message {
+  background: linear-gradient(135deg, var(--green-primary) 0%, var(--green-dark) 100%);
+  color: white;
+  border-radius: var(--border-radius-medium);
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+}
+
+.correct-message h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+}
+
+.incorrect-message {
+  background: var(--gradient-error-alpha);
+  color: var(--error-dark);
+  border-radius: var(--border-radius-medium);
+  padding: 2rem;
+  border: var(--border-error-subtle);
+}
+
+.incorrect-message h3 {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+  color: var(--red-primary);
+}
+
+.incorrect-message p {
+  color: var(--error-dark);
+}
+
+.question-progress-header {
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Blind Wager Phase Styles */
+.blind-wager-header {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(75, 35, 10, 0.4) 100%);
+  border-radius: var(--border-radius-medium);
+  border: 2px solid var(--gold-primary);
+  margin-bottom: 1rem;
+}
+
+.blind-wager-header h2 {
+  font-size: 2.5rem;
+  color: var(--gold-primary);
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-display);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.blind-wager-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-light-alpha-medium);
+  margin: 0;
+}
+
+.blind-wager-host-header {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(75, 35, 10, 0.4) 100%);
+  border-radius: var(--border-radius-medium);
+  border: 2px solid var(--gold-primary);
+}
+
+.blind-wager-host-header h3 {
+  font-size: 2.2rem;
+  color: var(--gold-primary);
+  margin: 0 0 1rem 0;
+  font-family: var(--font-display);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.blind-wager-host-header p {
+  font-size: 1.3rem;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.blind-wager-phase {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.wager-waiting {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.waiting-for-wagers {
+  text-align: center;
+  padding: 2rem;
+  background: var(--gradient-card-dark-alpha);
+  border-radius: var(--border-radius-medium);
+  border: var(--border-gold-subtle);
+}
+
+.waiting-for-wagers p {
+  font-size: 1.3rem;
+  color: var(--gold-dark);
+  margin: 0;
+}
+
+.waiting-for-wagers .waiting-hint {
+  font-size: 1rem;
+  color: var(--text-light-alpha-medium);
+  margin-top: 0.5rem;
+}
+
