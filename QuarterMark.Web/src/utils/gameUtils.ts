@@ -32,9 +32,11 @@ export function getGameName(type: string): string {
 
 export function sortPlayersByScore(
   players: PlayerDto[],
-  accumulatedScores: Record<string, number>
+  accumulatedScores: Record<string, number>,
+  excludeHost: boolean = true
 ): PlayerDto[] {
-  return [...players].sort(
+  const filtered = excludeHost ? players.filter(p => !p.isHost) : players;
+  return [...filtered].sort(
     (a, b) => (accumulatedScores[b.name] || 0) - (accumulatedScores[a.name] || 0)
   );
 }

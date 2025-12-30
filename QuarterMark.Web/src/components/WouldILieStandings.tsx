@@ -1,5 +1,6 @@
 import React from 'react';
 import { PlayerDto } from '../types';
+import { sortPlayersByScore } from '../utils/standingsUtils';
 import './WouldILie.css';
 
 interface WouldILieStandingsProps {
@@ -13,9 +14,7 @@ export function WouldILieStandings({
   title = '📊 Current Standings',
   highlightPlayerName,
 }: WouldILieStandingsProps) {
-  const sortedPlayers = [...players]
-    .filter(p => !p.isHost)
-    .sort((a, b) => b.score - a.score);
+  const sortedPlayers = sortPlayersByScore(players);
 
   return (
     <div className="wil-standings">

@@ -59,12 +59,19 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       setCurrentGame("drinkingWheel");
     };
 
+    const handleReturnToLobby = () => {
+      // Clear all game state and return to lobby
+      clearCompletedGame();
+      setCurrentGame(null);
+    };
+
     signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
     signalRService.on('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
     signalRService.on('QuizRoundStarted', handleQuizRoundStarted);
     signalRService.on('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
     signalRService.on('WagerRoundStarted', handleWagerRoundStarted);
     signalRService.on('ShowDrinkingWheel', handleShowDrinkingWheel);
+    signalRService.on('ReturnToLobby', handleReturnToLobby);
 
     return () => {
       signalRService.off('WouldILieRoundStarted', handleWouldILieRoundStarted);
@@ -73,6 +80,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       signalRService.off('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
       signalRService.off('WagerRoundStarted', handleWagerRoundStarted);
       signalRService.off('ShowDrinkingWheel', handleShowDrinkingWheel);
+      signalRService.off('ReturnToLobby', handleReturnToLobby);
     };
   }, [connection, clearCompletedGame]);
 

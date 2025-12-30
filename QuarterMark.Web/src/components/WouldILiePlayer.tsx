@@ -152,7 +152,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
   if (roundState === 'ShowingClaims') {
     const options = claims.map(claim => ({
       playerName: claim.playerName,
-      label: WOULD_I_LIE_MESSAGES.CLAIMS_TO_KNOW,
     }));
 
     return (

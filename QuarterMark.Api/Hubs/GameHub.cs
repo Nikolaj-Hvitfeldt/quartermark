@@ -698,14 +698,64 @@ public class GameHub : Hub
         var totalPlayers = players.Where(p => !p.IsHost).Count();
         var totalWagers = question.Wagers.Count;
 
+        // When all wagers are in, notify all players to reveal the question
+        var allWagersReceived = totalWagers >= totalPlayers && totalPlayers > 0;
+
         await _notificationService.NotifyClientAsync(
             await GetHostConnectionId(roomCode),
             "WagerReceived",
             new
             {
                 totalWagers,
-                totalPlayers
+                totalPlayers,
+                allWagersReceived
             });
+
+        if (allWagersReceived)
+        {
+            // Double-check counts right before sending to ensure accuracy
+            var finalPlayers = await _roomService.GetPlayersAsync(roomCode);
+            var finalTotalPlayers = finalPlayers.Where(p => !p.IsHost).Count();
+            var finalTotalWagers = question.Wagers.Count;
+            
+            // Only send if counts still match (prevents race conditions)
+            if (finalTotalWagers >= finalTotalPlayers && finalTotalPlayers > 0)
+            {
+                await _notificationService.NotifyRoomAsync(roomCode, "AllWagersReceived");
+            }
+        }
+    }
+
+    public async Task ResetWagers()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var success = await _wagerService.ResetWagersAsync(roomCode);
+        if (!success) return;
+
+        var question = GetCurrentWagerQuestion(roomCode);
+        if (question == null) return;
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var totalPlayers = players.Where(p => !p.IsHost).Count();
+
+        // Notify host that wagers have been reset
+        await _notificationService.NotifyClientAsync(
+            await GetHostConnectionId(roomCode),
+            "WagerReceived",
+            new
+            {
+                totalWagers = 0,
+                totalPlayers,
+                allWagersReceived = false
+            });
+
+        // Notify all players that wagers have been reset
+        await _notificationService.NotifyRoomAsync(roomCode, "WagersReset");
     }
 
     public async Task SubmitWagerAnswer(string selectedAnswer)
@@ -852,6 +902,21 @@ public class GameHub : Hub
         {
             selectedPlayer
         });
+    }
+
+    public async Task ReturnToLobby()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        // Reset game session state
+        await _gameSessionService.ResetSessionAsync(roomCode);
+
+        // Notify all players (including host) to return to the lobby
+        await _notificationService.NotifyRoomAsync(roomCode, "ReturnToLobby");
     }
 
     private async Task<string> GetHostConnectionId(string roomCode)

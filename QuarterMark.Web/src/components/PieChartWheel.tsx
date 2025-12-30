@@ -22,23 +22,15 @@ export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartW
   const playerCount = players.length;
   const sliceAngle = 360 / playerCount;
 
-  // Reset refs on mount to ensure fresh state
+  // Cleanup any pending animation on unmount only
   useEffect(() => {
-    hasStartedSpinningRef.current = false;
-    hasResultBeenShownRef.current = false;
-    hasStartedFinalAnimationRef.current = false;
-    setSpinnerRotation(-90);
-    currentRotationRef.current = -90;
-    setIsAnimating(false);
-    
     return () => {
-      // Cleanup any pending animation on unmount
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
     };
-  }, []); // Empty dependency - run only on mount
+  }, []);
 
   const colors = [
     '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',

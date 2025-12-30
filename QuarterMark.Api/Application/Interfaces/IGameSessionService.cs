@@ -9,5 +9,6 @@ public interface IGameSessionService
     Task<Dictionary<string, int>> GetAccumulatedScoresAsync(string roomCode);
     Task<bool> IsGameSessionActiveAsync(string roomCode);
     Task<int> GetCurrentGameNumberAsync(string roomCode);
+    Task ResetSessionAsync(string roomCode);
 }
 

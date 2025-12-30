@@ -121,6 +121,23 @@ public class GameSessionService : IGameSessionService
         return Task.FromResult(room?.GameSession?.CurrentGameNumber ?? 0);
     }
 
+    public Task ResetSessionAsync(string roomCode)
+    {
+        var room = GetRoom(roomCode);
+        if (room == null) return Task.CompletedTask;
+
+        // Reset the game session
+        room.GameSession = null;
+        
+        // Reset player scores
+        foreach (var player in room.Players)
+        {
+            player.Score = 0;
+        }
+
+        return Task.CompletedTask;
+    }
+
     private GameRoom? GetRoom(string roomCode)
     {
         var service = _roomService as GameRoomService;

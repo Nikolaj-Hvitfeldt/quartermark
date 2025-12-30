@@ -170,3 +170,81 @@
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+/* Blind Wager Phase Styles */
+.blind-wager-header {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(75, 35, 10, 0.4) 100%);
+  border-radius: var(--border-radius-medium);
+  border: 2px solid var(--gold-primary);
+  margin-bottom: 1rem;
+}
+
+.blind-wager-header h2 {
+  font-size: 2.5rem;
+  color: var(--gold-primary);
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-display);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.blind-wager-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-light-alpha-medium);
+  margin: 0;
+}
+
+.blind-wager-host-header {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(75, 35, 10, 0.4) 100%);
+  border-radius: var(--border-radius-medium);
+  border: 2px solid var(--gold-primary);
+}
+
+.blind-wager-host-header h3 {
+  font-size: 2.2rem;
+  color: var(--gold-primary);
+  margin: 0 0 1rem 0;
+  font-family: var(--font-display);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.blind-wager-host-header p {
+  font-size: 1.3rem;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.blind-wager-phase {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.wager-waiting {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.waiting-for-wagers {
+  text-align: center;
+  padding: 2rem;
+  background: var(--gradient-card-dark-alpha);
+  border-radius: var(--border-radius-medium);
+  border: var(--border-gold-subtle);
+}
+
+.waiting-for-wagers p {
+  font-size: 1.3rem;
+  color: var(--gold-dark);
+  margin: 0;
+}
+
+.waiting-for-wagers .waiting-hint {
+  font-size: 1rem;
+  color: var(--text-light-alpha-medium);
+  margin-top: 0.5rem;
+}
+

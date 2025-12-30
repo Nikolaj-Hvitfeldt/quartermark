@@ -8,21 +8,21 @@ export interface WagerQuestion {
 export const WAGER_QUESTIONS: WagerQuestion[] = [
   {
     id: 'wager1',
-    questionText: 'What is the host\'s favorite color?',
-    answers: ['Blue', 'Red', 'Green', 'Purple'],
-    correctAnswer: 'Blue', // TODO: Replace with actual host answer
+    questionText: 'What does Niko\'s artist name SLSH stand for?',
+    answers: ['Store Lår Sexet Hår', 'Spastisk Lam? Sikkert Ham', 'Stort Lem Sent Hjem', 'SLum SHeik'],
+    correctAnswer: 'Stort Lem Sent Hjem',
   },
   {
     id: 'wager2',
-    questionText: 'What is the host\'s favorite food?',
-    answers: ['Pizza', 'Sushi', 'Tacos', 'Pasta'],
-    correctAnswer: 'Pizza', // TODO: Replace with actual host answer
+    questionText: 'In what video game is Niko in the top 1% of the world leaderboard?',
+    answers: ['CounterStrike: Global Offensive', 'CounterStrike 1.6', 'CounterStrike Source', 'CounterStrike 2'],
+    correctAnswer: 'CounterStrike 2',
   },
   {
     id: 'wager3',
-    questionText: 'What is the host\'s favorite hobby?',
-    answers: ['Gaming', 'Reading', 'Sports', 'Music'],
-    correctAnswer: 'Gaming', // TODO: Replace with actual host answer
+    questionText: 'Against popular belief, what is Niko\'s favorite drink?',
+    answers: ['Gin Hass', 'Vodka Redbull', 'Strawberry Daiquiri', 'Pink Pussy'],
+    correctAnswer: 'Strawberry Daiquiri',
   },
 ];
 

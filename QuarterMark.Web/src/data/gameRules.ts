@@ -28,7 +28,7 @@ export const WOULD_I_LIE_RULES: GameRulesData = {
 };
 
 export const CONTESTANT_GUESS_RULES: GameRulesData = {
-  title: "Contestant Guess",
+  title: "Ai Morph",
   subtitle: "Can you spot who's hiding in the morph?",
   rules: [
     { emoji: '🖼️', text: 'A morphed photo combining a contestant with a celebrity will appear' },

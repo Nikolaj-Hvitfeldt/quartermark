@@ -82,14 +82,30 @@ export function useWager(connection: any) {
       setRoundState('Revealed');
     };
 
+    const handleAllWagersReceived = () => {
+      // Transition to answering phase - question will now be visible
+      setRoundState('Answering');
+    };
+
+    const handleWagersReset = () => {
+      // Reset wager state so players can re-wager
+      setHasWagered(false);
+      setPlayerWager(0);
+      setRoundState('Wagering');
+    };
+
     signalRService.on('WagerRoundStarted', handleRoundStarted);
     signalRService.on('WagerQuestionShown', handleQuestionShown);
     signalRService.on('WagerAnswerRevealed', handleAnswerRevealed);
+    signalRService.on('AllWagersReceived', handleAllWagersReceived);
+    signalRService.on('WagersReset', handleWagersReset);
 
     return () => {
       signalRService.off('WagerRoundStarted', handleRoundStarted);
       signalRService.off('WagerQuestionShown', handleQuestionShown);
       signalRService.off('WagerAnswerRevealed', handleAnswerRevealed);
+      signalRService.off('AllWagersReceived', handleAllWagersReceived);
+      signalRService.off('WagersReset', handleWagersReset);
     };
   }, [
     connection,

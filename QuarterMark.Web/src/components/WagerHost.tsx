@@ -15,6 +15,7 @@ import "./WagerHost.css";
 function WagerHost({ connection, players, onBack }: WagerHostProps) {
   const {
     roundActive,
+    roundState,
     currentQuestion,
     wagers,
     guesses,
@@ -34,20 +35,30 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
   useEffect(() => {
     if (!connection) return;
 
-    const handleWagerReceived = (data: { totalWagers: number; totalPlayers: number }) => {
+    const handleWagerReceived = (data: { totalWagers: number; totalPlayers: number; allWagersReceived?: boolean }) => {
       setWagerProgress({ total: data.totalPlayers, received: data.totalWagers });
+      // If backend confirms all wagers received, ensure UI reflects it
+      if (data.allWagersReceived && data.totalWagers >= data.totalPlayers) {
+        setWagerProgress({ total: data.totalPlayers, received: data.totalPlayers });
+      }
     };
 
     const handleAnswerReceived = (data: { totalAnswers: number; totalPlayers: number }) => {
       setAnswerProgress({ total: data.totalPlayers, received: data.totalAnswers });
     };
 
+    const handleWagersReset = () => {
+      setWagerProgress(prev => ({ ...prev, received: 0 }));
+    };
+
     signalRService.on("WagerReceived", handleWagerReceived);
     signalRService.on("WagerAnswerReceived", handleAnswerReceived);
+    signalRService.on("WagersReset", handleWagersReset);
 
     return () => {
       signalRService.off("WagerReceived", handleWagerReceived);
       signalRService.off("WagerAnswerReceived", handleAnswerReceived);
+      signalRService.off("WagersReset", handleWagersReset);
     };
   }, [connection]);
 
@@ -145,6 +156,8 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
   const allWagered = wagerProgress.received === wagerProgress.total && wagerProgress.total > 0;
   const allAnswered = answerProgress.received === answerProgress.total && answerProgress.total > 0 && allWagered;
   const isLastQuestion = currentQuestionIndex + 1 >= WAGER_QUESTIONS.length;
+  const isWageringPhase = roundState === 'Wagering' && !allWagered;
+  const isAnsweringPhase = roundState === 'Answering' || (roundState === 'Wagering' && allWagered);
 
   return (
     <div className="wager-host">
@@ -155,38 +168,60 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
         <div className="question-progress-header">
           <h2>Question {currentQuestionIndex + 1} of {WAGER_QUESTIONS.length}</h2>
         </div>
-        <QuestionDisplay questionText={currentQuestion.questionText} />
 
-        {!answerRevealed ? (
+        {/* Blind wagering phase - question hidden */}
+        {isWageringPhase && !answerRevealed && (
+          <div className="blind-wager-phase">
+            <div className="blind-wager-host-header">
+              <h3>🎲 Blind Wagering Phase</h3>
+              <p>Players are placing their wagers without seeing the question!</p>
+            </div>
+            <div className="wager-progress">
+              <p>
+                Wagers received: {wagerProgress.received} / {wagerProgress.total}
+              </p>
+              <p className="wager-hint">Waiting for all players to place their wagers...</p>
+            </div>
+            <button
+              className="btn btn-secondary"
+              onClick={async () => {
+                try {
+                  await signalRService.invoke("ResetWagers");
+                  setWagerProgress({ total: wagerProgress.total, received: 0 });
+                } catch (error) {
+                  console.error("Error resetting wagers:", error);
+                }
+              }}
+              style={{ marginTop: '1rem' }}
+            >
+              🔄 Reset All Wagers
+            </button>
+          </div>
+        )}
+
+        {/* Answering phase - question revealed after all wagers */}
+        {isAnsweringPhase && !answerRevealed && (
           <>
-            {!allWagered && (
-              <div className="wager-progress">
-                <p>
-                  Wagers received: {wagerProgress.received} / {wagerProgress.total}
-                </p>
-                <p className="wager-hint">Waiting for all players to place their wagers...</p>
-              </div>
-            )}
-            {allWagered && (
-              <>
-                <div className="answer-progress">
-                  <p>
-                    Answers received: {answerProgress.received} / {answerProgress.total}
-                  </p>
-                </div>
-                <AnswerGrid answers={currentQuestion.possibleAnswers} />
-                <button
-                  className="btn btn-primary"
-                  onClick={handleRevealAnswer}
-                  disabled={!allAnswered}
-                >
-                  {allAnswered ? "Reveal Answer" : `Waiting for ${answerProgress.total - answerProgress.received} more answer(s)`}
-                </button>
-              </>
-            )}
+            <QuestionDisplay questionText={currentQuestion.questionText} />
+            <div className="answer-progress">
+              <p>
+                Answers received: {answerProgress.received} / {answerProgress.total}
+              </p>
+            </div>
+            <AnswerGrid answers={currentQuestion.possibleAnswers} />
+            <button
+              className="btn btn-primary"
+              onClick={handleRevealAnswer}
+              disabled={!allAnswered}
+            >
+              {allAnswered ? "Reveal Answer" : `Waiting for ${answerProgress.total - answerProgress.received} more answer(s)`}
+            </button>
           </>
-        ) : (
+        )}
+
+        {answerRevealed && (
           <>
+            <QuestionDisplay questionText={currentQuestion.questionText} />
             <AnswerGrid
               answers={currentQuestion.possibleAnswers}
               correctAnswer={revealedCorrectAnswer}
