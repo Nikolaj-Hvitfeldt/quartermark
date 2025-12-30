@@ -11,11 +11,16 @@ export function useGameRoom() {
     players,
     error,
     isConnected,
+    playerName,
+    isHost,
     setConnection,
     setRoomCode,
     setPlayers,
     setError,
     setIsConnected,
+    setPlayerName,
+    setIsHost,
+    reset,
   } = useGameRoomStore();
 
   const connectMutation = useMutation({
@@ -36,6 +41,9 @@ export function useGameRoom() {
       if (!connection) {
         await connectMutation.mutateAsync();
       }
+
+      setPlayerName(playerName);
+      setIsHost(true);
 
       // Set up listeners
       signalRService.on('RoomCreated', (code: string) => {
@@ -59,6 +67,9 @@ export function useGameRoom() {
       if (!connection) {
         await connectMutation.mutateAsync();
       }
+
+      setPlayerName(playerName);
+      setIsHost(false);
 
       // Set up listeners
       signalRService.on('JoinedRoom', (code: string) => {
@@ -100,15 +111,26 @@ export function useGameRoom() {
     await connectMutation.mutateAsync();
   }, [connectMutation]);
 
+  const leaveRoom = useCallback(async () => {
+    if (connection) {
+      await signalRService.disconnect();
+      setConnection(null);
+    }
+    reset();
+  }, [connection, setConnection, reset]);
+
   return {
     connection,
     roomCode,
     players,
     error,
     isConnected,
+    playerName,
+    isHost,
     createRoom,
     joinRoom,
     connect,
+    leaveRoom,
     isLoading: createRoomMutation.isPending || joinRoomMutation.isPending || connectMutation.isPending,
   };
 }

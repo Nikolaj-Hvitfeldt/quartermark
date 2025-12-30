@@ -20,7 +20,7 @@ import "./HostScreen.css";
 
 function HostScreen({ onBack }: HostScreenProps) {
   const { t } = useTranslation();
-  const { connection, roomCode, players, isConnected, createRoom } =
+  const { connection, roomCode, players, isConnected, createRoom, playerName: storedPlayerName, roomCode: storedRoomCode, connect } =
     useGameRoom();
   const { isActive: sessionActive, currentGameNumber, accumulatedScores, showDrinkingWheel, wouldILieConfig, setShowDrinkingWheel, setWouldILieConfig, startSession } = useGameSession(connection);
   const [showWouldILieConfig, setShowWouldILieConfig] = useState(false);
@@ -30,9 +30,33 @@ function HostScreen({ onBack }: HostScreenProps) {
       setInGame(null);
     },
   });
-  const [playerName, setPlayerName] = useState<string>("");
+  const [playerName, setPlayerName] = useState<string>(storedPlayerName);
   const [dummyPlayerName, setDummyPlayerName] = useState<string>("");
   const [inGame, setInGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
+  const [hasRestored, setHasRestored] = useState(false);
+
+  // Restore connection and rejoin room on mount if we have stored room state
+  useEffect(() => {
+    if (hasRestored) return;
+    
+    const restoreRoom = async () => {
+      if (storedRoomCode && storedPlayerName && !isConnected) {
+        try {
+          setHasRestored(true);
+          await connect();
+          // The stored state indicates we were the host, so we need to create the room again
+          // Note: This won't work perfectly since the backend doesn't persist rooms, but it's better than nothing
+          await createRoom(storedPlayerName);
+        } catch (error) {
+          console.error('Failed to restore room connection:', error);
+          setHasRestored(true);
+        }
+      } else {
+        setHasRestored(true);
+      }
+    };
+    restoreRoom();
+  }, [storedRoomCode, storedPlayerName, isConnected, hasRestored, connect, createRoom]);
 
   const createDummyPlayerMutation = useMutation({
     mutationFn: async (name: string) => {

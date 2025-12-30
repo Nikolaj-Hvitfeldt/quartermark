@@ -22,6 +22,7 @@ interface QuizStore {
   setCorrectAnswer: (answer: string) => void;
   setHasAnswered: (answered: boolean) => void;
   setRoundState: (state: 'Waiting' | 'ShowingQuestion' | 'Revealed' | 'RoundEnded') => void;
+  reset: () => void;
 }
 
 export const useQuizStore = create<QuizStore>((set) => ({
@@ -42,5 +43,15 @@ export const useQuizStore = create<QuizStore>((set) => ({
   setCorrectAnswer: (answer) => set({ correctAnswer: answer }),
   setHasAnswered: (answered) => set({ hasAnswered: answered }),
   setRoundState: (state) => set({ roundState: state }),
+  reset: () => set({
+    roundActive: false,
+    currentQuestion: null,
+    guesses: {},
+    roundScores: {},
+    answerRevealed: false,
+    correctAnswer: '',
+    hasAnswered: false,
+    roundState: 'Waiting',
+  }),
 }));
 

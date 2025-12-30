@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useGameRoom } from './hooks/useGameRoom'
+import { usePlayerStore } from './stores/playerStore'
 import HostScreen from './components/HostScreen'
 import PlayerScreen from './components/PlayerScreen'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -8,6 +10,20 @@ import './App.css'
 function App() {
   const { t } = useTranslation()
   const [screen, setScreen] = useState<'home' | 'host' | 'player'>('home')
+  const { leaveRoom, roomCode, isHost } = useGameRoom()
+  const { playerName } = usePlayerStore()
+
+  // Restore screen from localStorage on mount
+  useEffect(() => {
+    if (roomCode) {
+      setScreen(isHost ? 'host' : 'player')
+    }
+  }, [roomCode, isHost])
+
+  const handleBackToHome = async () => {
+    await leaveRoom()
+    setScreen('home')
+  }
 
   return (
     <div className="app">
@@ -57,13 +73,13 @@ function App() {
       
       {screen === 'host' && (
         <HostScreen 
-          onBack={() => setScreen('home')}
+          onBack={handleBackToHome}
         />
       )}
       
       {screen === 'player' && (
         <PlayerScreen 
-          onBack={() => setScreen('home')}
+          onBack={handleBackToHome}
         />
       )}
     </div>
