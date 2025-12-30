@@ -8,33 +8,64 @@ export interface ContestantGuessQuestion {
 export const CONTESTANT_GUESS_QUESTIONS: ContestantGuessQuestion[] = [
   {
     id: '1',
-    imageUrl: '/images/placeholder-contestant1.jpg', // Will be replaced with actual images
-    answers: ['Contestant A', 'Contestant B', 'Contestant C', 'Contestant D'],
-    correctAnswer: 'Contestant A',
+    imageUrl: '/images/AI-morph-images/Seb-MetteF.jpg',
+    answers: ['Frederikke', 'Martin', 'Eline', 'Sebastian'],
+    correctAnswer: 'Sebastian',
   },
   {
     id: '2',
-    imageUrl: '/images/placeholder-contestant2.jpg',
-    answers: ['Contestant E', 'Contestant F', 'Contestant G', 'Contestant H'],
-    correctAnswer: 'Contestant F',
+    imageUrl: '/images/AI-morph-images/Frederikke-kongen.jpg',
+    answers: ['Anders', 'Martin', 'Eline', 'Frederikke'],
+    correctAnswer: 'Frederikke',
   },
   {
     id: '3',
-    imageUrl: '/images/placeholder-contestant3.jpg',
-    answers: ['Contestant I', 'Contestant J', 'Contestant K', 'Contestant L'],
-    correctAnswer: 'Contestant K',
+    imageUrl: '/images/AI-morph-images/Eline-Brad-Pitt.jpg',
+    answers: ['Martin', 'Eline', 'Sebastian', 'Anders'],
+    correctAnswer: 'Eline',
   },
   {
     id: '4',
-    imageUrl: '/images/placeholder-contestant4.jpg',
-    answers: ['Contestant M', 'Contestant N', 'Contestant O', 'Contestant P'],
-    correctAnswer: 'Contestant N',
+    imageUrl: '/images/AI-morph-images/Martin-Loc.jpg',
+    answers: ['Frederikke', 'Sebastian', 'Anders', 'Martin'],
+    correctAnswer: 'Martin',
   },
   {
     id: '5',
-    imageUrl: '/images/placeholder-contestant5.jpg',
-    answers: ['Contestant Q', 'Contestant R', 'Contestant S', 'Contestant T'],
-    correctAnswer: 'Contestant S',
+    imageUrl: '/images/AI-morph-images/Anders-putin.jpg',
+    answers: ['Anders', 'Martin', 'Sebastian', 'Eline'],
+    correctAnswer: 'Anders',
   },
+  {
+    id: '6',
+    imageUrl: '/images/AI-morph-images/Seb-Casper-Kristensen.jpg',
+    answers: ['Sebastian', 'Frederikke', 'Martin', 'Anders'],
+    correctAnswer: 'Sebastian',
+  },
+  {
+    id: '7',
+    imageUrl: '/images/AI-morph-images/Frederikke-trump.jpg',
+    answers: ['Martin', 'Frederikke', 'Eline', 'Anders'],
+    correctAnswer: 'Frederikke',
+  },
+  {
+    id: '8',
+    imageUrl: '/images/AI-morph-images/Eline-musk.jpg',
+    answers: ['Anders', 'Frederikke', 'Sebastian', 'Eline'],
+    correctAnswer: 'Eline',
+  },
+  {
+    id: '9',
+    imageUrl: '/images/AI-morph-images/Martin-Epstein.jpg',
+    answers: ['Martin', 'Sebastian', 'Anders', 'Frederikke'],
+    correctAnswer: 'Martin',
+  },
+  {
+    id: '10',
+    imageUrl: '/images/AI-morph-images/Anders-Johnny-Sins.jpg',
+    answers: ['Anders', 'Anders', 'Anders', 'Anders'],
+    correctAnswer: 'Anders',
+  },
+  
 ];
 
