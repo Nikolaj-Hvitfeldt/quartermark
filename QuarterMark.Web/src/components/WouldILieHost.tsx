@@ -9,8 +9,9 @@ import { GameRulesCard } from "./GameRulesCard";
 import { ImageDisplay } from "./ImageDisplay";
 import { WouldILieAnswerGrid } from "./WouldILieAnswerGrid";
 import { WouldILieStandings } from "./WouldILieStandings";
-import { WOULD_I_LIE_RULES } from "../data/gameRules";
+import { getWouldILieRules } from "../data/gameRules";
 import { WOULD_I_LIE_TITLES, WOULD_I_LIE_MESSAGES } from "../utils/wouldILieUtils";
+import { useTranslation } from "react-i18next";
 import "./WouldILie.css";
 import "./WouldILieHost.css";
 
@@ -19,6 +20,7 @@ function WouldILieHost({
   players: initialPlayers,
   onBack,
 }: WouldILieHostProps) {
+  const { t } = useTranslation();
   const {
     roundActive,
     currentQuestion,
@@ -143,15 +145,16 @@ function WouldILieHost({
 
   // Pre-round screen
   if (!roundActive) {
+    const wouldILieRules = getWouldILieRules(t);
     return (
       <div className="would-i-lie-host">
         <GameRulesCard
-          title={WOULD_I_LIE_RULES.title}
-          subtitle={WOULD_I_LIE_RULES.subtitle}
-          rules={WOULD_I_LIE_RULES.rules}
-          pointsInfo={WOULD_I_LIE_RULES.pointsInfo}
+          title={wouldILieRules.title}
+          subtitle={wouldILieRules.subtitle}
+          rules={wouldILieRules.rules}
+          pointsInfo={wouldILieRules.pointsInfo}
           onStart={handleStartRound}
-          startButtonText={WOULD_I_LIE_RULES.startButtonText}
+          startButtonText={wouldILieRules.startButtonText}
         />
         {hasConfig && (
           <div className="config-preview">
@@ -183,11 +186,11 @@ function WouldILieHost({
         <div className="score-screen">
           <h2>{WOULD_I_LIE_TITLES.CURRENT_STANDINGS}</h2>
           <p className="question-progress">
-            Question {currentRoundIndex + 1} of {totalRounds} complete
+            {t('standings.progressFormat', { current: currentRoundIndex + 1, total: totalRounds })}
           </p>
           <WouldILieStandings players={players} title="" />
           <button className="btn btn-primary btn-large" onClick={handleNextQuestion}>
-            {isLastRound ? "End Round" : "Next Question →"}
+            {isLastRound ? t('standings.endRound') : t('standings.nextQuestion')}
           </button>
         </div>
       </div>

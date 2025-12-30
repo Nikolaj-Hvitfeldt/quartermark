@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useGameRoom } from '../hooks/useGameRoom';
 import { usePlayerStore } from '../stores/playerStore';
 import { useGameSession } from '../hooks/useGameSession';
@@ -16,6 +17,7 @@ import { PlayerScreenProps } from '../types';
 import './PlayerScreen.css';
 
 function PlayerScreen({ onBack }: PlayerScreenProps) {
+  const { t } = useTranslation();
   const { connection, roomCode, players, error, isConnected, joinRoom } = useGameRoom();
   const { playerName, roomCodeInput, setPlayerName, setRoomCodeInput } = usePlayerStore();
   const { currentGameNumber, accumulatedScores } = useGameSession(connection);
@@ -104,16 +106,16 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       {/* Only show back button when in lobby or not connected */}
       {(!isConnected || isInLobby) && (
         <button className="btn btn-back" onClick={onBack}>
-          ← Back to Home
+          ← {t('common.backToHome')}
         </button>
       )}
 
       {!isConnected ? (
         <div className="player-join">
-          <h2>Join Game</h2>
+          <h2>{t('playerScreen.joinGame')}</h2>
           <input
             type="text"
-            placeholder="Enter room code"
+            placeholder={t('playerScreen.enterRoomCode')}
             value={roomCodeInput}
             onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
             className="input"
@@ -122,7 +124,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
           />
           <input
             type="text"
-            placeholder="Enter your name"
+            placeholder={t('hostScreen.enterYourName')}
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
             className="input"
@@ -133,7 +135,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
             className="btn btn-primary btn-large"
             onClick={handleJoinRoom}
           >
-            Join Room
+            {t('playerScreen.join')}
           </button>
         </div>
       ) : completedGame ? (
@@ -205,18 +207,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
           </div>
 
           <div className="waiting-message">
-            <p>Waiting for host to start the game...</p>
-          </div>
-          
-          {/* TEST BUTTONS - Remove these after testing */}
-          <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #374151' }}>
-            <h4 style={{ marginBottom: '1rem', color: '#9ca3af' }}>🧪 Test Mode</h4>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setCurrentGame("drinkingWheel")}
-            >
-              Test Drinking Wheel
-            </button>
+            <p>{t('playerScreen.waitingForHost')}</p>
           </div>
         </div>
       )}

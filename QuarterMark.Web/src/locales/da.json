@@ -1,0 +1,264 @@
+{
+  "common": {
+    "back": "Tilbage",
+    "backToHome": "Tilbage til hjem",
+    "continue": "Fortsæt",
+    "start": "Start",
+    "starting": "Starter...",
+    "submit": "Indsend",
+    "waiting": "Venter",
+    "loading": "Indlæser...",
+    "error": "Fejl",
+    "points": "point",
+    "pts": "pts",
+    "of": "af",
+    "question": "spørgsmål",
+    "questions": "spørgsmål",
+    "Question": "Spørgsmål",
+    "player": "spiller",
+    "players": "spillere",
+    "answer": "svar",
+    "answers": "svar",
+    "howToPlay": "Sådan spiller du",
+    "questionProgress": "Spørgsmål {{current}} af {{total}}",
+    "revealAnswer": "Afslør svar",
+    "waitingForAnswers": "Venter på {{count}} flere svar",
+    "waitingForGuesses": "Venter på {{count}} flere gæt",
+    "errorMessage": "Runde aktiv, men intet spørgsmål vises i øjeblikket. Dette bør ikke ske."
+  },
+  "hostScreen": {
+    "createGameRoom": "Opret spilrum",
+    "enterYourName": "Indtast dit navn",
+    "createRoom": "Opret rum",
+    "startGameSession": "Start spilsession (5 mini-spil)",
+    "configureWouldILie": "⚠️ Konfigurer \"Vil jeg lyve\" runder før start",
+    "configureWouldILieFirst": "Konfigurer Vil jeg lyve runder først",
+    "gameProgress": "Spil {{current}} af {{total}}",
+    "continueCurrentGame": "Fortsæt nuværende spil →",
+    "startNewSeries": "Start ny 5-spilsserie",
+    "continueHint": "Fortsæt til nuværende spil eller start ny serie",
+    "allGamesCompleted": "Alle spil gennemført",
+    "sessionGameNumber": "Spil {{number}} af 5",
+    "backToHome": "Tilbage til hjem",
+    "configureWouldILieLabel": "Konfigurer \"Vil jeg lyve\" runder"
+  },
+  "gameRules": {
+    "wouldILie": {
+      "title": "Vil jeg lyve for dig?",
+      "subtitle": "Det klassiske bluff-spil!",
+      "rule1": "Et foto vises til alle spillere",
+      "rule2": "Værten tildeler hemmeligt én spiller som \"sandhedssigende\" der faktisk kender personen, og én som \"løgneren\"",
+      "rule3": "Begge spillere skal overbevise andre om, at DE er den, der kender personen",
+      "rule4": "Andre spillere stemmer på, hvem de tror fortæller sandheden",
+      "rule5": "Korrekte stemmer giver point! Forkerte stemmer giver point til løgneren",
+      "pointsInfo": "10 point for korrekte gæt • Løgneren tjener point for hver narret spiller",
+      "startButton": "🎬 Start runde"
+    },
+    "contestantGuess": {
+      "title": "Deltagergæt",
+      "subtitle": "Kan du se, hvem der gemmer sig i morph'et?",
+      "rule1": "Et morfefoto der kombinerer en deltager med en kendis vil vises",
+      "rule2": "Studer billedet omhyggeligt - hvem gemmer sig derinde?",
+      "rule3": "Vælg blandt 4 mulige deltagere",
+      "rule4": "Alle spillere skal svare før afsløringen",
+      "rule5": "Kun korrekte gæt giver point!",
+      "pointsInfo": "10 point per korrekt svar",
+      "startButton": "🔍 Start gætteri"
+    },
+    "quiz": {
+      "title": "Quiz om 2025",
+      "subtitle": "Hvor godt husker du dette år?",
+      "rule1": "Test din viden om hvad der skete i 2025!",
+      "rule2": "Hvert spørgsmål har 4 mulige svar - vælg klogt",
+      "rule3": "Hastighed betyder noget! De første 2 korrekte svar får bonuspoint",
+      "rule4": "1. plads: +10 bonuspoint • 2. plads: +5 bonuspoint",
+      "rule5": "Alle der svarer korrekt får basispoint",
+      "pointsInfo": "10 basispoint + hastighedsbonusser",
+      "startButton": "🧠 Start quiz"
+    },
+    "socialMediaGuess": {
+      "title": "Sociale medier dybdegående",
+      "subtitle": "Hvem postede DET?!",
+      "rule1": "Et socialt medie-indlæg vises - men hvem postede det?",
+      "rule2": "Led efter ledetråde i skrivestilen, indholdet og konteksten",
+      "rule3": "Vælg blandt 4 mulige deltagere",
+      "rule4": "Disse er RIGTIGE indlæg fra deltagerne!",
+      "rule5": "Gør dig klar til nogle pinlige throwbacks...",
+      "pointsInfo": "10 point per korrekt gæt",
+      "startButton": "📲 Start scrolling"
+    },
+    "wager": {
+      "title": "All-In indsats",
+      "subtitle": "Dobbelt eller intet på værten!",
+      "rule1": "Sats ethvert antal af dine point før hvert spørgsmål",
+      "rule2": "Svar på sjove fakta om værten",
+      "rule3": "Korrekt svar: Vind dobbelt din indsats!",
+      "rule4": "Forkert svar: Tab din indsats",
+      "rule5": "Risk det hele eller spil sikkert - dit valg!",
+      "pointsInfo": "Dobbel din indsats eller tab det hele",
+      "startButton": "🎲 Placer dine væddemål"
+    }
+  },
+  "gameNames": {
+    "wouldILie": "Vil jeg lyve for dig?",
+    "contestantGuess": "Deltagergæt",
+    "quiz": "Quiz om 2025",
+    "socialMediaGuess": "Sociale medier dybdegående",
+    "wager": "All-In indsats"
+  },
+  "wager": {
+    "blindWager": {
+      "title": "🎲 Placer din indsats",
+      "subtitle": "Hvor selvsikker er du? Sats før du ser spørgsmålet!",
+      "howManyPoints": "Hvor mange point vil du satse?",
+      "placeWager": "Placer indsats",
+      "wagerHint": "Sats op til {{max}} point. Korrekt svar giver dobbelt!",
+      "yourWager": "Din indsats: {{amount}} pts (Vind: +{{win}}, Tab: -{{lose}})",
+      "waitingForWagers": "⏳ Venter på alle spillere placerer deres indsats...",
+      "revealHint": "Spørgsmålet vil blive afsløret når alle har sat ind!",
+      "resetWagers": "🔄 Nulstil alle indsatser"
+    },
+    "host": {
+      "blindWageringPhase": "🎲 Blind indsatsfase",
+      "playersPlacingBets": "Spillere placerer deres indsats uden at se spørgsmålet!",
+      "wagersReceived": "Indsatser modtaget: {{received}} / {{total}}",
+      "waitingForAll": "Venter på alle spillere placerer deres indsats...",
+      "answersReceived": "Svar modtaget: {{received}} / {{total}}",
+      "revealAnswer": "Afslør svar",
+      "waitingForAnswers": "Venter på {{count}} flere svar",
+      "nextQuestion": "Næste spørgsmål →",
+      "endRound": "Afslut runde"
+    },
+    "player": {
+      "yourCurrentScore": "Din nuværende score: {{score}} pts",
+      "answerSubmitted": "✓ Svar indsendt! Venter på andre spillere...",
+      "correct": "🎉 Korrekt!",
+      "youWon": "Du vandt {{points}} point!",
+      "incorrect": "❌ Forkert",
+      "youLost": "Du tabte {{points}} point",
+      "correctAnswerWas": "Det korrekte svar var: {{answer}}"
+    }
+  },
+  "gameCompletion": {
+    "title": "🎉 {{gameName}} gennemført! 🎉",
+    "viewFinalResults": "Se endelige resultater",
+    "viewPodium": "Se podiet →",
+    "returnToMenu": "Tilbage til menu",
+    "finalResultText": "Du vinder et fast håndtryk fra værten",
+    "endGameSession": "Afslut spilsession",
+    "continueToNext": "Fortsæt til næste spil"
+  },
+  "standings": {
+    "currentStandings": "Nuværende stilling",
+    "finalStandings": "Endelig stilling",
+    "nextQuestion": "Næste spørgsmål →",
+    "endRound": "Afslut runde",
+    "viewStandings": "Se stilling →",
+    "progressFormat": "Spørgsmål {{current}} af {{total}} gennemført",
+    "title": "Nuværende stilling",
+    "questionProgress": "Spørgsmål {{current}} af {{total}}",
+    "continueButton": "Fortsæt →"
+  },
+  "wouldILie": {
+    "whoKnowsThisPerson": "Hvem kender denne person?",
+    "claimsToKnow": "Påstår at kende dem",
+    "voteForThisPerson": "Stem på denne person",
+    "truthTeller": "Sandhedssigende",
+    "liar": "Løgner",
+    "roundComplete": "Runde gennemført"
+  },
+  "playerScreen": {
+    "joinGame": "Tilslut spil",
+    "enterRoomCode": "Indtast rumkode",
+    "join": "Tilslut",
+    "waitingForHost": "Venter på værten starter spillet...",
+    "waitingForHostEndGame": "Venter på værten afslutter spillet..."
+  },
+  "app": {
+    "welcome": "Velkommen til",
+    "createGame": "Opret spil",
+    "joinGame": "Tilslut spil"
+  },
+  "quiz": {
+    "questions": {
+      "q1": {
+        "question": "Hvilken fremtrædende religiøs person døde i 2025?",
+        "answer1": "Paven",
+        "answer2": "Dalai Lama",
+        "answer3": "Profeten Muhammed",
+        "answer4": "Anders"
+      },
+      "q2": {
+        "question": "Hvor mange mænd tog Bonnie Blue på i hendes berygtede rekord-brydende fuckfest?",
+        "answer1": "10 mænd",
+        "answer2": "100 mænd",
+        "answer3": "1000 mænd",
+        "answer4": "10000 mænd"
+      },
+      "q3": {
+        "question": "Ifølge hovednavnet på årets superbowl: Hvem af disse 4 personer kan lide dem unge, og bør aldrig gå til celleblok 1? (Han kan også lide a-mol akkorden, angiveligt)",
+        "answer1": "Serena Williams",
+        "answer2": "Jeffrey Epstein",
+        "answer3": "Drake",
+        "answer4": "Kong Frederik den 5. af Danmark"
+      },
+      "q4": {
+        "question": "Hvilken social medieplatform havde flest brugere i 2025?",
+        "answer1": "TikTok",
+        "answer2": "Instagram",
+        "answer3": "Facebook",
+        "answer4": "Twitter/X"
+      },
+      "q5": {
+        "question": "Hvad var det mest populære TV-show i 2025 ifølge IMDB?",
+        "answer1": "The White Lotus",
+        "answer2": "Stranger Things",
+        "answer3": "The Last of Us",
+        "answer4": "Severance"
+      },
+      "q6": {
+        "question": "Hvad skete der, da Trump og Zelenskyy mødtes i februar foran verdenspressen i det Ovale Kontor?",
+        "answer1": "Intet",
+        "answer2": "En journalist fik Trump til at briste ud i latter",
+        "answer3": "Mødet endte i en ophedet diskussion",
+        "answer4": "Trump gav Zelenskyy et håndskrevet brev fra Putin"
+      },
+      "q7": {
+        "question": "Hvilken popstjerne rejste til rummet i 2025?",
+        "answer1": "Beyonce",
+        "answer2": "Katy Perry",
+        "answer3": "Ed Sheeran",
+        "answer4": "Johnny Deluxe"
+      },
+      "q8": {
+        "question": "Hvilken berømthed havde flest Instagram-følgere i 2025?",
+        "answer1": "Cristiano Ronaldo",
+        "answer2": "Lionel Messi",
+        "answer3": "Selena Gomez",
+        "answer4": "Kylie Jenner"
+      },
+      "q9": {
+        "question": "Hvorfor blev al lufttrafik stoppet på Kastrup Lufthavn den 22. september?",
+        "answer1": "Arbejderne gik i strejke",
+        "answer2": "Observationer af droner",
+        "answer3": "En fugl blokerede landingsbanen",
+        "answer4": "Piloterne havde coronavirus"
+      },
+      "q10": {
+        "question": "I oktober, hvad blev stjålet fra det berømte kunstmuseum Louvre i Paris?",
+        "answer1": "Mona Lisa",
+        "answer2": "En 3000 år gammel mumie",
+        "answer3": "Stjernenatten",
+        "answer4": "Smykker"
+      },
+      "q11": {
+        "question": "Objektivt, hvilken kunstner har flest hits?",
+        "answer1": "The Weeknd",
+        "answer2": "Post Malone",
+        "answer3": "Bruno Mars",
+        "answer4": "LDLD x SLSH"
+      }
+    }
+  }
+}
+

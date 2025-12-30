@@ -1,3 +1,5 @@
+import { TFunction } from 'i18next';
+
 export interface WagerQuestion {
   id: string;
   questionText: string;
@@ -5,24 +7,43 @@ export interface WagerQuestion {
   correctAnswer: string; // Must match one of the answers
 }
 
-export const WAGER_QUESTIONS: WagerQuestion[] = [
-  {
-    id: 'wager1',
-    questionText: 'What does Niko\'s artist name SLSH stand for?',
-    answers: ['Store Lår Sexet Hår', 'Spastisk Lam? Sikkert Ham', 'Stort Lem Sent Hjem', 'SLum SHeik'],
-    correctAnswer: 'Stort Lem Sent Hjem',
-  },
-  {
-    id: 'wager2',
-    questionText: 'In what video game is Niko in the top 1% of the world leaderboard?',
-    answers: ['CounterStrike: Global Offensive', 'CounterStrike 1.6', 'CounterStrike Source', 'CounterStrike 2'],
-    correctAnswer: 'CounterStrike 2',
-  },
-  {
-    id: 'wager3',
-    questionText: 'Against popular belief, what is Niko\'s favorite drink?',
-    answers: ['Gin Hass', 'Vodka Redbull', 'Strawberry Daiquiri', 'Pink Pussy'],
-    correctAnswer: 'Strawberry Daiquiri',
-  },
-];
+export function getWagerQuestions(t: TFunction): WagerQuestion[] {
+  return [
+    {
+      id: 'wager1',
+      questionText: t('wager.questions.q1.question'),
+      answers: [
+        t('wager.questions.q1.answer1'),
+        t('wager.questions.q1.answer2'),
+        t('wager.questions.q1.answer3'),
+        t('wager.questions.q1.answer4'),
+      ],
+      correctAnswer: t('wager.questions.q1.answer3'),
+    },
+    {
+      id: 'wager2',
+      questionText: t('wager.questions.q2.question'),
+      answers: [
+        t('wager.questions.q2.answer1'),
+        t('wager.questions.q2.answer2'),
+        t('wager.questions.q2.answer3'),
+        t('wager.questions.q2.answer4'),
+      ],
+      correctAnswer: t('wager.questions.q2.answer4'),
+    },
+    {
+      id: 'wager3',
+      questionText: t('wager.questions.q3.question'),
+      answers: [
+        t('wager.questions.q3.answer1'),
+        t('wager.questions.q3.answer2'),
+        t('wager.questions.q3.answer3'),
+        t('wager.questions.q3.answer4'),
+      ],
+      correctAnswer: t('wager.questions.q3.answer3'),
+    },
+  ];
+}
+
+// Legacy constant removed - all components now use getWagerQuestions(t)
 

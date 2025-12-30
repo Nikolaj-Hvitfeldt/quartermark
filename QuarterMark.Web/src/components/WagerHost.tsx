@@ -6,13 +6,16 @@ import { QuestionDisplay } from "./QuestionDisplay";
 import { AnswerGrid } from "./AnswerGrid";
 import { GameRulesCard } from "./GameRulesCard";
 import { WagerRoundScores } from "./WagerRoundScores";
-import { WAGER_QUESTIONS } from "../data/wagerQuestions";
-import { WAGER_RULES, getQuestionCountText } from "../data/gameRules";
+import { getWagerQuestions } from "../data/wagerQuestions";
+import { getWagerRules, getQuestionCountText } from "../data/gameRules";
+import { useTranslation } from "react-i18next";
 import { getNonHostPlayerCount } from "../utils/wagerUtils";
 import "./Wager.css";
 import "./WagerHost.css";
 
 function WagerHost({ connection, players, onBack }: WagerHostProps) {
+  const { t } = useTranslation();
+  const WAGER_QUESTIONS = getWagerQuestions(t);
   const {
     roundActive,
     roundState,
@@ -27,6 +30,17 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
     revealAnswer,
     endRound,
   } = useWager(connection);
+
+  // Translate current question for host display
+  const translatedCurrentQuestion = currentQuestion && currentQuestion.questionId
+    ? (() => {
+        const question = WAGER_QUESTIONS.find(q => q.id === currentQuestion.questionId);
+        return question ? {
+          questionText: question.questionText,
+          possibleAnswers: question.answers,
+        } : currentQuestion;
+      })()
+    : currentQuestion;
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [wagerProgress, setWagerProgress] = useState({ total: 0, received: 0 });
@@ -93,6 +107,7 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
     try {
       const nextQuestion = WAGER_QUESTIONS[nextIndex];
       await showQuestion(
+        nextQuestion.id, // Send question ID for translation
         nextQuestion.questionText,
         nextQuestion.correctAnswer,
         [...nextQuestion.answers]
@@ -123,16 +138,17 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
   };
 
   if (!roundActive) {
-    const questionCount = getQuestionCountText(WAGER_QUESTIONS.length);
+    const wagerRules = getWagerRules(t);
+    const questionCount = getQuestionCountText(WAGER_QUESTIONS.length, t);
     return (
       <div className="wager-host">
         <GameRulesCard
-          title={WAGER_RULES.title}
-          subtitle={WAGER_RULES.subtitle}
-          rules={WAGER_RULES.rules}
-          pointsInfo={`${questionCount} • ${WAGER_RULES.pointsInfo}`}
+          title={wagerRules.title}
+          subtitle={wagerRules.subtitle}
+          rules={wagerRules.rules}
+          pointsInfo={`${questionCount} • ${wagerRules.pointsInfo}`}
           onStart={handleStartRound}
-          startButtonText={WAGER_RULES.startButtonText}
+          startButtonText={wagerRules.startButtonText}
         />
       </div>
     );
@@ -162,25 +178,25 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
   return (
     <div className="wager-host">
       <button className="btn btn-back" onClick={onBack}>
-        ← Back
+        ← {t('common.back')}
       </button>
       <div className="wager-question-container">
         <div className="question-progress-header">
-          <h2>Question {currentQuestionIndex + 1} of {WAGER_QUESTIONS.length}</h2>
+          <h2>{t('common.Question')} {currentQuestionIndex + 1} {t('common.of')} {WAGER_QUESTIONS.length}</h2>
         </div>
 
         {/* Blind wagering phase - question hidden */}
         {isWageringPhase && !answerRevealed && (
           <div className="blind-wager-phase">
             <div className="blind-wager-host-header">
-              <h3>🎲 Blind Wagering Phase</h3>
-              <p>Players are placing their wagers without seeing the question!</p>
+              <h3>{t('wager.host.blindWageringPhase')}</h3>
+              <p>{t('wager.host.playersPlacingBets')}</p>
             </div>
             <div className="wager-progress">
               <p>
-                Wagers received: {wagerProgress.received} / {wagerProgress.total}
+                {t('wager.host.wagersReceived', { received: wagerProgress.received, total: wagerProgress.total })}
               </p>
-              <p className="wager-hint">Waiting for all players to place their wagers...</p>
+              <p className="wager-hint">{t('wager.host.waitingForAll')}</p>
             </div>
             <button
               className="btn btn-secondary"
@@ -194,7 +210,7 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
               }}
               style={{ marginTop: '1rem' }}
             >
-              🔄 Reset All Wagers
+              {t('wager.blindWager.resetWagers')}
             </button>
           </div>
         )}
@@ -202,28 +218,27 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
         {/* Answering phase - question revealed after all wagers */}
         {isAnsweringPhase && !answerRevealed && (
           <>
-            <QuestionDisplay questionText={currentQuestion.questionText} />
+            <QuestionDisplay questionText={translatedCurrentQuestion?.questionText || currentQuestion.questionText} />
             <div className="answer-progress">
               <p>
                 Answers received: {answerProgress.received} / {answerProgress.total}
               </p>
             </div>
-            <AnswerGrid answers={currentQuestion.possibleAnswers} />
+            <AnswerGrid answers={translatedCurrentQuestion?.possibleAnswers || currentQuestion.possibleAnswers} />
             <button
               className="btn btn-primary"
               onClick={handleRevealAnswer}
-              disabled={!allAnswered}
             >
-              {allAnswered ? "Reveal Answer" : `Waiting for ${answerProgress.total - answerProgress.received} more answer(s)`}
+              {allAnswered ? t('wager.host.revealAnswer') : t('wager.host.revealAnswer') + ` (${answerProgress.received}/${answerProgress.total} answered)`}
             </button>
           </>
         )}
 
         {answerRevealed && (
           <>
-            <QuestionDisplay questionText={currentQuestion.questionText} />
+            <QuestionDisplay questionText={translatedCurrentQuestion?.questionText || currentQuestion.questionText} />
             <AnswerGrid
-              answers={currentQuestion.possibleAnswers}
+              answers={translatedCurrentQuestion?.possibleAnswers || currentQuestion.possibleAnswers}
               correctAnswer={revealedCorrectAnswer}
               guesses={guesses}
               revealed={true}
@@ -236,7 +251,7 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
               correctAnswer={revealedCorrectAnswer}
             />
             <button className="btn btn-primary" onClick={handleNextQuestion}>
-              {isLastQuestion ? "End Round" : "Next Question →"}
+              {isLastQuestion ? t('wager.host.endRound') : t('wager.host.nextQuestion')}
             </button>
           </>
         )}

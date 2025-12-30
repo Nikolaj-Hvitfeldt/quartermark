@@ -4,6 +4,7 @@ import signalRService from '../services/signalRService';
 import { useWagerStore } from '../stores/wagerStore';
 
 interface WagerQuestionShownData {
+  questionId?: string; // Optional for backward compatibility
   questionText: string;
   possibleAnswers: string[];
 }
@@ -62,6 +63,8 @@ export function useWager(connection: any) {
       setCurrentQuestion({
         questionText: data.questionText,
         possibleAnswers: data.possibleAnswers,
+        questionId: data.questionId, // Store ID for translation
+        originalAnswers: data.possibleAnswers, // Store original for backend submission
       });
       setWagers({});
       setGuesses({});
@@ -130,15 +133,17 @@ export function useWager(connection: any) {
 
   const showQuestionMutation = useMutation({
     mutationFn: async ({
+      questionId,
       questionText,
       correctAnswer,
       possibleAnswers,
     }: {
+      questionId: string;
       questionText: string;
       correctAnswer: string;
       possibleAnswers: string[];
     }) => {
-      await signalRService.invoke('ShowWagerQuestion', questionText, correctAnswer, possibleAnswers);
+      await signalRService.invoke('ShowWagerQuestion', questionId, questionText, correctAnswer, possibleAnswers);
     },
   });
 
@@ -173,8 +178,8 @@ export function useWager(connection: any) {
   }, [startRoundMutation]);
 
   const showQuestion = useCallback(
-    async (questionText: string, correctAnswer: string, possibleAnswers: string[]) => {
-      await showQuestionMutation.mutateAsync({ questionText, correctAnswer, possibleAnswers });
+    async (questionId: string, questionText: string, correctAnswer: string, possibleAnswers: string[]) => {
+      await showQuestionMutation.mutateAsync({ questionId, questionText, correctAnswer, possibleAnswers });
     },
     [showQuestionMutation]
   );

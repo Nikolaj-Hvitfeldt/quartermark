@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { PlayerDto } from "../types";
 import { getGameName, sortPlayersByScore } from "../utils/gameUtils";
 import { FINAL_RESULTS_AUTO_SHOW_DELAY_MS } from "../utils/finalResultsConstants";
@@ -23,6 +24,7 @@ function GameCompletionScreenPlayer({
   accumulatedScores,
   playerName,
 }: GameCompletionScreenPlayerProps) {
+  const { t } = useTranslation();
   const [showFinalResults, setShowFinalResults] = useState(false);
   const sortedPlayers = sortPlayersByScore(players, accumulatedScores);
   const playerRank = sortedPlayers.findIndex((p) => p.name === playerName) + 1;
@@ -82,17 +84,17 @@ function GameCompletionScreenPlayer({
         <div className="completion-message">
           {isLastGame ? (
             <>
-              <p className="final-message">🏆 Final Results! 🏆</p>
+              <p className="final-message">🏆 {t('standings.finalStandings')}! 🏆</p>
               <button 
                 className="btn btn-primary view-final-btn-player" 
                 onClick={() => setShowFinalResults(true)}
               >
-                View Podium →
+                {t('gameCompletion.viewPodium')}
               </button>
             </>
           ) : (
             <p className="waiting-message">
-              Waiting for host to continue to next game...
+              {t('playerScreen.waitingForHost')}
             </p>
           )}
         </div>

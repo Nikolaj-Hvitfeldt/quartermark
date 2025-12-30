@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { GameRule } from '../data/gameRules';
 import './GameRulesCard.css';
 
@@ -20,6 +21,8 @@ export function GameRulesCard({
   startButtonText = 'Start Game',
   isLoading = false,
 }: GameRulesCardProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="game-rules-card">
       <div className="rules-header">
@@ -28,7 +31,7 @@ export function GameRulesCard({
       </div>
 
       <div className="rules-content">
-        <h3 className="how-to-play">How to Play</h3>
+        <h3 className="how-to-play">{t('common.howToPlay', 'How to Play')}</h3>
         <ul className="rules-list">
           {rules.map((rule, index) => (
             <li key={index} className="rule-item">
@@ -51,7 +54,7 @@ export function GameRulesCard({
         onClick={onStart}
         disabled={isLoading}
       >
-        {isLoading ? 'Starting...' : startButtonText}
+        {isLoading ? t('common.starting', 'Starting...') : startButtonText}
       </button>
     </div>
   );

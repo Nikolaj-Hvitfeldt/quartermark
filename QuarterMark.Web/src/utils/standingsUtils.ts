@@ -3,20 +3,21 @@
  */
 
 import { PlayerDto } from '../types';
+import { TFunction } from 'i18next';
 
-export const STANDINGS_CONSTANTS = {
+export const getStandingsConstants = (t: TFunction) => ({
   TITLES: {
-    CURRENT_STANDINGS: 'Current Standings',
-    FINAL_STANDINGS: 'Final Standings',
+    CURRENT_STANDINGS: t('standings.currentStandings'),
+    FINAL_STANDINGS: t('standings.finalStandings'),
   },
   BUTTONS: {
-    NEXT_QUESTION: 'Next Question →',
-    END_ROUND: 'End Round',
-    VIEW_STANDINGS: 'View Standings →',
+    NEXT_QUESTION: t('standings.nextQuestion'),
+    END_ROUND: t('standings.endRound'),
+    VIEW_STANDINGS: t('standings.viewStandings'),
   },
   PROGRESS_FORMAT: (current: number, total: number) => 
-    `Question ${current} of ${total} complete`,
-} as const;
+    t('standings.progressFormat', { current, total }),
+});
 
 /**
  * Sort players by score (excluding host)

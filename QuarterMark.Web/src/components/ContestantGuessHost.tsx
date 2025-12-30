@@ -7,11 +7,13 @@ import { AnswerGrid } from "./AnswerGrid";
 import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
 import { CONTESTANT_GUESS_QUESTIONS } from "../data/contestantGuessQuestions";
-import { CONTESTANT_GUESS_RULES, getQuestionCountText } from "../data/gameRules";
+import { getContestantGuessRules, getQuestionCountText } from "../data/gameRules";
+import { useTranslation } from "react-i18next";
 import "./ContestantGuess.css";
 import "./ContestantGuessHost.css";
 
 function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHostProps) {
+  const { t } = useTranslation();
   const {
     roundActive,
     currentQuestion,
@@ -115,16 +117,17 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
   };
 
   if (!roundActive) {
-    const questionCount = getQuestionCountText(CONTESTANT_GUESS_QUESTIONS.length);
+    const contestantGuessRules = getContestantGuessRules(t);
+    const questionCount = getQuestionCountText(CONTESTANT_GUESS_QUESTIONS.length, t);
     return (
       <div className="contestant-guess-host">
         <GameRulesCard
-          title={CONTESTANT_GUESS_RULES.title}
-          subtitle={CONTESTANT_GUESS_RULES.subtitle}
-          rules={CONTESTANT_GUESS_RULES.rules}
-          pointsInfo={`${questionCount} • ${CONTESTANT_GUESS_RULES.pointsInfo}`}
+          title={contestantGuessRules.title}
+          subtitle={contestantGuessRules.subtitle}
+          rules={contestantGuessRules.rules}
+          pointsInfo={`${questionCount} • ${contestantGuessRules.pointsInfo}`}
           onStart={handleStartRound}
-          startButtonText={CONTESTANT_GUESS_RULES.startButtonText}
+          startButtonText={contestantGuessRules.startButtonText}
         />
       </div>
     );
@@ -154,9 +157,9 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
       return (
         <div className="contestant-guess-host">
           <button className="btn btn-back" onClick={onBack}>
-            ← Back
+            ← {t('common.back')}
           </button>
-          <h3 className="question-progress-header">Question {currentQuestionIndex + 1} of {CONTESTANT_GUESS_QUESTIONS.length}</h3>
+          <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: CONTESTANT_GUESS_QUESTIONS.length })}</h3>
           <div className="contestant-guess-question-container">
             <ImageDisplay imageUrl={currentQuestion.imageUrl} />
             <AnswerGrid
@@ -173,9 +176,9 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
     return (
       <div className="contestant-guess-host">
         <button className="btn btn-back" onClick={onBack}>
-          ← Back
+          ← {t('common.back')}
         </button>
-        <h3 className="question-progress-header">Question {currentQuestionIndex + 1} of {CONTESTANT_GUESS_QUESTIONS.length}</h3>
+        <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: CONTESTANT_GUESS_QUESTIONS.length })}</h3>
         <div className="contestant-guess-question-container">
           <ImageDisplay imageUrl={currentQuestion.imageUrl} />
 
@@ -188,9 +191,8 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
           <button
             className="btn btn-primary"
             onClick={handleRevealAnswer}
-            disabled={!allGuessed}
           >
-            {allGuessed ? "Reveal Answer" : `Waiting for ${guessProgress.total - guessProgress.received} more guess(es)`}
+            {allGuessed ? t('common.revealAnswer') : t('common.revealAnswer') + ` (${guessProgress.received}/${guessProgress.total} answered)`}
           </button>
         </div>
       </div>
