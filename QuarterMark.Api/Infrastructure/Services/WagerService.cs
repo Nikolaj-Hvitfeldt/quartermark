@@ -120,11 +120,11 @@ public class WagerService : IWagerService
 
             if (isCorrect)
             {
-                // Win: get double the wager amount (net gain = wagerAmount)
-                // Player wagers X, wins 2X, so net change is +X
+                // Win: get double the wager amount (net gain = 2 * wagerAmount)
+                // Player wagers X, wins 2X, so net change is +2X
                 if (room.WagerRound.RoundScores.ContainsKey(playerName))
                 {
-                    room.WagerRound.RoundScores[playerName] += wagerAmount;
+                    room.WagerRound.RoundScores[playerName] += wagerAmount * 2;
                 }
             }
             else

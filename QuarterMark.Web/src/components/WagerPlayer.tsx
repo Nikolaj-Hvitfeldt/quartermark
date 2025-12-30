@@ -89,7 +89,8 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
 
   const playerGuess = guesses[playerName];
   const isPlayerCorrect = playerGuess === correctAnswer;
-  const playerWagerAmount = wagers[playerName] || 0;
+  // Use playerWager from store during wagering phase, wagers[playerName] after reveal
+  const playerWagerAmount = answerRevealed ? (wagers[playerName] || 0) : playerWager;
   const netChange = roundScores[playerName] || 0;
 
   return (
@@ -166,7 +167,6 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
                 <div className="correct-message">
                   <h3>🎉 Correct!</h3>
                   <p>You won {calculateWinnings(playerWagerAmount)} points!</p>
-                  <p>Net gain: +{playerWagerAmount} points</p>
                 </div>
               ) : (
                 <div className="incorrect-message">

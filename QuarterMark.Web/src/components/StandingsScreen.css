@@ -1,0 +1,136 @@
+/* Standings Screen - Clean post-question standings display */
+.standings-screen {
+  width: 100%;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.standings-content {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.standings-title {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--gold-primary);
+  text-align: center;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+}
+
+.standings-progress {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.standings-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.standings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.standings-item:hover {
+  border-color: rgba(255, 215, 0, 0.3);
+  transform: translateX(5px);
+}
+
+.standings-rank {
+  font-size: 1.25rem;
+  font-weight: bold;
+  min-width: 50px;
+  color: var(--text-muted);
+}
+
+/* Top 3 special colors */
+.standings-item:nth-child(1) .standings-rank {
+  background: linear-gradient(135deg, #ffd700 0%, #ffec8b 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.4rem;
+}
+
+.standings-item:nth-child(2) .standings-rank {
+  color: #c0c0c0;
+  font-size: 1.3rem;
+}
+
+.standings-item:nth-child(3) .standings-rank {
+  color: #cd7f32;
+  font-size: 1.2rem;
+}
+
+/* 4th+ place - muted */
+.standings-item:nth-child(n+4) .standings-rank {
+  color: rgba(120, 120, 140, 0.9);
+  font-size: 1.1rem;
+}
+
+.standings-item:nth-child(n+4) {
+  opacity: 0.85;
+}
+
+.standings-name {
+  flex: 1;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+  text-align: left;
+  margin-left: 1rem;
+}
+
+.standings-score {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--gold-primary);
+  min-width: 80px;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .standings-title {
+    font-size: 1.75rem;
+  }
+
+  .standings-item {
+    padding: 0.75rem 1rem;
+  }
+
+  .standings-rank {
+    font-size: 1rem;
+    min-width: 40px;
+  }
+
+  .standings-name {
+    font-size: 1rem;
+  }
+
+  .standings-score {
+    font-size: 1rem;
+    min-width: 60px;
+  }
+}
+

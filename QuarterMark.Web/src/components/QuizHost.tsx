@@ -4,8 +4,9 @@ import { QuizHostProps } from "../types";
 import signalRService from "../services/signalRService";
 import { QuestionDisplay } from "./QuestionDisplay";
 import { AnswerGrid } from "./AnswerGrid";
-import { QuizRoundScores } from "./QuizRoundScores";
+import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
+import { STANDINGS_CONSTANTS } from "../utils/standingsUtils";
 import { QUIZ_QUESTIONS_2025 } from "../data/quizQuestions";
 import { QUIZ_RULES, getQuestionCountText } from "../data/gameRules";
 import "./Quiz.css";
@@ -27,6 +28,7 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answerProgress, setAnswerProgress] = useState({ total: 0, received: 0 });
+  const [showStandings, setShowStandings] = useState(false);
 
   useEffect(() => {
     if (!connection) return;
@@ -62,7 +64,12 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
     }
   };
 
+  const handleShowStandings = () => {
+    setShowStandings(true);
+  };
+
   const handleNextQuestion = async () => {
+    setShowStandings(false);
     const nextIndex = currentQuestionIndex + 1;
     
     if (nextIndex >= QUIZ_QUESTIONS_2025.length) {
@@ -122,6 +129,21 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
     const allAnswered = answerProgress.received === answerProgress.total && answerProgress.total > 0;
     const isLastQuestion = currentQuestionIndex + 1 >= QUIZ_QUESTIONS_2025.length;
 
+    // Show standings screen after answer is revealed and user clicks "View Standings"
+    if (answerRevealed && showStandings) {
+      return (
+        <div className="quiz-host">
+          <StandingsScreen
+            players={players}
+            currentQuestion={currentQuestionIndex + 1}
+            totalQuestions={QUIZ_QUESTIONS_2025.length}
+            onNextQuestion={handleNextQuestion}
+            isLastQuestion={isLastQuestion}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="quiz-host">
         <button className="btn btn-back" onClick={onBack}>
@@ -160,12 +182,8 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
                 guesses={guesses}
                 revealed={true}
               />
-              <QuizRoundScores
-                roundScores={roundScores}
-                players={players}
-              />
-              <button className="btn btn-primary btn-large" onClick={handleNextQuestion}>
-                {isLastQuestion ? "End Round" : "Next Question →"}
+              <button className="btn btn-primary btn-large" onClick={handleShowStandings}>
+                {STANDINGS_CONSTANTS.BUTTONS.VIEW_STANDINGS}
               </button>
             </>
           )}

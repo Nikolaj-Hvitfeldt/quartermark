@@ -4,8 +4,9 @@ import { SocialMediaGuessHostProps } from "../types";
 import signalRService from "../services/signalRService";
 import { ImageDisplay } from "./ImageDisplay";
 import { AnswerGrid } from "./AnswerGrid";
-import { SocialMediaGuessRoundScores } from "./SocialMediaGuessRoundScores";
+import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
+import { STANDINGS_CONSTANTS } from "../utils/standingsUtils";
 import { SOCIAL_MEDIA_GUESS_QUESTIONS } from "../data/socialMediaGuessQuestions";
 import { SOCIAL_MEDIA_RULES, getQuestionCountText } from "../data/gameRules";
 import "./SocialMediaGuess.css";
@@ -27,6 +28,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [guessProgress, setGuessProgress] = useState({ total: 0, received: 0 });
+  const [showStandings, setShowStandings] = useState(false);
 
   useEffect(() => {
     if (!connection) return;
@@ -60,7 +62,12 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     }
   };
 
+  const handleShowStandings = () => {
+    setShowStandings(true);
+  };
+
   const handleNextQuestion = async () => {
+    setShowStandings(false);
     const nextIndex = currentQuestionIndex + 1;
 
     if (nextIndex >= SOCIAL_MEDIA_GUESS_QUESTIONS.length) {
@@ -132,6 +139,21 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
   const allGuessed = guessProgress.received === guessProgress.total && guessProgress.total > 0;
   const isLastQuestion = currentQuestionIndex + 1 >= SOCIAL_MEDIA_GUESS_QUESTIONS.length;
 
+  // Show standings screen after answer is revealed and user clicks "View Standings"
+  if (answerRevealed && showStandings) {
+    return (
+      <div className="social-media-guess-host">
+        <StandingsScreen
+          players={players}
+          currentQuestion={currentQuestionIndex + 1}
+          totalQuestions={SOCIAL_MEDIA_GUESS_QUESTIONS.length}
+          onNextQuestion={handleNextQuestion}
+          isLastQuestion={isLastQuestion}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="social-media-guess-host">
       <button className="btn btn-back" onClick={onBack}>
@@ -149,13 +171,13 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
               </p>
             </div>
             <AnswerGrid answers={currentQuestion.possibleAnswers} />
-              <button
-                className="btn btn-primary"
-                onClick={handleRevealAnswer}
-                disabled={!allGuessed}
-              >
-                {allGuessed ? "Reveal Answer" : `Waiting for ${guessProgress.total - guessProgress.received} more guess(es)`}
-              </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleRevealAnswer}
+              disabled={!allGuessed}
+            >
+              {allGuessed ? "Reveal Answer" : `Waiting for ${guessProgress.total - guessProgress.received} more guess(es)`}
+            </button>
           </>
         ) : (
           <>
@@ -165,12 +187,8 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
               guesses={guesses}
               revealed={true}
             />
-            <SocialMediaGuessRoundScores
-              roundScores={roundScores}
-              players={players}
-            />
-            <button className="btn btn-primary" onClick={handleNextQuestion}>
-              {isLastQuestion ? "End Round" : "Next Question →"}
+            <button className="btn btn-primary btn-large" onClick={handleShowStandings}>
+              {STANDINGS_CONSTANTS.BUTTONS.VIEW_STANDINGS}
             </button>
           </>
         )}

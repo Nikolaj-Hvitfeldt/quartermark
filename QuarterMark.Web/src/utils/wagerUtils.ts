@@ -16,9 +16,9 @@ export const WAGER_CONSTANTS = {
  */
 export function calculateWagerResult(wagerAmount: number, isCorrect: boolean): number {
   if (isCorrect) {
-    // Win: get double the wager (2x), net gain = wager amount
-    // Example: wager 50, win 100, net = +50
-    return wagerAmount;
+    // Win: get double the wager (2x), net gain = 2x wager amount
+    // Example: wager 50, win 100, net = +100
+    return wagerAmount * WAGER_CONSTANTS.MULTIPLIER;
   } else {
     // Lose: lose the wager amount
     // Example: wager 50, lose 50, net = -50

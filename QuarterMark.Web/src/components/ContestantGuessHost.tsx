@@ -4,8 +4,9 @@ import { ContestantGuessHostProps } from "../types";
 import signalRService from "../services/signalRService";
 import { ImageDisplay } from "./ImageDisplay";
 import { AnswerGrid } from "./AnswerGrid";
-import { ContestantGuessRoundScores } from "./ContestantGuessRoundScores";
+import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
+import { STANDINGS_CONSTANTS } from "../utils/standingsUtils";
 import { CONTESTANT_GUESS_QUESTIONS } from "../data/contestantGuessQuestions";
 import { CONTESTANT_GUESS_RULES, getQuestionCountText } from "../data/gameRules";
 import "./ContestantGuess.css";
@@ -27,6 +28,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [guessProgress, setGuessProgress] = useState({ total: 0, received: 0 });
+  const [showStandings, setShowStandings] = useState(false);
 
   useEffect(() => {
     if (!connection) return;
@@ -61,7 +63,12 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
     }
   };
 
+  const handleShowStandings = () => {
+    setShowStandings(true);
+  };
+
   const handleNextQuestion = async () => {
+    setShowStandings(false);
     const nextIndex = currentQuestionIndex + 1;
     
     if (nextIndex >= CONTESTANT_GUESS_QUESTIONS.length) {
@@ -120,6 +127,21 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
     const allGuessed = guessProgress.received === guessProgress.total && guessProgress.total > 0;
     const isLastQuestion = currentQuestionIndex + 1 >= CONTESTANT_GUESS_QUESTIONS.length;
 
+    // Show standings screen after answer is revealed and user clicks "View Standings"
+    if (answerRevealed && showStandings) {
+      return (
+        <div className="contestant-guess-host">
+          <StandingsScreen
+            players={players}
+            currentQuestion={currentQuestionIndex + 1}
+            totalQuestions={CONTESTANT_GUESS_QUESTIONS.length}
+            onNextQuestion={handleNextQuestion}
+            isLastQuestion={isLastQuestion}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="contestant-guess-host">
         <button className="btn btn-back" onClick={onBack}>
@@ -153,12 +175,8 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
                 guesses={guesses}
                 revealed={true}
               />
-              <ContestantGuessRoundScores
-                roundScores={roundScores}
-                players={players}
-              />
-              <button className="btn btn-primary" onClick={handleNextQuestion}>
-                {isLastQuestion ? "End Round" : "Next Question →"}
+              <button className="btn btn-primary btn-large" onClick={handleShowStandings}>
+                {STANDINGS_CONSTANTS.BUTTONS.VIEW_STANDINGS}
               </button>
             </>
           )}
