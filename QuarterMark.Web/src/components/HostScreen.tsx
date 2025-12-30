@@ -12,13 +12,16 @@ import SocialMediaGuessHost from "./SocialMediaGuessHost";
 import WagerHost from "./WagerHost";
 import DrinkingWheelHost from "./DrinkingWheelHost";
 import GameCompletionScreen from "./GameCompletionScreen";
+import { WouldILieConfig } from "./WouldILieConfig";
+import { WouldILieRoundConfig } from "../data/wouldILieImages";
 import { HostScreenProps } from "../types";
 import "./HostScreen.css";
 
 function HostScreen({ onBack }: HostScreenProps) {
   const { connection, roomCode, players, isConnected, createRoom } =
     useGameRoom();
-  const { isActive: sessionActive, currentGameNumber, accumulatedScores, showDrinkingWheel, setShowDrinkingWheel, startSession } = useGameSession(connection);
+  const { isActive: sessionActive, currentGameNumber, accumulatedScores, showDrinkingWheel, wouldILieConfig, setShowDrinkingWheel, setWouldILieConfig, startSession } = useGameSession(connection);
+  const [showWouldILieConfig, setShowWouldILieConfig] = useState(false);
   const { completedGame, clearCompletedGame } = useGameCompletion({
     connection,
     onGameCompleted: () => {
@@ -269,14 +272,40 @@ function HostScreen({ onBack }: HostScreenProps) {
             )}
           </div>
 
+          {/* Would I Lie Configuration */}
+          {showWouldILieConfig && (
+            <WouldILieConfig
+              players={players}
+              existingConfig={wouldILieConfig}
+              onConfigComplete={(config: WouldILieRoundConfig[]) => {
+                setWouldILieConfig(config);
+                setShowWouldILieConfig(false);
+              }}
+            />
+          )}
+
           <div className="game-actions">
-            {!sessionActive && (
-              <button
-                className="btn btn-primary btn-large"
-                onClick={handleStartSession}
-              >
-                Start Game Session (5 Mini-Games)
-              </button>
+            {!sessionActive && !showWouldILieConfig && (
+              <div className="pre-game-actions">
+                <button
+                  className="btn btn-secondary btn-large config-btn"
+                  onClick={() => setShowWouldILieConfig(true)}
+                  disabled={players.filter(p => !p.isHost).length < 2}
+                >
+                  🎭 Configure "Would I Lie" Rounds {wouldILieConfig.length > 0 ? `(${wouldILieConfig.length} configured)` : ''}
+                </button>
+                <button
+                  className="btn btn-primary btn-large"
+                  onClick={handleStartSession}
+                  disabled={wouldILieConfig.length === 0}
+                  title={wouldILieConfig.length === 0 ? 'Configure Would I Lie rounds first' : ''}
+                >
+                  Start Game Session (5 Mini-Games)
+                </button>
+                {wouldILieConfig.length === 0 && (
+                  <p className="config-reminder">⚠️ Configure "Would I Lie" rounds before starting</p>
+                )}
+              </div>
             )}
             {sessionActive && !inGame && !completedGame && (
               <div className="session-status">

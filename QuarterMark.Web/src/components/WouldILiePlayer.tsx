@@ -4,7 +4,18 @@ import signalRService from '../services/signalRService';
 import { usePlayerGameStore } from '../stores/playerGameStore';
 import { useGameRoom } from '../hooks/useGameRoom';
 import { GAME_CONSTANTS } from '../utils/gameUtils';
-import { WouldILiePlayerProps, QuestionShownData, AnswerRevealedData, ClaimDto } from '../types';
+import {
+  WOULD_I_LIE_TITLES,
+  WOULD_I_LIE_MESSAGES,
+  getClaimerResultMessage,
+  getVoterResultMessage,
+  calculateVotesReceived,
+} from '../utils/wouldILieUtils';
+import { WouldILiePlayerProps, QuestionShownData, AnswerRevealedData } from '../types';
+import { ImageDisplay } from './ImageDisplay';
+import { WouldILieAnswerGrid } from './WouldILieAnswerGrid';
+import { WouldILieStandings } from './WouldILieStandings';
+import './WouldILie.css';
 import './WouldILiePlayer.css';
 
 function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProps) {
@@ -15,12 +26,9 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     canVote,
     hasVoted,
     claimers,
-    isRevealed,
     correctPlayer,
     votes,
     isClaimer,
-    isAssigned,
-    roundScores,
     setRoundState,
     setImageUrl,
     setClaims,
@@ -61,7 +69,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
       const claimerNames = (data.claims || []).map(c => c.playerName);
       setIsClaimer(claimerNames.includes(playerName));
       setIsAssigned(data.assignedPlayers.includes(playerName));
-      // Go straight to claims screen since claims are automatically created
       setRoundState('ShowingClaims');
     };
 
@@ -81,7 +88,6 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
 
     const handleRoundEnded = () => {
       setRoundState('RoundEnded');
-      // After a short delay, go back to show completion screen
       setTimeout(() => {
         onBack();
       }, GAME_CONSTANTS.PLAYER_ROUND_END_DELAY_WOULD_ILIE);
@@ -115,6 +121,7 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     setIsClaimer,
     setIsAssigned,
     setRoundScores,
+    onBack,
   ]);
 
   const submitVoteMutation = useMutation({
@@ -126,128 +133,139 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     },
   });
 
-  const handleVote = async (claimerName: string) => {
+  const handleVote = (claimerName: string) => {
     submitVoteMutation.mutate(claimerName);
   };
 
+  // Waiting state
+  if (roundState === 'Waiting') {
+    return (
+      <div className="would-i-lie-player">
+        <div className="wil-waiting-message">
+          <h2>{WOULD_I_LIE_MESSAGES.WAITING_FOR_HOST}</h2>
+        </div>
+      </div>
+    );
+  }
+
+  // Showing claims
+  if (roundState === 'ShowingClaims') {
+    const options = claims.map(claim => ({
+      playerName: claim.playerName,
+      label: WOULD_I_LIE_MESSAGES.CLAIMS_TO_KNOW,
+    }));
+
+    return (
+      <div className="would-i-lie-player">
+        <div className="wil-game-container">
+          <h2 className="wil-game-title">{WOULD_I_LIE_TITLES.WHO_KNOWS}</h2>
+          {imageUrl && <ImageDisplay imageUrl={imageUrl} altText="Mystery Person" />}
+          <WouldILieAnswerGrid options={options} />
+          <div className="wil-status-message">
+            <p>{isClaimer ? WOULD_I_LIE_MESSAGES.CLAIMER_WAITING : WOULD_I_LIE_MESSAGES.WAITING_FOR_VOTING}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Voting - can vote
+  if (roundState === 'Voting' && canVote && !hasVoted) {
+    const options = claimers.map(name => ({
+      playerName: name,
+      label: WOULD_I_LIE_MESSAGES.VOTE_FOR_THEM,
+    }));
+
+    return (
+      <div className="would-i-lie-player">
+        <div className="wil-game-container">
+          <h2 className="wil-game-title">{WOULD_I_LIE_TITLES.WHOS_TELLING_TRUTH}</h2>
+          {imageUrl && <ImageDisplay imageUrl={imageUrl} altText="Mystery Person" />}
+          <WouldILieAnswerGrid options={options} onOptionClick={handleVote} clickable />
+        </div>
+      </div>
+    );
+  }
+
+  // Voting - already voted or is claimer
+  if (roundState === 'Voting' && (hasVoted || isClaimer)) {
+    const options = claimers.map(name => ({ playerName: name }));
+
+    return (
+      <div className="would-i-lie-player">
+        <div className="wil-game-container">
+          <h2 className="wil-game-title">{WOULD_I_LIE_TITLES.VOTING_IN_PROGRESS}</h2>
+          {imageUrl && <ImageDisplay imageUrl={imageUrl} altText="Mystery Person" />}
+          <WouldILieAnswerGrid options={options} />
+          <div className="wil-answer-submitted">
+            <p>{hasVoted ? WOULD_I_LIE_MESSAGES.VOTE_SUBMITTED : WOULD_I_LIE_MESSAGES.WAITING_FOR_VOTES}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Revealed state
+  if (roundState === 'Revealed') {
+    const playerVote = votes[playerName];
+    const isPlayerCorrect = playerVote === correctPlayer;
+    const votesReceived = isClaimer ? calculateVotesReceived(votes, playerName) : 0;
+
+    const options = claimers.map(name => ({
+      playerName: name,
+      isCorrect: name === correctPlayer,
+      isPlayerChoice: playerVote === name,
+      showCorrectBadge: name === correctPlayer,
+      showPlayerBadge: playerVote === name && !isClaimer,
+    }));
+
+    const resultMessage = isClaimer
+      ? getClaimerResultMessage(votesReceived)
+      : getVoterResultMessage(isPlayerCorrect);
+    const resultClass = isClaimer ? (votesReceived > 0 ? 'correct' : 'incorrect') : (isPlayerCorrect ? 'correct' : 'incorrect');
+
+    return (
+      <div className="would-i-lie-player">
+        <div className="wil-game-container">
+          <h2 className="wil-game-title">{WOULD_I_LIE_TITLES.ANSWER_REVEALED}</h2>
+          {imageUrl && <ImageDisplay imageUrl={imageUrl} altText="Mystery Person" />}
+          <WouldILieAnswerGrid options={options} revealed />
+          <div className="wil-result-message">
+            <div className={`wil-result-box ${resultClass}`}>
+              <h3>{resultMessage}</h3>
+            </div>
+          </div>
+          <WouldILieStandings players={players} highlightPlayerName={playerName} />
+        </div>
+      </div>
+    );
+  }
+
+  // Round ended state
+  if (roundState === 'RoundEnded') {
+    return (
+      <div className="would-i-lie-player">
+        <div className="wil-game-container">
+          <h2 className="wil-game-title">{WOULD_I_LIE_TITLES.ROUND_COMPLETE}</h2>
+          <p className="wil-round-complete-message">{WOULD_I_LIE_MESSAGES.SKAAL}</p>
+          <WouldILieStandings
+            players={players}
+            title="📊 Final Standings"
+            highlightPlayerName={playerName}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback
   return (
     <div className="would-i-lie-player">
-
-      {roundState === 'Waiting' && (
-        <div className="waiting-screen">
-          <h2>Waiting for host to start the round...</h2>
-        </div>
-      )}
-
-      {roundState === 'ShowingClaims' && (
-        <div className="round-screen">
-          <h2>Players who claim to know this person:</h2>
-          {imageUrl && (
-            <div className="person-image">
-              <img src={imageUrl} alt="Person" />
-            </div>
-          )}
-          <div className="claims-list">
-            {claims.map((claim, index) => (
-              <div key={index} className="claim-card">
-                <h3>{claim.playerName}</h3>
-              </div>
-            ))}
-          </div>
-          {isClaimer && (
-            <p className="claimer-note">You claimed to know them. Waiting for others to vote...</p>
-          )}
-        </div>
-      )}
-
-      {roundState === 'Voting' && canVote && !hasVoted && (
-        <div className="round-screen">
-          <h2>Who do you think is telling the truth?</h2>
-          <div className="voting-options">
-            {claimers.map((claimerName, index) => (
-              <button
-                key={index}
-                className="btn btn-vote btn-large"
-                onClick={() => handleVote(claimerName)}
-              >
-                {claimerName}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {roundState === 'Voting' && (hasVoted || isClaimer) && (
-        <div className="round-screen">
-          <h2>Waiting for other players to vote...</h2>
-        </div>
-      )}
-
-      {roundState === 'Revealed' && (
-        <div className="round-screen">
-          <h2>Answer Revealed!</h2>
-          <div className="reveal-section">
-            <p className="correct-answer">
-              The correct answer is: <strong>{correctPlayer}</strong>
-            </p>
-            {isClaimer && (() => {
-              const votesReceived = Object.values(votes).filter(v => v === playerName).length;
-              return (
-                <p className={`result ${votesReceived > 0 ? 'correct' : 'incorrect'}`}>
-                  {votesReceived > 0 
-                    ? `🎉 You received ${votesReceived} vote(s)! +${votesReceived * 10} points`
-                    : '😅 No one voted for you. 0 points'}
-                </p>
-              );
-            })()}
-            {!isClaimer && (
-              <p className={`result ${votes[playerName] === correctPlayer ? 'correct' : 'incorrect'}`}>
-                {votes[playerName] === correctPlayer 
-                  ? '🎉 You guessed correctly! +10 points' 
-                  : '❌ You guessed wrong! 0 points'}
-              </p>
-            )}
-          </div>
-          
-          <div className="score-screen">
-            <h3>Current Standings</h3>
-            <div className="standings-list">
-              {players
-                .filter(p => !p.isHost)
-                .sort((a, b) => b.score - a.score)
-                .map((player, index) => (
-                  <div key={player.name} className="standing-item">
-                    <span className="standing-rank">#{index + 1}</span>
-                    <span className="standing-name">{player.name}</span>
-                    <span className="standing-score">{player.score} pts</span>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {roundState === 'RoundEnded' && (
-        <div className="round-screen">
-          <h2>Final Standings</h2>
-          <p className="round-complete-message">Round complete - SKÅL!</p>
-          <div className="standings-list">
-            {players
-              .filter(p => !p.isHost)
-              .sort((a, b) => b.score - a.score)
-              .map((player, index) => (
-                <div key={player.name} className="standing-item">
-                  <span className="standing-rank">#{index + 1}</span>
-                  <span className="standing-name">{player.name}</span>
-                  <span className="standing-score">{player.score} pts</span>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
+      <div className="wil-waiting-message">
+        <h2>{WOULD_I_LIE_MESSAGES.LOADING}</h2>
+      </div>
     </div>
   );
 }
 
 export default WouldILiePlayer;
-
