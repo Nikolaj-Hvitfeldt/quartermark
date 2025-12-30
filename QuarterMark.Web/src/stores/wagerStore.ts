@@ -8,6 +8,8 @@ interface WagerState {
   currentQuestion: {
     questionText: string;
     possibleAnswers: string[];
+    questionId?: string; // Optional question ID for translation
+    originalAnswers?: string[]; // Original answers for backend submission
   } | null;
   wagers: Record<string, number>; // playerName -> wagerAmount
   guesses: Record<string, string>; // playerName -> selectedAnswer
@@ -23,7 +25,7 @@ interface WagerState {
   
   // Host setters
   setRoundActive: (active: boolean) => void;
-  setCurrentQuestion: (question: { questionText: string; possibleAnswers: string[] } | null) => void;
+  setCurrentQuestion: (question: { questionText: string; possibleAnswers: string[]; questionId?: string; originalAnswers?: string[] } | null) => void;
   setWagers: (wagers: Record<string, number>) => void;
   setGuesses: (guesses: Record<string, string>) => void;
   setRoundScores: (scores: Record<string, number>) => void;

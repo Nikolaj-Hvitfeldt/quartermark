@@ -2,6 +2,7 @@ namespace QuarterMark.Api.Domain.Entities;
 
 public class WagerQuestion
 {
+    public string QuestionId { get; set; } = string.Empty; // ID for translation
     public string QuestionText { get; set; } = string.Empty;
     public string CorrectAnswer { get; set; } = string.Empty;
     public List<string> PossibleAnswers { get; set; } = new(); // List of possible answers

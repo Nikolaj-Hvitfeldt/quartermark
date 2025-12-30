@@ -666,7 +666,7 @@ public class GameHub : Hub
         await _notificationService.NotifyRoomAsync(roomCode, "WagerRoundStarted");
     }
 
-    public async Task ShowWagerQuestion(string questionText, string correctAnswer, List<string> possibleAnswers)
+    public async Task ShowWagerQuestion(string questionId, string questionText, string correctAnswer, List<string> possibleAnswers)
     {
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
         if (roomCode == null) return;
@@ -674,10 +674,11 @@ public class GameHub : Hub
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
 
-        await _wagerService.ShowQuestionAsync(roomCode, questionText, correctAnswer, possibleAnswers);
+        await _wagerService.ShowQuestionAsync(roomCode, questionId, questionText, correctAnswer, possibleAnswers);
         
         await _notificationService.NotifyRoomAsync(roomCode, "WagerQuestionShown", new
         {
+            questionId,
             questionText,
             possibleAnswers
         });

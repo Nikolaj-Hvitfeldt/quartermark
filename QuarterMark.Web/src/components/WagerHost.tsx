@@ -31,6 +31,17 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
     endRound,
   } = useWager(connection);
 
+  // Translate current question for host display
+  const translatedCurrentQuestion = currentQuestion && currentQuestion.questionId
+    ? (() => {
+        const question = WAGER_QUESTIONS.find(q => q.id === currentQuestion.questionId);
+        return question ? {
+          questionText: question.questionText,
+          possibleAnswers: question.answers,
+        } : currentQuestion;
+      })()
+    : currentQuestion;
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [wagerProgress, setWagerProgress] = useState({ total: 0, received: 0 });
   const [answerProgress, setAnswerProgress] = useState({ total: 0, received: 0 });
@@ -96,6 +107,7 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
     try {
       const nextQuestion = WAGER_QUESTIONS[nextIndex];
       await showQuestion(
+        nextQuestion.id, // Send question ID for translation
         nextQuestion.questionText,
         nextQuestion.correctAnswer,
         [...nextQuestion.answers]
@@ -206,13 +218,13 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
         {/* Answering phase - question revealed after all wagers */}
         {isAnsweringPhase && !answerRevealed && (
           <>
-            <QuestionDisplay questionText={currentQuestion.questionText} />
+            <QuestionDisplay questionText={translatedCurrentQuestion?.questionText || currentQuestion.questionText} />
             <div className="answer-progress">
               <p>
                 Answers received: {answerProgress.received} / {answerProgress.total}
               </p>
             </div>
-            <AnswerGrid answers={currentQuestion.possibleAnswers} />
+            <AnswerGrid answers={translatedCurrentQuestion?.possibleAnswers || currentQuestion.possibleAnswers} />
             <button
               className="btn btn-primary"
               onClick={handleRevealAnswer}
@@ -224,9 +236,9 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
 
         {answerRevealed && (
           <>
-            <QuestionDisplay questionText={currentQuestion.questionText} />
+            <QuestionDisplay questionText={translatedCurrentQuestion?.questionText || currentQuestion.questionText} />
             <AnswerGrid
-              answers={currentQuestion.possibleAnswers}
+              answers={translatedCurrentQuestion?.possibleAnswers || currentQuestion.possibleAnswers}
               correctAnswer={revealedCorrectAnswer}
               guesses={guesses}
               revealed={true}

@@ -27,7 +27,7 @@ public class WagerService : IWagerService
         return Task.FromResult(true);
     }
 
-    public Task<bool> ShowQuestionAsync(string roomCode, string questionText, string correctAnswer, List<string> possibleAnswers)
+    public Task<bool> ShowQuestionAsync(string roomCode, string questionId, string questionText, string correctAnswer, List<string> possibleAnswers)
     {
         var room = GetRoom(roomCode);
         if (room == null || room.WagerRound == null) return Task.FromResult(false);
@@ -40,6 +40,7 @@ public class WagerService : IWagerService
 
         var question = new WagerQuestion
         {
+            QuestionId = questionId,
             QuestionText = questionText,
             CorrectAnswer = correctAnswer,
             PossibleAnswers = possibleAnswers,
