@@ -123,7 +123,7 @@
     },
     "host": {
       "blindWageringPhase": "🎲 Blind Wagering Phase",
-      "playersPlacingBets": "Players are placing their wagers without seeing the question!",
+      "playersPlacingBets": "Players are placing their wagers!",
       "wagersReceived": "Wagers received: {{received}} / {{total}}",
       "waitingForAll": "Waiting for all players to place their wagers...",
       "answersReceived": "Answers received: {{received}} / {{total}}",

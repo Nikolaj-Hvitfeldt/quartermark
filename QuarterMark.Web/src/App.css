@@ -11,8 +11,11 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  gap: 2rem;
-  padding: 2rem;
+  min-height: 100dvh;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   background: linear-gradient(135deg, #0c1445 0%, #1a1a2e 25%, #16213e 50%, #0f0f23 75%, #1a0a2e 100%);
   background-size: 400% 400%;
   animation: midnightShift 20s ease infinite;
@@ -81,7 +84,7 @@
 
 .home-screen h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 5rem;
+  font-size: clamp(2.5rem, 10vw, 5rem);
   font-weight: 900;
   margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #ffd700 0%, #ffec8b 25%, #daa520 50%, #fff8dc 75%, #ffd700 100%);
@@ -94,6 +97,7 @@
   position: relative;
   z-index: 1;
   letter-spacing: 0.05em;
+  text-align: center;
 }
 
 @keyframes shimmer {
@@ -102,15 +106,16 @@
 }
 
 .home-subtitle {
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 4vw, 1.5rem);
   color: #c9b037;
   margin-bottom: 1rem;
   text-shadow: 0 0 20px rgba(201, 176, 55, 0.5);
   position: relative;
   z-index: 1;
   animation: subtitlePulse 2s ease-in-out infinite;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
+  text-align: center;
 }
 
 @keyframes subtitlePulse {
@@ -120,7 +125,7 @@
 
 .home-year {
   font-family: 'Playfair Display', serif;
-  font-size: 8rem;
+  font-size: clamp(4rem, 15vw, 8rem);
   font-weight: 900;
   background: linear-gradient(180deg, #ffd700 0%, #ff6b6b 50%, #c9b037 100%);
   background-clip: text;
@@ -131,7 +136,7 @@
   z-index: 1;
   animation: yearGlow 2s ease-in-out infinite alternate;
   line-height: 1;
-  margin: -1rem 0 1rem 0;
+  margin: -0.5rem 0 1rem 0;
 }
 
 @keyframes yearGlow {
@@ -142,9 +147,10 @@
 .home-buttons {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
   max-width: 400px;
+  padding: 0 1rem;
   position: relative;
   z-index: 1;
 }
@@ -175,8 +181,8 @@
 
 /* ===== BUTTONS ===== */
 .btn {
-  padding: 1rem 2rem;
-  font-size: 1.25rem;
+  padding: 0.875rem 1.5rem;
+  font-size: clamp(1rem, 4vw, 1.25rem);
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -184,6 +190,9 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  /* Better touch targets */
+  min-height: 48px;
+  touch-action: manipulation;
 }
 
 .btn::before {
@@ -202,9 +211,10 @@
 }
 
 .btn-large {
-  padding: 1.5rem 2.5rem;
-  font-size: 1.5rem;
+  padding: 1.25rem 2rem;
+  font-size: clamp(1.125rem, 4.5vw, 1.5rem);
   border-radius: 16px;
+  min-height: 56px;
 }
 
 .btn-primary {
@@ -286,6 +296,50 @@
     opacity: 0.3;
     top: 110%;
     transform: translateX(100px) rotate(720deg);
+  }
+}
+
+/* ===== MOBILE RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 480px) {
+  .home-screen {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .home-buttons {
+    gap: 0.75rem;
+    padding: 0 0.5rem;
+  }
+  
+  .btn-large {
+    padding: 1rem 1.5rem;
+    font-size: 1.125rem;
+  }
+  
+  .floating-decoration {
+    font-size: 1.5rem;
+    opacity: 0.4;
+  }
+  
+  /* Hide some decorations on very small screens */
+  .floating-decoration:nth-child(5),
+  .floating-decoration:nth-child(6) {
+    display: none;
+  }
+  
+  .confetti-piece {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .home-screen {
+    padding: 0.75rem;
+  }
+  
+  .home-buttons {
+    padding: 0;
   }
 }
 

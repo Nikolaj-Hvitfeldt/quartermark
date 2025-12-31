@@ -13,6 +13,7 @@ import './WagerPlayer.css';
 function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
   const { t } = useTranslation();
   const WAGER_QUESTIONS = getWagerQuestions(t);
+  
   const {
     roundState,
     currentQuestion,
@@ -27,7 +28,7 @@ function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
     submitWager,
     submitAnswer,
   } = useWager(connection);
-
+  
   // Translate question if questionId is available
   const translatedQuestion = useMemo(() => {
     if (!currentQuestion || !currentQuestion.questionId) {
@@ -43,7 +44,7 @@ function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
       questionId: question.id,
       correctAnswer: question.correctAnswer,
     };
-  }, [currentQuestion, WAGER_QUESTIONS, t]);
+  }, [currentQuestion, WAGER_QUESTIONS]);
 
   // Translate correctAnswer when revealed (map from original to translated)
   const translatedCorrectAnswer = useMemo(() => {
@@ -125,7 +126,7 @@ function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
     return (
       <div className="wager-player">
         <div className="waiting-message">
-          <h2>Waiting for host to start the round...</h2>
+          <h2>{t('common.waitingForHost', 'Waiting for host to start the round...')}</h2>
         </div>
       </div>
     );

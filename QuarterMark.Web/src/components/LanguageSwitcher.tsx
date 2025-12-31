@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import './LanguageSwitcher.css';
 
@@ -11,7 +12,7 @@ function LanguageSwitcher() {
   };
 
   // Load saved language preference on mount
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       const savedLanguage = localStorage.getItem('language');
       if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'da')) {

@@ -78,7 +78,44 @@
   /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
+  --transition-medium: 0.25s ease;
   --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Additional Gradients */
+  --gradient-card-dark: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.9) 100%);
+  --gradient-card-dark-alpha: linear-gradient(135deg, rgba(17, 24, 39, 0.7) 0%, rgba(31, 41, 55, 0.6) 100%);
+  --gradient-card-item-dark-alpha: linear-gradient(135deg, rgba(31, 41, 55, 0.6) 0%, rgba(17, 24, 39, 0.5) 100%);
+  --gradient-player-highlight-item: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(31, 41, 55, 0.8) 100%);
+  --gradient-success-alpha: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.15) 100%);
+  --gradient-error-alpha: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.1) 100%);
+  --gradient-points-info: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(218, 165, 32, 0.05) 100%);
+  
+  /* Additional Colors */
+  --green-primary: #10b981;
+  --green-dark: #059669;
+  --red-primary: #ef4444;
+  --text-light-alpha-medium: rgba(255, 255, 255, 0.6);
+  --gold-primary-alpha-light: rgba(255, 215, 0, 0.1);
+  --gold-primary-alpha-strong: rgba(255, 215, 0, 0.4);
+  
+  /* Additional Borders */
+  --border-gold-subtle: 1px solid rgba(255, 215, 0, 0.2);
+  --border-gold-subtle-alpha: 1px solid rgba(255, 215, 0, 0.15);
+  --border-gold-medium: 1px solid rgba(255, 215, 0, 0.3);
+  --border-success-subtle: 1px solid rgba(16, 185, 129, 0.3);
+  --border-error-subtle: 1px solid rgba(239, 68, 68, 0.3);
+  --border-input: 2px solid rgba(255, 215, 0, 0.3);
+  
+  /* Additional Shadows */
+  --shadow-card-medium: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --shadow-gold-input-focus: 0 0 0 3px rgba(255, 215, 0, 0.2);
+  
+  /* Input Backgrounds */
+  --bg-input: rgba(17, 24, 39, 0.9);
+  
+  /* Border Radius Aliases */
+  --border-radius-small: var(--radius-sm);
+  --border-radius-medium: var(--radius-md);
 }
 
 /* ===== SHARED ANIMATIONS ===== */

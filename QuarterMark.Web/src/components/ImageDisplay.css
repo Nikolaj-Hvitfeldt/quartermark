@@ -31,3 +31,16 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .image-display {
+    border-radius: 12px;
+    min-height: auto;
+    padding: 1rem;
+  }
+  
+  .contestant-image {
+    border-radius: 8px;
+  }
+}
+

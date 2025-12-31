@@ -118,16 +118,37 @@
 
 @media (max-width: 480px) {
   :root {
-    --prompt-min-height: 220px;
-    --prompt-max-height: 300px;
-    --prompt-image-max-height: 220px;
+    --prompt-min-height: 180px;
+    --prompt-max-height: 260px;
+    --prompt-padding: 1rem;
+    --prompt-image-max-height: 200px;
     
-    --answer-option-min-height: 70px;
-    --answer-font-size: 0.9rem;
+    --answer-grid-gap: 0.5rem;
+    --answer-option-min-height: 60px;
+    --answer-option-padding: 0.875rem;
+    --answer-font-size: 0.85rem;
   }
   
   .game-prompt-text {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+  
+  .game-prompt-container {
+    border-radius: 12px;
+  }
+  
+  .game-answer-grid {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --prompt-min-height: 150px;
+    --prompt-max-height: 220px;
+    --prompt-image-max-height: 160px;
+    --answer-option-min-height: 50px;
   }
 }
 

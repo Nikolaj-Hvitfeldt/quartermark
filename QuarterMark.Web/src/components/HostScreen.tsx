@@ -34,6 +34,7 @@ function HostScreen({ onBack }: HostScreenProps) {
   const [dummyPlayerName, setDummyPlayerName] = useState<string>("");
   const [inGame, setInGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
   const [hasRestored, setHasRestored] = useState(false);
+  const [drinkingWheelGameNumber, setDrinkingWheelGameNumber] = useState<number>(0);
 
   // Restore connection and rejoin room on mount if we have stored room state
   useEffect(() => {
@@ -114,16 +115,20 @@ function HostScreen({ onBack }: HostScreenProps) {
   };
 
   const handleContinueToNextGame = () => {
+    // Capture the game number before clearing
+    const gameNumber = completedGame?.gameNumber ?? currentGameNumber;
     clearCompletedGame();
     
     // Check if we should show drinking wheel after this game
-    if (shouldShowDrinkingWheel(currentGameNumber)) {
+    if (shouldShowDrinkingWheel(gameNumber)) {
+      // Store the game number for when the wheel completes
+      setDrinkingWheelGameNumber(gameNumber);
       // Show drinking wheel instead of next game
       setShowDrinkingWheel(true);
       setInGame("drinkingWheel");
     } else {
       // Go to next game
-      const nextGameType = getNextGameType(currentGameNumber);
+      const nextGameType = getNextGameType(gameNumber);
       setInGame(nextGameType);
     }
   };
@@ -185,9 +190,11 @@ function HostScreen({ onBack }: HostScreenProps) {
           players={players}
           onSpinComplete={() => {
             // When host clicks "Continue" on drinking wheel, go to next game
+            // Use the stored gameNumber from when the wheel was shown
             setShowDrinkingWheel(false);
             setInGame(null);
-            const nextGameType = getNextGameType(currentGameNumber);
+            const gameNumber = drinkingWheelGameNumber || currentGameNumber;
+            const nextGameType = getNextGameType(gameNumber);
             setInGame(nextGameType);
           }}
         />
@@ -386,6 +393,12 @@ function HostScreen({ onBack }: HostScreenProps) {
               onClick={() => setInGame("drinkingWheel")}
             >
               Test Drinking Wheel
+            </button>
+            <button
+              className="btn btn-secondary btn-test"
+              onClick={() => setInGame("wager")}
+            >
+              Test Wager Game
             </button>
           </div>
         </div>

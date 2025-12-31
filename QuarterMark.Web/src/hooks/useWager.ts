@@ -48,12 +48,16 @@ export function useWager(connection: any) {
     const handleRoundStarted = () => {
       setRoundActive(true);
       setRoundScores({});
-      setCurrentQuestion(null);
+      // Note: Don't clear currentQuestion here - it may have already been set by 
+      // the pre-registered handler in PlayerScreen. If it's already set, keep it.
+      // This handler and handleQuestionShown may fire in either order due to timing,
+      // so we want to be defensive and not clear data that's already been set.
       setAnswerRevealed(false);
       setCorrectAnswer('');
       setWagers({});
       setGuesses({});
-      setRoundState('Waiting');
+      // Don't reset roundState to Waiting if question is already set - 
+      // handleQuestionShown will set it to Wagering, and we don't want to override that
       setHasWagered(false);
       setHasAnswered(false);
       setPlayerWager(0);
