@@ -15,6 +15,7 @@ import { WouldILiePlayerProps, QuestionShownData, AnswerRevealedData } from '../
 import { ImageDisplay } from './ImageDisplay';
 import { WouldILieAnswerGrid } from './WouldILieAnswerGrid';
 import { WouldILieStandings } from './WouldILieStandings';
+import { seededShuffle } from '../utils/wouldILieUtils';
 import './WouldILie.css';
 import './WouldILiePlayer.css';
 
@@ -150,7 +151,11 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
 
   // Showing claims
   if (roundState === 'ShowingClaims') {
-    const options = claims.map(claim => ({
+    // Randomize the order of claims (truth teller and liar) so position isn't predictable
+    // Use imageUrl as seed for consistent randomization across all players
+    const shuffledClaims = seededShuffle(claims, imageUrl || '');
+    
+    const options = shuffledClaims.map(claim => ({
       playerName: claim.playerName,
     }));
 
@@ -170,7 +175,11 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
 
   // Voting - can vote
   if (roundState === 'Voting' && canVote && !hasVoted) {
-    const options = claimers.map(name => ({
+    // Randomize the order of claimers so position isn't predictable
+    // Use imageUrl as seed for consistent randomization across all players
+    const shuffledClaimers = seededShuffle(claimers, imageUrl || '');
+    
+    const options = shuffledClaimers.map(name => ({
       playerName: name,
       label: WOULD_I_LIE_MESSAGES.VOTE_FOR_THEM,
     }));
@@ -188,7 +197,11 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
 
   // Voting - already voted or is claimer
   if (roundState === 'Voting' && (hasVoted || isClaimer)) {
-    const options = claimers.map(name => ({ playerName: name }));
+    // Randomize the order of claimers so position isn't predictable
+    // Use imageUrl as seed for consistent randomization across all players
+    const shuffledClaimers = seededShuffle(claimers, imageUrl || '');
+    
+    const options = shuffledClaimers.map(name => ({ playerName: name }));
 
     return (
       <div className="would-i-lie-player">
@@ -210,7 +223,11 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
     const isPlayerCorrect = playerVote === correctPlayer;
     const votesReceived = isClaimer ? calculateVotesReceived(votes, playerName) : 0;
 
-    const options = claimers.map(name => ({
+    // Randomize the order of claimers so position isn't predictable
+    // Use imageUrl as seed for consistent randomization across all players
+    const shuffledClaimers = seededShuffle(claimers, imageUrl || '');
+
+    const options = shuffledClaimers.map(name => ({
       playerName: name,
       isCorrect: name === correctPlayer,
       isPlayerChoice: playerVote === name,

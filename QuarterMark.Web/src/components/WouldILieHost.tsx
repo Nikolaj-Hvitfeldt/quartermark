@@ -9,7 +9,7 @@ import { ImageDisplay } from "./ImageDisplay";
 import { WouldILieAnswerGrid } from "./WouldILieAnswerGrid";
 import { WouldILieStandings } from "./WouldILieStandings";
 import { getWouldILieRules } from "../data/gameRules";
-import { WOULD_I_LIE_TITLES, WOULD_I_LIE_MESSAGES } from "../utils/wouldILieUtils";
+import { WOULD_I_LIE_TITLES, WOULD_I_LIE_MESSAGES, seededShuffle } from "../utils/wouldILieUtils";
 import { useTranslation } from "react-i18next";
 import "./WouldILie.css";
 import "./WouldILieHost.css";
@@ -196,7 +196,12 @@ function WouldILieHost({
   }
 
   // Active question screen
-  const answerOptions = claims.map(claim => ({
+  // Randomize the order of claims (truth teller and liar) so position isn't predictable
+  // Use imageUrl as seed for consistent randomization across all players
+  const seed = currentQuestion?.imageUrl || '';
+  const shuffledClaims = seededShuffle(claims, seed);
+  
+  const answerOptions = shuffledClaims.map(claim => ({
     playerName: claim.playerName,
   }));
 

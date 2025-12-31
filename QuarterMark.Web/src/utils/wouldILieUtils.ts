@@ -1,5 +1,27 @@
 // Would I Lie game constants and utilities
 
+/**
+ * Deterministically shuffle an array using a seed value
+ * This ensures all players see the same randomized order
+ */
+export function seededShuffle<T>(array: T[], seed: string): T[] {
+  const shuffled = [...array];
+  // Create a simple seeded random function
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  // Use hash as seed for shuffling
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    hash = ((hash << 5) - hash) + i;
+    hash = hash & hash;
+    const j = Math.abs(hash) % (i + 1);
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export const WOULD_I_LIE_SCORING = {
   CORRECT_VOTE: 10,
   POINTS_PER_VOTE_RECEIVED: 10,
