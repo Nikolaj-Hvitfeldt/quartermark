@@ -30,9 +30,13 @@ export function useSocialMediaGuess(connection: any) {
     const handleRoundStarted = () => {
       setRoundActive(true);
       setRoundScores({});
-      setCurrentQuestion(null);
+      // Don't clear currentQuestion if it's already set by pre-registered handler
+      // This prevents race conditions where QuestionShown arrives before component mounts
+      if (!useSocialMediaGuessStore.getState().currentQuestion) {
+        setCurrentQuestion(null);
+        setRoundState('Waiting');
+      }
       setAnswerRevealed(false);
-      setRoundState('Waiting');
       setHasGuessed(false);
     };
 

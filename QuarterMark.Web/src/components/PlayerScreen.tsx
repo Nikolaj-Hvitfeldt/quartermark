@@ -148,6 +148,55 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       store.setRoundActive(true);
     };
 
+    // Pre-register ContestantGuessQuestionShown handler to avoid race condition
+    // This ensures the question is captured even before ContestantGuessPlayer mounts
+    const handleContestantGuessQuestionShown = (data: { imageUrl: string; possibleAnswers: string[] }) => {
+      const store = useContestantGuessStore.getState();
+      store.setCurrentQuestion({
+        imageUrl: data.imageUrl,
+        possibleAnswers: data.possibleAnswers,
+      });
+      store.setGuesses({});
+      store.setAnswerRevealed(false);
+      store.setCorrectAnswer('');
+      store.setRoundState('ShowingImage');
+      store.setHasGuessed(false);
+      store.setRoundActive(true);
+    };
+
+    // Pre-register QuizQuestionShown handler to avoid race condition
+    // This ensures the question is captured even before QuizPlayer mounts
+    const handleQuizQuestionShown = (data: { questionText: string; imageUrl?: string; possibleAnswers: string[] }) => {
+      const store = useQuizStore.getState();
+      store.setCurrentQuestion({
+        questionText: data.questionText,
+        imageUrl: data.imageUrl,
+        possibleAnswers: data.possibleAnswers,
+      });
+      store.setGuesses({});
+      store.setAnswerRevealed(false);
+      store.setCorrectAnswer('');
+      store.setHasAnswered(false);
+      store.setRoundState('ShowingQuestion');
+      store.setRoundActive(true);
+    };
+
+    // Pre-register SocialMediaGuessQuestionShown handler to avoid race condition
+    // This ensures the question is captured even before SocialMediaGuessPlayer mounts
+    const handleSocialMediaGuessQuestionShown = (data: { imageUrl: string; possibleAnswers: string[] }) => {
+      const store = useSocialMediaGuessStore.getState();
+      store.setCurrentQuestion({
+        imageUrl: data.imageUrl,
+        possibleAnswers: data.possibleAnswers,
+      });
+      store.setGuesses({});
+      store.setAnswerRevealed(false);
+      store.setCorrectAnswer('');
+      store.setRoundState('ShowingImage');
+      store.setHasGuessed(false);
+      store.setRoundActive(true);
+    };
+
     const handleShowDrinkingWheel = () => {
       clearCompletedGame(); // Clear completion state first
       setCurrentGame("drinkingWheel");
@@ -161,8 +210,11 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
 
     signalRService.on('WouldILieRoundStarted', handleWouldILieRoundStarted);
     signalRService.on('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
+    signalRService.on('ContestantGuessQuestionShown', handleContestantGuessQuestionShown);
     signalRService.on('QuizRoundStarted', handleQuizRoundStarted);
+    signalRService.on('QuizQuestionShown', handleQuizQuestionShown);
     signalRService.on('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
+    signalRService.on('SocialMediaGuessQuestionShown', handleSocialMediaGuessQuestionShown);
     signalRService.on('WagerRoundStarted', handleWagerRoundStarted);
     signalRService.on('WagerQuestionShown', handleWagerQuestionShown);
     signalRService.on('ShowDrinkingWheel', handleShowDrinkingWheel);
@@ -171,8 +223,11 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
     return () => {
       signalRService.off('WouldILieRoundStarted', handleWouldILieRoundStarted);
       signalRService.off('ContestantGuessRoundStarted', handleContestantGuessRoundStarted);
+      signalRService.off('ContestantGuessQuestionShown', handleContestantGuessQuestionShown);
       signalRService.off('QuizRoundStarted', handleQuizRoundStarted);
+      signalRService.off('QuizQuestionShown', handleQuizQuestionShown);
       signalRService.off('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
+      signalRService.off('SocialMediaGuessQuestionShown', handleSocialMediaGuessQuestionShown);
       signalRService.off('WagerRoundStarted', handleWagerRoundStarted);
       signalRService.off('WagerQuestionShown', handleWagerQuestionShown);
       signalRService.off('ShowDrinkingWheel', handleShowDrinkingWheel);
