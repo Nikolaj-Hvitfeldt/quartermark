@@ -122,16 +122,7 @@ function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
     }
   };
 
-  if (roundState === 'Waiting' || !currentQuestion) {
-    return (
-      <div className="wager-player">
-        <div className="waiting-message">
-          <h2>{t('common.waitingForHost', 'Waiting for host to start the round...')}</h2>
-        </div>
-      </div>
-    );
-  }
-
+  // ALL HOOKS MUST BE BEFORE ANY EARLY RETURNS
   const playerGuess = guesses[playerName];
   // Map playerGuess to translated version for display comparison
   const translatedPlayerGuess = useMemo(() => {
@@ -147,6 +138,17 @@ function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
   const isPlayerCorrect = playerGuess === correctAnswer; // Compare original texts
   // Use playerWager from store during wagering phase, wagers[playerName] after reveal
   const playerWagerAmount = answerRevealed ? (wagers[playerName] || 0) : playerWager;
+
+  // NOW we can do early returns
+  if (roundState === 'Waiting' || !currentQuestion) {
+    return (
+      <div className="wager-player">
+        <div className="waiting-message">
+          <h2>{t('common.waitingForHost', 'Waiting for host to start the round...')}</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wager-player">
