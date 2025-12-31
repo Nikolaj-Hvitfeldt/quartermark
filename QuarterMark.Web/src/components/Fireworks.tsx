@@ -27,7 +27,7 @@ export function Fireworks({ active }: FireworksProps) {
     }
     
     const createBurst = () => {
-      const newParticles = Array.from({ length: FIREWORKS_CONFIG.PARTICLES_PER_BURST }, (_, i) => ({
+      const newParticles = Array.from({ length: FIREWORKS_CONFIG.PARTICLES_PER_BURST }, () => ({
         id: idCounterRef.current++,
         x: FIREWORKS_CONFIG.X_POSITION_MIN + Math.random() * (FIREWORKS_CONFIG.X_POSITION_MAX - FIREWORKS_CONFIG.X_POSITION_MIN),
         y: FIREWORKS_CONFIG.Y_POSITION_MIN + Math.random() * (FIREWORKS_CONFIG.Y_POSITION_MAX - FIREWORKS_CONFIG.Y_POSITION_MIN),

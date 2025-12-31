@@ -30,7 +30,7 @@ export function WagerRoundScores({
     <div className="round-scores">
       <h3>Round Winnings/Losses</h3>
       <div className="wager-results-list">
-        {sortedPlayers.map((player, index) => {
+        {sortedPlayers.map((player) => {
           const playerWager = wagers[player.name] || 0;
           const playerGuess = guesses[player.name];
           const isCorrect = playerGuess === correctAnswer;
