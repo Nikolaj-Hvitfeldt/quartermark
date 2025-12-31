@@ -18,7 +18,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     roundActive,
     currentQuestion,
     guesses,
-    roundScores,
+    roundScores: _roundScores,
     answerRevealed,
     correctAnswer: revealedCorrectAnswer,
     startRound,
@@ -173,7 +173,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
         </button>
         <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: SOCIAL_MEDIA_GUESS_QUESTIONS.length })}</h3>
         <div className="social-media-guess-question-container">
-          <ImageDisplay imageUrl={currentQuestion.imageUrl} title="Who posted this?" />
+          <ImageDisplay imageUrl={currentQuestion.imageUrl} altText="Who posted this?" />
           <AnswerGrid
             answers={currentQuestion.possibleAnswers}
             correctAnswer={revealedCorrectAnswer}
@@ -192,7 +192,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
       </button>
       <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: SOCIAL_MEDIA_GUESS_QUESTIONS.length })}</h3>
       <div className="social-media-guess-question-container">
-        <ImageDisplay imageUrl={currentQuestion.imageUrl} title="Who posted this?" />
+        <ImageDisplay imageUrl={currentQuestion.imageUrl} altText="Who posted this?" />
 
         <div className="guess-progress">
           <p>

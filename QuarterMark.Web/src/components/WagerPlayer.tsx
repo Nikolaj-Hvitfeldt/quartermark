@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWager } from '../hooks/useWager';
 import { WagerPlayerProps } from '../types';
 import { QuestionDisplay } from './QuestionDisplay';
 import { AnswerGrid } from './AnswerGrid';
 import { WagerRoundScores } from './WagerRoundScores';
-import { calculateWinnings, WAGER_CONSTANTS } from '../utils/wagerUtils';
+import { calculateWinnings } from '../utils/wagerUtils';
+import { getWagerQuestions } from '../data/wagerQuestions';
 import './Wager.css';
 import './WagerPlayer.css';
 
-function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerProps) {
+function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
   const { t } = useTranslation();
   const WAGER_QUESTIONS = getWagerQuestions(t);
+  
   const {
     roundState,
     currentQuestion,
@@ -26,13 +28,13 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
     submitWager,
     submitAnswer,
   } = useWager(connection);
-
+  
   // Translate question if questionId is available
   const translatedQuestion = useMemo(() => {
     if (!currentQuestion || !currentQuestion.questionId) {
       return currentQuestion; // Fallback to received text if no ID
     }
-    const question = WAGER_QUESTIONS.find(q => q.id === currentQuestion.questionId);
+    const question = WAGER_QUESTIONS.find((q: { id: string }) => q.id === currentQuestion.questionId);
     if (!question) {
       return currentQuestion; // Fallback if question not found
     }
@@ -120,16 +122,7 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
     }
   };
 
-  if (roundState === 'Waiting' || !currentQuestion) {
-    return (
-      <div className="wager-player">
-        <div className="waiting-message">
-          <h2>Waiting for host to start the round...</h2>
-        </div>
-      </div>
-    );
-  }
-
+  // ALL HOOKS MUST BE BEFORE ANY EARLY RETURNS
   const playerGuess = guesses[playerName];
   // Map playerGuess to translated version for display comparison
   const translatedPlayerGuess = useMemo(() => {
@@ -145,7 +138,17 @@ function WagerPlayer({ connection, playerName, players, onBack }: WagerPlayerPro
   const isPlayerCorrect = playerGuess === correctAnswer; // Compare original texts
   // Use playerWager from store during wagering phase, wagers[playerName] after reveal
   const playerWagerAmount = answerRevealed ? (wagers[playerName] || 0) : playerWager;
-  const netChange = roundScores[playerName] || 0;
+
+  // NOW we can do early returns
+  if (roundState === 'Waiting' || !currentQuestion) {
+    return (
+      <div className="wager-player">
+        <div className="waiting-message">
+          <h2>{t('common.waitingForHost', 'Waiting for host to start the round...')}</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wager-player">

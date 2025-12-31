@@ -5,10 +5,12 @@ import { getBonusMessage, calculatePointsEarned, QUIZ_SCORING } from '../utils/q
 import { QuestionDisplay } from './QuestionDisplay';
 import { AnswerGrid } from './AnswerGrid';
 import { QuizRoundScores } from './QuizRoundScores';
+import { useGameRoomStore } from '../stores/gameRoomStore';
 import './Quiz.css';
 import './QuizPlayer.css';
 
-function QuizPlayer({ connection, playerName, players, onBack }: QuizPlayerProps) {
+function QuizPlayer({ connection, playerName }: QuizPlayerProps) {
+  const { players } = useGameRoomStore();
   const {
     roundState,
     currentQuestion,

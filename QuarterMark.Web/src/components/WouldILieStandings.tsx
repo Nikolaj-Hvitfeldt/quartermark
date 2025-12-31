@@ -1,4 +1,3 @@
-import React from 'react';
 import { PlayerDto } from '../types';
 import { sortPlayersByScore } from '../utils/standingsUtils';
 import './WouldILie.css';

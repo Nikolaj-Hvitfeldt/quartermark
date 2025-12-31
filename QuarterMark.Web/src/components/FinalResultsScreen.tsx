@@ -1,4 +1,3 @@
-import React from 'react';
 import { PlayerDto } from '../types';
 import { sortPlayersByScore } from '../utils/gameUtils';
 import { FINAL_RESULTS_TEXT } from '../utils/finalResultsConstants';

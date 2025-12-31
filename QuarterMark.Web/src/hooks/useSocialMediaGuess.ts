@@ -48,7 +48,7 @@ export function useSocialMediaGuess(connection: any) {
       setHasGuessed(false);
     };
 
-    const handleGuessReceived = (data: SocialMediaGuessReceivedData) => {
+    const handleGuessReceived = (_data: SocialMediaGuessReceivedData) => {
       // This is mainly for host to track progress
       // Actual guesses will be sent in the reveal event
     };

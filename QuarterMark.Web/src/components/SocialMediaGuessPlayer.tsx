@@ -7,7 +7,7 @@ import { SocialMediaGuessRoundScores } from './SocialMediaGuessRoundScores';
 import './SocialMediaGuess.css';
 import './SocialMediaGuessPlayer.css';
 
-function SocialMediaGuessPlayer({ connection, playerName, players, onBack }: SocialMediaGuessPlayerProps) {
+function SocialMediaGuessPlayer({ connection, playerName, players }: SocialMediaGuessPlayerProps) {
   const {
     roundState,
     currentQuestion,

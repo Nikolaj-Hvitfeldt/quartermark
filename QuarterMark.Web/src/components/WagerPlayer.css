@@ -1,6 +1,4 @@
-@import './Wager.css';
-
-/* WagerPlayer specific styles - inherits from Wager.css */
+/* WagerPlayer specific styles - Wager.css imported in component */
 
 .player-score-display {
   text-align: center;
@@ -81,5 +79,79 @@
 
 .wager-reminder strong {
   font-size: 1.2rem;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .wager-input-section {
+    padding: 1.5rem;
+  }
+  
+  .wager-input-section label {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .wager-input-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .wager-input {
+    width: 100%;
+    max-width: 200px;
+    font-size: 1.3rem;
+    padding: 0.875rem 1.25rem;
+  }
+  
+  .wager-input-group .btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .player-score-display {
+    padding: 0.875rem;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+  }
+  
+  .player-score-display p {
+    font-size: 1rem;
+  }
+  
+  .player-score-display strong {
+    font-size: 1.2rem;
+  }
+  
+  .wager-input-section {
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+  }
+  
+  .wager-input-section label {
+    font-size: 1rem;
+  }
+  
+  .wager-input {
+    font-size: 1.2rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  .wager-reminder {
+    padding: 0.875rem;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+  }
+  
+  .wager-reminder p {
+    font-size: 1rem;
+  }
+  
+  .wager-reminder strong {
+    font-size: 1.1rem;
+  }
 }
 

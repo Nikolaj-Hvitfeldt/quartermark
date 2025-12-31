@@ -128,6 +128,26 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       setCurrentGame("wager");
     };
 
+    // Pre-register WagerQuestionShown handler to avoid race condition
+    // This ensures the question is captured even before WagerPlayer mounts
+    const handleWagerQuestionShown = (data: { questionId?: string; questionText: string; possibleAnswers: string[] }) => {
+      const store = useWagerStore.getState();
+      // Ensure we have a clean state, then set the question
+      // This handles the case where the question arrives before or after the round starts
+      store.setCurrentQuestion({
+        questionText: data.questionText,
+        possibleAnswers: data.possibleAnswers,
+        questionId: data.questionId,
+        originalAnswers: data.possibleAnswers,
+      });
+      store.setRoundState('Wagering');
+      store.setHasWagered(false);
+      store.setHasAnswered(false);
+      store.setPlayerWager(0);
+      // Ensure roundActive is set (though players don't use it, setting it for consistency)
+      store.setRoundActive(true);
+    };
+
     const handleShowDrinkingWheel = () => {
       clearCompletedGame(); // Clear completion state first
       setCurrentGame("drinkingWheel");
@@ -144,6 +164,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
     signalRService.on('QuizRoundStarted', handleQuizRoundStarted);
     signalRService.on('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
     signalRService.on('WagerRoundStarted', handleWagerRoundStarted);
+    signalRService.on('WagerQuestionShown', handleWagerQuestionShown);
     signalRService.on('ShowDrinkingWheel', handleShowDrinkingWheel);
     signalRService.on('ReturnToLobby', handleReturnToLobby);
 
@@ -153,6 +174,7 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       signalRService.off('QuizRoundStarted', handleQuizRoundStarted);
       signalRService.off('SocialMediaGuessRoundStarted', handleSocialMediaGuessRoundStarted);
       signalRService.off('WagerRoundStarted', handleWagerRoundStarted);
+      signalRService.off('WagerQuestionShown', handleWagerQuestionShown);
       signalRService.off('ShowDrinkingWheel', handleShowDrinkingWheel);
       signalRService.off('ReturnToLobby', handleReturnToLobby);
     };
@@ -241,7 +263,6 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
         <QuizPlayer
           connection={connection}
           playerName={playerName}
-          players={players}
           onBack={() => setCurrentGame(null)}
         />
       ) : currentGame === "socialMediaGuess" ? (

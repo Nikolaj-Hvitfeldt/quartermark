@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PlayerDto } from '../types';
 import { WOULD_I_LIE_IMAGES, WouldILieRoundConfig } from '../data/wouldILieImages';
 import './WouldILieConfig.css';

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameRoom } from './hooks/useGameRoom'
-import { usePlayerStore } from './stores/playerStore'
 import HostScreen from './components/HostScreen'
 import PlayerScreen from './components/PlayerScreen'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -11,7 +10,6 @@ function App() {
   const { t } = useTranslation()
   const [screen, setScreen] = useState<'home' | 'host' | 'player'>('home')
   const { leaveRoom, roomCode, isHost } = useGameRoom()
-  const { playerName } = usePlayerStore()
 
   // Restore screen from localStorage on mount
   useEffect(() => {

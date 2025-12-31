@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import './Fireworks.css';
 import { FIREWORK_COLORS, FIREWORK_SIZES, FIREWORKS_CONFIG, FireworkSize } from '../utils/finalResultsConstants';
 
@@ -17,16 +17,18 @@ interface FireworksProps {
 
 export function Fireworks({ active }: FireworksProps) {
   const [particles, setParticles] = useState<FireworkParticle[]>([]);
+  const idCounterRef = useRef(0);
 
   useEffect(() => {
     if (!active) {
       setParticles([]);
+      idCounterRef.current = 0; // Reset counter when inactive
       return;
     }
     
     const createBurst = () => {
-      const newParticles = Array.from({ length: FIREWORKS_CONFIG.PARTICLES_PER_BURST }, (_, i) => ({
-        id: Date.now() + i,
+      const newParticles = Array.from({ length: FIREWORKS_CONFIG.PARTICLES_PER_BURST }, () => ({
+        id: idCounterRef.current++,
         x: FIREWORKS_CONFIG.X_POSITION_MIN + Math.random() * (FIREWORKS_CONFIG.X_POSITION_MAX - FIREWORKS_CONFIG.X_POSITION_MIN),
         y: FIREWORKS_CONFIG.Y_POSITION_MIN + Math.random() * (FIREWORKS_CONFIG.Y_POSITION_MAX - FIREWORKS_CONFIG.Y_POSITION_MIN),
         delay: Math.random() * FIREWORKS_CONFIG.INITIAL_DELAY_MAX,

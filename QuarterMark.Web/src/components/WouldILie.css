@@ -272,6 +272,32 @@
 }
 
 /* Responsive adjustments */
+@media (max-width: 768px) {
+  .wil-game-container {
+    gap: 1.25rem;
+  }
+  
+  .wil-game-title {
+    font-size: 1.75rem;
+  }
+  
+  .wil-standings {
+    padding: 1.25rem;
+  }
+  
+  .wil-standings h3 {
+    font-size: 1.125rem;
+  }
+  
+  .wil-voting-progress {
+    margin-top: 0.75rem;
+  }
+  
+  .wil-vote-count {
+    font-size: 1.125rem;
+  }
+}
+
 @media (max-width: 600px) {
   .wil-game-title {
     font-size: 1.5rem;
@@ -279,20 +305,87 @@
 
   .wil-answer-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
   .wil-answer-option {
-    min-height: 80px;
+    min-height: 70px;
     padding: 1rem;
   }
 
   .wil-player-name {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
   }
 
   .wil-standing-item {
     padding: 0.75rem 1rem;
+  }
+  
+  .wil-waiting-message {
+    min-height: 40vh;
+    gap: 1.5rem;
+  }
+  
+  .wil-waiting-message h2 {
+    font-size: 1.25rem;
+  }
+  
+  .wil-result-box {
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .wil-answer-submitted {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .wil-game-container {
+    gap: 1rem;
+  }
+  
+  .wil-game-title {
+    font-size: 1.25rem;
+  }
+  
+  .wil-answer-option {
+    min-height: 60px;
+    padding: 0.875rem;
+    border-radius: 10px;
+  }
+  
+  .wil-player-name {
+    font-size: 1rem;
+  }
+  
+  .wil-option-label {
+    font-size: 0.8rem;
+  }
+  
+  .wil-correct-badge,
+  .wil-player-badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.75rem;
+  }
+  
+  .wil-standings {
+    padding: 1rem;
+    border-radius: 10px;
+  }
+  
+  .wil-standing-item {
+    padding: 0.625rem 0.875rem;
+    border-radius: 6px;
+  }
+  
+  .wil-standing-rank,
+  .wil-standing-name,
+  .wil-standing-score {
+    font-size: 0.9rem;
+  }
+  
+  .wil-round-complete-message {
+    font-size: 1.25rem;
   }
 }
 

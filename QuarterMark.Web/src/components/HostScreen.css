@@ -1,12 +1,16 @@
 /* ===== HOST SCREEN - NEW YEAR'S EVE LOBBY THEME ===== */
 .host-screen {
   min-height: 100vh;
-  padding: 2rem;
+  min-height: 100dvh;
+  padding: 1.5rem;
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #0c1445 0%, #1a1a2e 40%, #16213e 70%, #0f0f23 100%);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Starfield background */
@@ -87,13 +91,14 @@
 
 .host-setup h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 3rem;
+  font-size: clamp(1.75rem, 8vw, 3rem);
   margin-bottom: 1rem;
   background: linear-gradient(135deg, #ffd700 0%, #ffec8b 50%, #daa520 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+  text-align: center;
 }
 
 .input {
@@ -132,9 +137,9 @@
 
 .room-code-display {
   text-align: center;
-  padding: 2.5rem;
+  padding: clamp(1.5rem, 5vw, 2.5rem);
   background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%);
-  border-radius: 20px;
+  border-radius: 16px;
   border: 2px solid rgba(255, 215, 0, 0.3);
   box-shadow: 
     0 10px 40px rgba(0, 0, 0, 0.3),
@@ -168,18 +173,19 @@
 }
 
 .room-code {
-  font-size: 5rem;
+  font-size: clamp(2.5rem, 12vw, 5rem);
   font-weight: bold;
-  letter-spacing: 1.5rem;
+  letter-spacing: clamp(0.5rem, 3vw, 1.5rem);
   background: linear-gradient(135deg, #ffd700 0%, #ffec8b 30%, #daa520 60%, #ffd700 100%);
   background-size: 200% auto;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin: 1rem 0;
+  margin: 0.75rem 0;
   font-family: 'Courier New', monospace;
   animation: codeShimmer 2s linear infinite;
   text-shadow: 0 0 60px rgba(255, 215, 0, 0.5);
+  word-break: break-all;
 }
 
 @keyframes codeShimmer {
@@ -217,8 +223,8 @@
 
 .players-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+  gap: 0.75rem;
 }
 
 .player-card {
@@ -443,5 +449,119 @@
 .btn-small:hover {
   background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
   transform: scale(1.05);
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .host-screen {
+    padding: 1rem;
+  }
+  
+  .btn-back {
+    padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .host-setup {
+    gap: 1.5rem;
+    padding: 0 0.5rem;
+  }
+  
+  .host-game {
+    gap: 1.5rem;
+  }
+  
+  .room-code-display h3 {
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+  }
+  
+  .room-code-hint {
+    font-size: 0.875rem;
+  }
+  
+  .players-section {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+  
+  .players-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .player-card {
+    padding: 1rem;
+  }
+  
+  .player-name {
+    font-size: 1rem;
+  }
+  
+  .host-badge {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.7rem;
+  }
+  
+  .game-actions {
+    margin-top: 1.5rem;
+  }
+  
+  .session-status {
+    padding: 1.5rem;
+  }
+  
+  .session-game-number {
+    font-size: 1.25rem;
+  }
+  
+  .pre-game-actions {
+    max-width: 100%;
+  }
+  
+  .dummy-players-section {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .dummy-player-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .host-screen {
+    padding: 0.75rem;
+  }
+  
+  .host-setup h2 {
+    font-size: 1.5rem;
+  }
+  
+  .input {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+  }
+  
+  .room-code-display {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+  
+  .players-section {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  
+  .players-section h3 {
+    font-size: 1.25rem;
+  }
+  
+  .player-card {
+    padding: 0.875rem;
+    border-radius: 10px;
+  }
 }
 

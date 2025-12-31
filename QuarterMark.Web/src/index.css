@@ -8,6 +8,12 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Prevent text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -15,9 +21,29 @@ body {
   background: var(--bg-dark-3);
   color: #ffffff;
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  /* Prevent pull-to-refresh and overscroll */
+  overscroll-behavior: none;
+  /* Safe area insets for notched phones */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Improve touch targets on mobile */
+button, 
+input, 
+select, 
+textarea {
+  font-size: 16px; /* Prevent iOS zoom on input focus */
+}
+
+/* Better scrolling on mobile */
+.scrollable {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
 }
 

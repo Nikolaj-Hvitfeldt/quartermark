@@ -1,16 +1,21 @@
 /* Shared styles for Wager components */
 .wager-host,
 .wager-player {
-  padding: 2rem;
+  padding: clamp(1rem, 4vw, 2rem);
   max-width: 1200px;
   margin: 0 auto;
   color: var(--text-light);
+  position: relative;
+  z-index: 10 !important;
+  min-height: 0;
+  width: 100%;
+  background: transparent;
 }
 
 .wager-question-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: clamp(1rem, 3vw, 2rem);
 }
 
 .wager-progress,
@@ -246,5 +251,124 @@
   font-size: 1rem;
   color: var(--text-light-alpha-medium);
   margin-top: 0.5rem;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .wager-host,
+  .wager-player {
+    padding: 1rem;
+  }
+  
+  .wager-question-container {
+    gap: 1.25rem;
+  }
+  
+  .question-progress-header {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .blind-wager-header {
+    padding: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .blind-wager-header h2 {
+    font-size: 2rem;
+  }
+  
+  .blind-wager-subtitle {
+    font-size: 1rem;
+  }
+  
+  .blind-wager-host-header {
+    padding: 2rem 1.5rem;
+  }
+  
+  .blind-wager-host-header h3 {
+    font-size: 1.75rem;
+  }
+  
+  .blind-wager-host-header p {
+    font-size: 1.1rem;
+  }
+  
+  .wager-progress,
+  .answer-progress {
+    font-size: 1rem;
+  }
+  
+  .round-scores {
+    padding: 1.25rem;
+  }
+  
+  .wager-result-item {
+    padding: 0.875rem 1rem;
+  }
+  
+  .wager-result-item .net-change {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .wager-host,
+  .wager-player {
+    padding: 0.75rem;
+  }
+  
+  .question-progress-header {
+    font-size: 1.1rem;
+  }
+  
+  .blind-wager-header {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+  
+  .blind-wager-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .blind-wager-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .blind-wager-host-header {
+    padding: 1.5rem 1.25rem;
+    border-radius: 12px;
+  }
+  
+  .blind-wager-host-header h3 {
+    font-size: 1.4rem;
+  }
+  
+  .blind-wager-host-header p {
+    font-size: 1rem;
+  }
+  
+  .wager-result-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+  
+  .wager-result-item .player-name {
+    font-size: 0.9rem;
+  }
+  
+  .wager-result-item .wager-amount {
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+  }
+  
+  .waiting-for-wagers {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .waiting-for-wagers p {
+    font-size: 1.1rem;
+  }
 }
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import './AnswerGrid.css';
 
 interface AnswerGridProps {

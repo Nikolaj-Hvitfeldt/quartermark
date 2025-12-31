@@ -19,7 +19,7 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
     roundActive,
     currentQuestion,
     guesses,
-    roundScores,
+    roundScores: _roundScores,
     answerRevealed,
     correctAnswer: revealedCorrectAnswer,
     startRound,
