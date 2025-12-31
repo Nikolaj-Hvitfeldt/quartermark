@@ -73,7 +73,6 @@ export interface ContestantGuessPlayerProps {
   connection: any; // HubConnection from SignalR
   playerName: string;
   players: PlayerDto[];
-  onBack: () => void;
 }
 
 export interface ContestantGuessQuestionShownData {

@@ -19,7 +19,6 @@ interface ContestantGuessState {
   imageUrl: string;
   possibleAnswers: string[];
   hasGuessed: boolean;
-  isRevealed: boolean;
 
   // Host setters
   setRoundActive: (active: boolean) => void;
@@ -34,7 +33,6 @@ interface ContestantGuessState {
   setImageUrl: (url: string) => void;
   setPossibleAnswers: (answers: string[]) => void;
   setHasGuessed: (hasGuessed: boolean) => void;
-  setIsRevealed: (revealed: boolean) => void;
   
   reset: () => void;
 }
@@ -53,7 +51,6 @@ export const useContestantGuessStore = create<ContestantGuessState>((set) => ({
   imageUrl: '',
   possibleAnswers: [],
   hasGuessed: false,
-  isRevealed: false,
 
   // Host setters
   setRoundActive: (roundActive) => set({ roundActive }),
@@ -68,7 +65,6 @@ export const useContestantGuessStore = create<ContestantGuessState>((set) => ({
   setImageUrl: (imageUrl) => set({ imageUrl }),
   setPossibleAnswers: (possibleAnswers) => set({ possibleAnswers }),
   setHasGuessed: (hasGuessed) => set({ hasGuessed }),
-  setIsRevealed: (isRevealed) => set({ isRevealed }),
   
   reset: () => set({
     roundActive: false,
@@ -81,7 +77,6 @@ export const useContestantGuessStore = create<ContestantGuessState>((set) => ({
     imageUrl: '',
     possibleAnswers: [],
     hasGuessed: false,
-    isRevealed: false,
   }),
 }));
 

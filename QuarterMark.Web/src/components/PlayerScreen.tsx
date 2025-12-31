@@ -257,7 +257,6 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
           connection={connection}
           playerName={playerName}
           players={players}
-          onBack={() => setCurrentGame(null)}
         />
       ) : currentGame === "quiz" ? (
         <QuizPlayer
