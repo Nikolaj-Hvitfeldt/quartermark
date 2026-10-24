@@ -27,14 +27,12 @@ public class RoomLockHubFilter : IHubFilter
         HubInvocationContext invocationContext,
         Func<HubInvocationContext, ValueTask<object?>> next)
     {
-        var roomCode = await _roomService.GetRoomCodeAsync(invocationContext.Context.ConnectionId);
-
-        // JoinRoom is called before the connection is mapped to a room
-        if (roomCode == null && invocationContext.HubMethodName == nameof(GameHub.JoinRoom)
-            && invocationContext.HubMethodArguments.Count > 0)
-        {
-            roomCode = invocationContext.HubMethodArguments[0] as string;
-        }
+        // JoinRoom changes the room it names (the connection may not be mapped yet, or be
+        // mapped to another room), so lock that one; everything else locks the caller's room
+        var roomCode = invocationContext.HubMethodName == nameof(GameHub.JoinRoom)
+            && invocationContext.HubMethodArguments.Count > 0
+                ? invocationContext.HubMethodArguments[0] as string
+                : await _roomService.GetRoomCodeAsync(invocationContext.Context.ConnectionId);
 
         var gate = GetLock(roomCode);
         await gate.WaitAsync();

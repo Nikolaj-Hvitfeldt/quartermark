@@ -132,7 +132,13 @@ export function useGameRoom() {
     const { roomCode: code, playerName: name } = useGameRoomStore.getState();
     if (!code || !name) return null;
     ensureRoomListeners();
-    return await signalRService.invoke('JoinRoom', code, name, playerId);
+    const result: JoinRoomResult = await signalRService.invoke('JoinRoom', code, name, playerId);
+    if (result && !result.success) {
+      // Room gone (server restarted) or seat taken: back to the join/create form, which
+      // shows the error the server sent, instead of staying on a dead game screen
+      useGameRoomStore.getState().setIsConnected(false);
+    }
+    return result;
   }, []);
 
   const connect = useCallback(async () => {

@@ -13,7 +13,13 @@ public class GameRoomService : IGameRoomService
 
     public Task<string> CreateRoomAsync(string hostConnectionId, string hostName, string playerId)
     {
-        var roomCode = GenerateRoomCode();
+        // Rooms now outlive a dropped host, so make sure a new code never replaces a live room
+        string roomCode;
+        do
+        {
+            roomCode = GenerateRoomCode();
+        } while (_rooms.ContainsKey(roomCode));
+
         var room = new GameRoom
         {
             RoomCode = roomCode,
@@ -42,12 +48,15 @@ public class GameRoomService : IGameRoomService
             return Task.FromResult(new JoinRoomResult { Status = JoinRoomStatus.RoomNotFound });
 
         // A returning device (screen lock, tab switch, reload) takes its old seat back so score
-        // and answers keyed by name are kept. Match on the device's player id; fall back to the
-        // name when that seat is offline, e.g. if the browser lost its stored id.
+        // and answers keyed by name are kept. Match on the device's player id plus name (tabs in
+        // one browser share the id, so a second tab under another name must not take the seat).
+        // Fall back to the name alone when that seat is offline, e.g. if the browser lost its
+        // stored id, but never for the host: anyone can read the host's name off the TV.
         var existing =
-            (string.IsNullOrEmpty(playerId) ? null : room.Players.FirstOrDefault(p => p.PlayerId == playerId))
+            (string.IsNullOrEmpty(playerId) ? null : room.Players.FirstOrDefault(p =>
+                p.PlayerId == playerId && p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase)))
             ?? room.Players.FirstOrDefault(p =>
-                !p.IsConnected && !p.IsDummy && p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
+                !p.IsHost && !p.IsConnected && !p.IsDummy && p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
 
         if (existing != null)
         {

@@ -209,7 +209,8 @@ public class GameHub : Hub
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
         if (roomCode == null) return;
 
-        await _wouldILieService.SubmitVoteAsync(roomCode, Context.ConnectionId, claimedPlayerName);
+        var accepted = await _wouldILieService.SubmitVoteAsync(roomCode, Context.ConnectionId, claimedPlayerName);
+        if (!accepted) return;
         
         var question = GetCurrentQuestion(roomCode);
         if (question == null) return;
@@ -278,6 +279,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _wouldILieService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _wouldILieService.EndRoundAsync(roomCode);
         
@@ -384,6 +388,9 @@ public class GameHub : Hub
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
 
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _contestantGuessService.IsRoundActiveAsync(roomCode)) return;
+
         var roundScores = await _contestantGuessService.EndRoundAsync(roomCode);
         
         var players = await _roomService.GetPlayersAsync(roomCode);
@@ -486,6 +493,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _quizService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _quizService.EndRoundAsync(roomCode);
         
@@ -591,6 +601,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _socialMediaGuessService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _socialMediaGuessService.EndRoundAsync(roomCode);
         
@@ -909,6 +922,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _wagerService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _wagerService.EndRoundAsync(roomCode);
         
