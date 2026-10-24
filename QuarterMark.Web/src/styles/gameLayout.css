@@ -152,3 +152,19 @@
   }
 }
 
+
+/* In-game back button on the host (TV): pinned to the top-left corner, mirroring the
+   language switcher on the right, instead of sitting in the centred game column right
+   above the picture. */
+.contestant-guess-host > .btn-back,
+.social-media-guess-host > .btn-back,
+.quiz-host > .btn-back,
+.wager-host > .btn-back {
+  position: fixed;
+  top: max(0.75rem, env(safe-area-inset-top));
+  left: max(0.75rem, env(safe-area-inset-left));
+  z-index: 1000;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
