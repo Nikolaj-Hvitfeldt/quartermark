@@ -141,7 +141,7 @@ export const DATASETS: GameDataset[] = [
     contestantGuessQuestions: CONTESTANT_GUESS_QUESTIONS,
     socialMediaGuessQuestions: SOCIAL_MEDIA_GUESS_QUESTIONS,
   },
-  folderDataset('pigerne', 'Pigerne', ['Frederikke', 'Emily', 'Nolle', 'Sofie'], {
+  folderDataset('pigerne', 'Girlies', ['Frederikke', 'Emily', 'Nolle', 'Sofie'], {
     wouldILie: import.meta.glob('../datasets/pigerne/would-i-lie/*.{jpg,jpeg,png,webp,gif,JPG,JPEG,PNG}', { eager: true, query: '?url', import: 'default' }) as ImageGlob,
     aiMorph: import.meta.glob('../datasets/pigerne/ai-morph/*.{jpg,jpeg,png,webp,gif,JPG,JPEG,PNG}', { eager: true, query: '?url', import: 'default' }) as ImageGlob,
     socialMedia: import.meta.glob('../datasets/pigerne/social-media/*.{jpg,jpeg,png,webp,gif,JPG,JPEG,PNG}', { eager: true, query: '?url', import: 'default' }) as ImageGlob,

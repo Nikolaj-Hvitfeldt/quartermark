@@ -42,7 +42,3 @@ Thumbs.db
 # Logs
 logs/
 *.log
-
-# Dataset photos of real people stay on this machine (the repo is public)
-QuarterMark.Web/src/datasets/*/*/*
-!QuarterMark.Web/src/datasets/*/*/.gitkeep

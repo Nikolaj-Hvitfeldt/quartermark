@@ -1,4 +1,4 @@
-# Datasæt: Pigerne
+# Datasæt: Girlies (mappe: pigerne)
 
 Personer: **Frederikke, Emily, Nolle, Sofie** (rettes i `src/data/datasets.ts`).
 
