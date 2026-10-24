@@ -9,28 +9,86 @@ interface PieChartWheelProps {
   isSpinning: boolean;
 }
 
+// The bottle image points straight up (-90° in screen angles, where 0° is 3 o'clock and angles
+// grow clockwise). Rotating the image by `angle - BOTTLE_IMAGE_ANGLE` makes its neck point at `angle`.
+const BOTTLE_IMAGE_ANGLE = -90;
+
+// Spin speed while waiting for the server's pick, in degrees per ms (1.5 turns per second)
+const SPIN_SPEED = 0.54;
+
 export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartWheelProps) {
   const spinnerRef = useRef<HTMLDivElement>(null);
-  const [spinnerRotation, setSpinnerRotation] = useState(-90); // Start pointing up
-  const [, setIsAnimating] = useState(false);
+  // Screen angle the bottle neck points at. Start pointing up.
+  const [spinnerRotation, setSpinnerRotation] = useState(-90);
   const animationFrameRef = useRef<number | null>(null);
-  const hasStartedSpinningRef = useRef(false);
-  const hasResultBeenShownRef = useRef(false); // Track if we've shown a result to prevent restarting
-  const hasStartedFinalAnimationRef = useRef(false); // Track if we've started the final animation
-  const currentRotationRef = useRef(-90); // Track current rotation in a ref to avoid dependency issues
+  const currentRotationRef = useRef(-90); // Read by animations without re-running effects
+
+  // The parent passes a freshly filtered array on every render. Effects must not depend on
+  // its identity, or a re-render mid-animation cancels the landing and the bottle stops
+  // wherever it happens to be, often between two players.
+  const playersRef = useRef(players);
+  playersRef.current = players;
 
   const playerCount = players.length;
   const sliceAngle = 360 / playerCount;
 
-  // Cleanup any pending animation on unmount only
-  useEffect(() => {
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+  const cancelAnimation = () => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+  };
+
+  const setRotation = (rotation: number) => {
+    setSpinnerRotation(rotation);
+    currentRotationRef.current = rotation;
+  };
+
+  // Degrees per ms the bottle is turning right now, so the landing can pick up at the same speed
+  const velocityRef = useRef(0);
+
+  // Constant-speed spin until the server's pick arrives (it takes ~2s)
+  const spinFreely = () => {
+    cancelAnimation();
+    const startRotation = currentRotationRef.current;
+    const startTime = Date.now();
+    velocityRef.current = SPIN_SPEED;
+
+    const animate = () => {
+      setRotation(startRotation + (Date.now() - startTime) * SPIN_SPEED);
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+  };
+
+  // One continuous slow-down onto `distance` degrees further. A cubic ease-out starts at
+  // 3 * distance / duration, so choosing duration = 3 * distance / speed makes it start at
+  // exactly the current speed: no jerk when the result comes in, no extra push at the end.
+  const decelerateBy = (distance: number) => {
+    cancelAnimation();
+    const startRotation = currentRotationRef.current;
+    const speed = velocityRef.current;
+    const duration = speed > 0 ? (3 * distance) / speed : 1500;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const progress = Math.min((Date.now() - startTime) / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setRotation(startRotation + distance * easeOut);
+      if (progress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
         animationFrameRef.current = null;
+        velocityRef.current = 0;
       }
     };
-  }, []);
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+  };
+
+  // Cleanup any pending animation on unmount only
+  useEffect(() => cancelAnimation, []);
 
   const colors = [
     '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
@@ -38,140 +96,23 @@ export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartW
     '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6'
   ];
 
-  // Reset spinning state when isSpinning becomes false, but only if we don't have a selected player
-  // This prevents the spinner from restarting after a result is shown
+  // Spin while the server picks a player (also on "spin again")
   useEffect(() => {
-    if (!isSpinning && !selectedPlayer && !hasResultBeenShownRef.current) {
-      hasStartedSpinningRef.current = false;
-      hasStartedFinalAnimationRef.current = false; // Reset final animation flag too
-      setIsAnimating(false);
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-    }
-  }, [isSpinning, selectedPlayer]);
+    if (isSpinning) spinFreely();
+  }, [isSpinning]);
 
-  // Update ref when rotation changes
+  // Result received: slow down clockwise into the middle of the selected player's slice
   useEffect(() => {
-    currentRotationRef.current = spinnerRotation;
-  }, [spinnerRotation]);
+    if (!selectedPlayer || isSpinning) return;
+    const playerIndex = playersRef.current.findIndex(p => p.name === selectedPlayer);
+    if (playerIndex === -1) return;
 
-  // Start spinning animation
-  useEffect(() => {
-    if (isSpinning && !selectedPlayer && !hasStartedSpinningRef.current && !hasResultBeenShownRef.current) {
-      hasStartedSpinningRef.current = true;
-      setIsAnimating(true);
-      // Start spinning with at least 1 full rotation plus some extra
-      const minRotation = 360;
-      const extraRotation = Math.random() * 360;
-      // Use the ref to get the current rotation at the start of the animation
-      const startRotation = currentRotationRef.current;
-      const targetRotation = startRotation + minRotation + extraRotation;
-      
-      // Continuously update rotation during animation
-      const startTime = Date.now();
-      const duration = 3000; // 3 seconds
-      
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        // Use easing function for smooth animation
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const currentRotation = startRotation + (targetRotation - startRotation) * easeOut;
-        setSpinnerRotation(currentRotation);
-        currentRotationRef.current = currentRotation; // Update ref
-        
-        if (progress < 1) {
-          animationFrameRef.current = requestAnimationFrame(animate);
-        } else {
-          // Initial animation complete - wait for result
-          setIsAnimating(false);
-          animationFrameRef.current = null;
-        }
-      };
-      
-      animationFrameRef.current = requestAnimationFrame(animate);
-      
-      return () => {
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-          animationFrameRef.current = null;
-        }
-      };
-    }
-  }, [isSpinning, selectedPlayer]); // Removed spinnerRotation from dependencies
-
-  // Calculate the target rotation when result is received - smoothly transition to final position WITHOUT additional full rotation
-  useEffect(() => {
-    if (selectedPlayer && !isSpinning && !hasStartedFinalAnimationRef.current) {
-      hasResultBeenShownRef.current = true; // Mark that we've shown a result
-      hasStartedFinalAnimationRef.current = true; // Mark that we've started the final animation
-      const playerIndex = players.findIndex(p => p.name === selectedPlayer);
-      if (playerIndex !== -1) {
-        // Cancel any ongoing animation first
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-          animationFrameRef.current = null;
-        }
-        
-        setIsAnimating(true);
-        
-        // Use the ref to get the current rotation at the start
-        const currentRotation = currentRotationRef.current;
-        
-        // Calculate the center angle of the selected player's slice
-        // Slices are drawn starting from -90 degrees (top)
-        // Slice center in SVG coordinates: -90 + playerIndex * sliceAngle + sliceAngle / 2
-        const sliceCenterAngle = -90 + playerIndex * sliceAngle + sliceAngle / 2;
-        
-        // Get current rotation normalized to 0-360
-        const currentNormalized = ((currentRotation % 360) + 360) % 360;
-        
-        // Calculate how much we need to rotate from current position to point at the slice
-        let targetNormalized = ((sliceCenterAngle % 360) + 360) % 360;
-        
-        // Calculate shortest rotation path
-        let rotationNeeded = targetNormalized - currentNormalized;
-        if (rotationNeeded > 180) rotationNeeded -= 360;
-        if (rotationNeeded < -180) rotationNeeded += 360;
-        
-        // Smoothly transition from current position to target (no extra full rotation)
-        const startRotation = currentRotation;
-        const finalRotation = startRotation + rotationNeeded;
-        
-        // Animate to final position with continuous updates
-        const startTime = Date.now();
-        const duration = 1500; // Shorter duration for final positioning
-        
-        const animate = () => {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          // Use cubic-bezier easing
-          const easeOut = 1 - Math.pow(1 - progress, 3);
-          const newRotation = startRotation + (finalRotation - startRotation) * easeOut;
-          setSpinnerRotation(newRotation);
-          currentRotationRef.current = newRotation; // Update ref
-          
-          if (progress < 1) {
-            animationFrameRef.current = requestAnimationFrame(animate);
-          } else {
-            setIsAnimating(false);
-            animationFrameRef.current = null;
-          }
-        };
-        
-        animationFrameRef.current = requestAnimationFrame(animate);
-        
-        return () => {
-          if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-            animationFrameRef.current = null;
-          }
-        };
-      }
-    }
-  }, [selectedPlayer, isSpinning, players, sliceAngle]); // Removed spinnerRotation from dependencies - use ref instead
+    // Slices are drawn clockwise starting at the top (-90°)
+    const sliceCenterAngle = -90 + playerIndex * sliceAngle + sliceAngle / 2;
+    const forward = (((sliceCenterAngle - currentRotationRef.current) % 360) + 360) % 360;
+    // While spinning, add one more lap so the slow-down is long enough to look natural
+    decelerateBy(velocityRef.current > 0 ? forward + 360 : forward);
+  }, [selectedPlayer, isSpinning, sliceAngle]);
 
   const renderSlice = (index: number, player: PlayerDto) => {
     // Slices are drawn starting from top (-90 degrees), going clockwise
@@ -244,7 +185,7 @@ export function PieChartWheel({ players, selectedPlayer, isSpinning }: PieChartW
         ref={spinnerRef}
         className="bottle-center"
         style={{
-          transform: `translate(-50%, -50%) rotate(${spinnerRotation}deg)`,
+          transform: `translate(-50%, -50%) rotate(${spinnerRotation - BOTTLE_IMAGE_ANGLE}deg)`,
           transition: 'none' // Animation is handled by requestAnimationFrame, not CSS
         }}
       >

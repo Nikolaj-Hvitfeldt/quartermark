@@ -133,6 +133,10 @@ public class WouldILieService : IWouldILieService
         if (room == null || room.CurrentQuestion == null || room.WouldILieRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
+        // Revealing twice (double click, retry after reconnect) must not award points again
+        if (room.CurrentQuestion.IsRevealed)
+            return Task.FromResult(room.WouldILieRound.RoundScores);
+
         room.CurrentQuestion.State = QuestionState.Revealed;
         room.CurrentQuestion.IsRevealed = true;
 
@@ -187,15 +191,15 @@ public class WouldILieService : IWouldILieService
         }
 
         // Update overall player scores immediately so standings are current
-        // RoundScores is cumulative for the current round, so we set Player.Score to match
+        // RoundScores is cumulative for the current round, so Player.Score is the
+        // session total from earlier games plus this round's total so far
         foreach (var roundScore in room.WouldILieRound.RoundScores)
         {
             var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
             if (player != null)
             {
-                // Set player's score to their current round total
-                // (RoundScores accumulates points as questions are answered)
-                player.Score = roundScore.Value;
+                var previousGamesScore = room.GameSession?.AccumulatedScores.GetValueOrDefault(roundScore.Key) ?? 0;
+                player.Score = previousGamesScore + roundScore.Value;
             }
         }
 
@@ -208,15 +212,8 @@ public class WouldILieService : IWouldILieService
         if (room == null || room.WouldILieRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
-        // Update player scores from round scores
-        foreach (var roundScore in room.WouldILieRound.RoundScores)
-        {
-            var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
-            if (player != null)
-            {
-                player.Score += roundScore.Value;
-            }
-        }
+        // Player scores already include this round's points (applied in RevealAnswerAsync),
+        // so adding RoundScores again here would count them twice
 
         // Host gets points equal to lowest scoring player
         var lowestScore = room.WouldILieRound.RoundScores.Values.DefaultIfEmpty(0).Min();

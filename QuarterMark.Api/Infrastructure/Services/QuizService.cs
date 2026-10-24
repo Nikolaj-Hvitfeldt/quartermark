@@ -82,6 +82,10 @@ public class QuizService : IQuizService
         if (room == null || room.CurrentQuizQuestion == null || room.QuizRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
+        // Revealing twice (double click, retry after reconnect) must not award points again
+        if (room.CurrentQuizQuestion.IsRevealed)
+            return Task.FromResult(room.QuizRound.RoundScores);
+
         room.CurrentQuizQuestion.IsRevealed = true;
 
         var correctAnswer = room.CurrentQuizQuestion.CorrectAnswer;
@@ -115,6 +119,8 @@ public class QuizService : IQuizService
             }
         }
 
+        // Standings between questions (and the Wager limit) show the points won so far
+        room.ApplyRoundScores(room.QuizRound.RoundScores);
         return Task.FromResult(room.QuizRound.RoundScores);
     }
 
@@ -130,14 +136,7 @@ public class QuizService : IQuizService
         if (host != null)
         {
             host.Score += lowestScore;
-            foreach (var roundScore in room.QuizRound.RoundScores)
-            {
-                var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
-                if (player != null)
-                {
-                    player.Score += roundScore.Value;
-                }
-            }
+            // Player scores already include this round (applied on each reveal)
         }
 
         room.QuizRound.IsActive = false;

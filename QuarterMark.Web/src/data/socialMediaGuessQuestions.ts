@@ -1,6 +1,7 @@
 export interface SocialMediaGuessQuestion {
   id: string;
   imageUrl: string;
+  revealImageUrl?: string; // Optional uncensored version, shown once the answer is revealed
   answers: [string, string, string, string]; // Exactly 4 answers
   correctAnswer: string; // Must match one of the answers
 }

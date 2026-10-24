@@ -4,11 +4,23 @@ import { useGameRoom } from './hooks/useGameRoom'
 import HostScreen from './components/HostScreen'
 import PlayerScreen from './components/PlayerScreen'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import DevHarness from './dev/DevHarness'
+import { isDevHarness, devHostName, devRoomCode } from './dev/devMode'
 import './App.css'
 
 function App() {
+  // Dev-only: /?dev renders host + players side by side in one window
+  if (isDevHarness) {
+    return <DevHarness />
+  }
+  return <GameApp />
+}
+
+function GameApp() {
   const { t } = useTranslation()
-  const [screen, setScreen] = useState<'home' | 'host' | 'player'>('home')
+  const [screen, setScreen] = useState<'home' | 'host' | 'player'>(
+    devHostName ? 'host' : devRoomCode ? 'player' : 'home'
+  )
   const { leaveRoom, roomCode, isHost } = useGameRoom()
 
   // Restore screen from localStorage on mount

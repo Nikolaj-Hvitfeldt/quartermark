@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Leaderboard } from './Leaderboard';
 import { PlayerDto } from '../types';
 import { sortPlayersByScore } from '../utils/gameUtils';
@@ -14,6 +15,7 @@ export function ContestantGuessRoundScores({
   players,
   highlightPlayerName,
 }: ContestantGuessRoundScoresProps) {
+  const { t } = useTranslation();
   // Filter out host and create player list with round scores
   const nonHostPlayers = players.filter((p) => !p.isHost);
   
@@ -25,7 +27,7 @@ export function ContestantGuessRoundScores({
 
   return (
     <div className="round-scores">
-      <h3>Round Scores</h3>
+      <h3>{t('game.roundScores')}</h3>
       <Leaderboard
         players={sortedPlayers}
         accumulatedScores={roundScores}

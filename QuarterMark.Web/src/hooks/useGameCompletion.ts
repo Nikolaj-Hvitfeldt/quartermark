@@ -62,9 +62,16 @@ export function useGameCompletion({ connection, onGameCompleted }: UseGameComple
     }, 100);
   }, []);
 
+  // Used when resyncing after a reconnect, where there is no GameCompleted event to replay
+  const showCompletedGame = useCallback((game: { gameType: string; gameNumber: number }) => {
+    isClearedRef.current = false;
+    setCompletedGame(game);
+  }, []);
+
   return {
     completedGame,
     clearCompletedGame,
+    showCompletedGame,
   };
 }
 

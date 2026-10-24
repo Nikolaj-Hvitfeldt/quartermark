@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { PlayerDto } from '../types';
+import { devSlot } from '../dev/devMode';
 
 interface GameRoomState {
   connection: any | null;
@@ -21,10 +22,13 @@ interface GameRoomState {
 
 const STORAGE_KEY = 'quartermark-room-state';
 
+// Dev harness slots (several app instances in one browser) must not share localStorage
+const persistenceEnabled = !devSlot;
+
 // Load from localStorage on initialization
 const loadFromStorage = () => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = persistenceEnabled ? localStorage.getItem(STORAGE_KEY) : null;
     if (stored) {
       const parsed = JSON.parse(stored);
       return {
@@ -44,6 +48,7 @@ const loadFromStorage = () => {
 };
 
 const saveToStorage = (roomCode: string, playerName: string, isHost: boolean) => {
+  if (!persistenceEnabled) return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ roomCode, playerName, isHost }));
   } catch (e) {
@@ -52,6 +57,7 @@ const saveToStorage = (roomCode: string, playerName: string, isHost: boolean) =>
 };
 
 const clearStorage = () => {
+  if (!persistenceEnabled) return;
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (e) {
@@ -60,6 +66,31 @@ const clearStorage = () => {
 };
 
 const initialState = loadFromStorage();
+
+const PLAYER_ID_KEY = 'quartermark-player-id';
+
+const generatePlayerId = () =>
+  // randomUUID needs a secure context, which a phone on http://<LAN IP> isn't
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+
+// Identifies this device to the server so it can take its seat back after the
+// connection drops (screen lock, tab switch, reload). Kept across leaving a room.
+const loadPlayerId = () => {
+  if (!persistenceEnabled) return generatePlayerId();
+  try {
+    const stored = localStorage.getItem(PLAYER_ID_KEY);
+    if (stored) return stored;
+    const id = generatePlayerId();
+    localStorage.setItem(PLAYER_ID_KEY, id);
+    return id;
+  } catch {
+    return generatePlayerId();
+  }
+};
+
+export const playerId = loadPlayerId();
 
 export const useGameRoomStore = create<GameRoomState>((set) => ({
   connection: null,

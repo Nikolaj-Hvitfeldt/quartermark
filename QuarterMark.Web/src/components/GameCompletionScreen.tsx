@@ -45,7 +45,7 @@ function GameCompletionScreen({
   return (
     <div className="game-completion-screen">
       <div className="completion-content">
-        <h2>🎉 {t('gameCompletion.title', { gameName: getGameName(gameType, t) })} 🎉</h2>
+        <h2>{t('gameCompletion.title', { gameName: getGameName(gameType, t) })}</h2>
         <p className="game-progress">
           {t('hostScreen.gameProgress', { current: gameNumber, total: totalGames })}
         </p>

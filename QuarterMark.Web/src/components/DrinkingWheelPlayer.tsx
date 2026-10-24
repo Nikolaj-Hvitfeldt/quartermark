@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { DrinkingWheelPlayerProps } from "../types";
 import { PieChartWheel } from "./PieChartWheel";
 import { Confetti } from "./Confetti";
@@ -8,6 +9,7 @@ import "./DrinkingWheel.css";
 import "./DrinkingWheelPlayer.css";
 
 function DrinkingWheelPlayer({ players }: DrinkingWheelPlayerProps) {
+  const { t } = useTranslation();
   const { isSpinning, selectedPlayer } = useDrinkingWheel();
   const nonHostPlayers = players.filter((p) => !p.isHost);
   const showConfetti = selectedPlayer !== null && !isSpinning;
@@ -26,7 +28,7 @@ function DrinkingWheelPlayer({ players }: DrinkingWheelPlayerProps) {
             isSpinning={isSpinning}
           />
         ) : (
-          <p>No players available</p>
+          <p>{t('drinkingWheel.noPlayers')}</p>
         )}
       </div>
     </div>

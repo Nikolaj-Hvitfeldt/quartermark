@@ -6,7 +6,7 @@ import { ImageDisplay } from "./ImageDisplay";
 import { AnswerGrid } from "./AnswerGrid";
 import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
-import { CONTESTANT_GUESS_QUESTIONS } from "../data/contestantGuessQuestions";
+import { useActiveDataset } from "../stores/datasetStore";
 import { getContestantGuessRules, getQuestionCountText } from "../data/gameRules";
 import { useTranslation } from "react-i18next";
 import "./ContestantGuess.css";
@@ -14,6 +14,8 @@ import "./ContestantGuessHost.css";
 
 function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHostProps) {
   const { t } = useTranslation();
+  // Questions from the dataset the host picked in the lobby
+  const questions = useActiveDataset().contestantGuessQuestions;
   const {
     roundActive,
     currentQuestion,
@@ -62,8 +64,8 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
       await startRound();
       setCurrentQuestionIndex(0);
       // Automatically show the first question
-      if (CONTESTANT_GUESS_QUESTIONS.length > 0) {
-        const firstQuestion = CONTESTANT_GUESS_QUESTIONS[0];
+      if (questions.length > 0) {
+        const firstQuestion = questions[0];
         await showQuestion(
           firstQuestion.imageUrl,
           firstQuestion.correctAnswer,
@@ -80,14 +82,14 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
     setShowStandings(false);
     const nextIndex = currentQuestionIndex + 1;
     
-    if (nextIndex >= CONTESTANT_GUESS_QUESTIONS.length) {
+    if (nextIndex >= questions.length) {
       // All questions completed, end the round
       await handleEndRound();
       return;
     }
 
     try {
-      const nextQuestion = CONTESTANT_GUESS_QUESTIONS[nextIndex];
+      const nextQuestion = questions[nextIndex];
       await showQuestion(
         nextQuestion.imageUrl,
         nextQuestion.correctAnswer,
@@ -118,7 +120,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
 
   if (!roundActive) {
     const contestantGuessRules = getContestantGuessRules(t);
-    const questionCount = getQuestionCountText(CONTESTANT_GUESS_QUESTIONS.length, t);
+    const questionCount = getQuestionCountText(questions.length, t);
     return (
       <div className="contestant-guess-host">
         <GameRulesCard
@@ -135,7 +137,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
 
   if (currentQuestion) {
     const allGuessed = guessProgress.received === guessProgress.total && guessProgress.total > 0;
-    const isLastQuestion = currentQuestionIndex + 1 >= CONTESTANT_GUESS_QUESTIONS.length;
+    const isLastQuestion = currentQuestionIndex + 1 >= questions.length;
 
     // Show standings screen after 3 second delay when answer is revealed
     if (answerRevealed && showStandings) {
@@ -144,7 +146,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
           <StandingsScreen
             players={players}
             currentQuestion={currentQuestionIndex + 1}
-            totalQuestions={CONTESTANT_GUESS_QUESTIONS.length}
+            totalQuestions={questions.length}
             onNextQuestion={handleNextQuestion}
             isLastQuestion={isLastQuestion}
           />
@@ -159,7 +161,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
           <button className="btn btn-back" onClick={onBack}>
             ← {t('common.back')}
           </button>
-          <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: CONTESTANT_GUESS_QUESTIONS.length })}</h3>
+          <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: questions.length })}</h3>
           <div className="contestant-guess-question-container">
             <ImageDisplay imageUrl={currentQuestion.imageUrl} />
             <AnswerGrid
@@ -178,13 +180,13 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
         <button className="btn btn-back" onClick={onBack}>
           ← {t('common.back')}
         </button>
-        <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: CONTESTANT_GUESS_QUESTIONS.length })}</h3>
+        <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: questions.length })}</h3>
         <div className="contestant-guess-question-container">
           <ImageDisplay imageUrl={currentQuestion.imageUrl} />
 
           <div className="guess-progress">
             <p>
-              Guesses received: {guessProgress.received} / {guessProgress.total}
+              {t('game.guessesReceived', { received: guessProgress.received, total: guessProgress.total })}
             </p>
           </div>
           <AnswerGrid answers={currentQuestion.possibleAnswers} />
@@ -192,7 +194,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
             className="btn btn-primary"
             onClick={handleRevealAnswer}
           >
-            {allGuessed ? t('common.revealAnswer') : t('common.revealAnswer') + ` (${guessProgress.received}/${guessProgress.total} answered)`}
+            {allGuessed ? t('common.revealAnswer') : t('common.revealAnswer') + ' ' + t('game.answeredCount', { received: guessProgress.received, total: guessProgress.total })}
           </button>
         </div>
       </div>
@@ -205,10 +207,10 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
       <button className="btn btn-back" onClick={onBack}>
         ← Back
       </button>
-      <h2>Contestant Guess</h2>
-      <p>Round active, but no question currently displayed. This should not happen.</p>
+      <h2>{t('gameNames.contestantGuess')}</h2>
+      <p>{t('common.errorMessage')}</p>
       <button className="btn btn-secondary" onClick={handleEndRound}>
-        End Round
+        {t('standings.endRound')}
       </button>
     </div>
   );

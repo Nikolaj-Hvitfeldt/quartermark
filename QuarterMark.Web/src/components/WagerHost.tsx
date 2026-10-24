@@ -161,10 +161,10 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
         <button className="btn btn-back" onClick={onBack}>
           ← Back
         </button>
-        <h2>Wager Game</h2>
-        <p>Round active, but no question currently displayed. This should not happen.</p>
+        <h2>{t('gameNames.wager')}</h2>
+        <p>{t('common.errorMessage')}</p>
         <button className="btn btn-secondary" onClick={handleEndRound}>
-          End Round
+          {t('standings.endRound')}
         </button>
       </div>
     );
@@ -213,6 +213,20 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
             >
               {t('wager.blindWager.resetWagers')}
             </button>
+            {/* Escape hatch when a phone is locked: missing bets become 0 and the game goes on */}
+            <button
+              className="btn btn-secondary"
+              onClick={async () => {
+                try {
+                  await signalRService.invoke("CloseWagers");
+                } catch (error) {
+                  console.error("Error closing wagers:", error);
+                }
+              }}
+              style={{ marginTop: '1rem', marginLeft: '0.5rem' }}
+            >
+              {t('wager.host.closeWagers', 'Continue without missing bets')}
+            </button>
           </div>
         )}
 
@@ -222,7 +236,7 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
             <QuestionDisplay questionText={translatedCurrentQuestion?.questionText || currentQuestion.questionText} />
             <div className="answer-progress">
               <p>
-                Answers received: {answerProgress.received} / {answerProgress.total}
+                {t('wager.host.answersReceived', { received: answerProgress.received, total: answerProgress.total })}
               </p>
             </div>
             <AnswerGrid answers={translatedCurrentQuestion?.possibleAnswers || currentQuestion.possibleAnswers} />
@@ -230,7 +244,7 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
               className="btn btn-primary"
               onClick={handleRevealAnswer}
             >
-              {allAnswered ? t('wager.host.revealAnswer') : t('wager.host.revealAnswer') + ` (${answerProgress.received}/${answerProgress.total} answered)`}
+              {allAnswered ? t('wager.host.revealAnswer') : t('wager.host.revealAnswer') + ' ' + t('game.answeredCount', { received: answerProgress.received, total: answerProgress.total })}
             </button>
           </>
         )}

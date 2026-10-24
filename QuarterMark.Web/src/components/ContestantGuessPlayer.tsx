@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useContestantGuess } from '../hooks/useContestantGuess';
 import { ContestantGuessPlayerProps } from '../types';
 import { GAME_CONSTANTS } from '../utils/gameUtils';
@@ -8,6 +9,7 @@ import './ContestantGuess.css';
 import './ContestantGuessPlayer.css';
 
 function ContestantGuessPlayer({ connection, playerName, players }: ContestantGuessPlayerProps) {
+  const { t } = useTranslation();
   const {
     roundState,
     currentQuestion,
@@ -36,7 +38,7 @@ function ContestantGuessPlayer({ connection, playerName, players }: ContestantGu
     return (
       <div className="contestant-guess-player">
         <div className="waiting-message">
-          <h2>Waiting for host to start the round...</h2>
+          <h2>{t('game.waitingForRound')}</h2>
         </div>
       </div>
     );
@@ -48,14 +50,14 @@ function ContestantGuessPlayer({ connection, playerName, players }: ContestantGu
   return (
     <div className="contestant-guess-player">
       <div className="contestant-guess-question-container">
-        <h2>Which contestant is in this picture?</h2>
+        <h2>{t('game.whichContestant')}</h2>
         <ImageDisplay imageUrl={currentQuestion.imageUrl} />
 
         {!answerRevealed ? (
           <>
             {hasGuessed ? (
               <div className="answer-submitted">
-                <p>✓ Guess submitted! Waiting for other players...</p>
+                <p>{t('game.guessSubmitted')}</p>
               </div>
             ) : (
               <AnswerGrid
@@ -78,12 +80,12 @@ function ContestantGuessPlayer({ connection, playerName, players }: ContestantGu
             <div className="result-message">
               {isPlayerCorrect ? (
                 <div className="correct-message">
-                  <h3>🎉 Correct! +{GAME_CONSTANTS.CONTESTANT_GUESS_POINTS_PER_CORRECT} points</h3>
+                  <h3>{t('game.correctPoints', { points: GAME_CONSTANTS.CONTESTANT_GUESS_POINTS_PER_CORRECT })}</h3>
                 </div>
               ) : (
                 <div className="incorrect-message">
-                  <h3>❌ Incorrect</h3>
-                  <p>The correct answer was: {correctAnswer}</p>
+                  <h3>{t('game.incorrect')}</h3>
+                  <p>{t('game.correctAnswerWas', { answer: correctAnswer })}</p>
                 </div>
               )}
             </div>

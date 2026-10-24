@@ -92,6 +92,11 @@ export function useWager(connection: any) {
     const handleAllWagersReceived = () => {
       // Transition to answering phase - question will now be visible
       setRoundState('Answering');
+      // If the host closed betting before we bet, the server recorded a 0 wager for us
+      if (!useWagerStore.getState().hasWagered) {
+        setHasWagered(true);
+        setPlayerWager(0);
+      }
     };
 
     const handleWagersReset = () => {

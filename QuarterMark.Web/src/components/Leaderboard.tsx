@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PlayerDto } from '../types';
 
 interface LeaderboardProps {
@@ -11,6 +12,7 @@ export function Leaderboard({
   accumulatedScores,
   highlightPlayerName,
 }: LeaderboardProps) {
+  const { t } = useTranslation();
   return (
     <div className="leaderboard">
       {players.map((player, index) => {
@@ -23,7 +25,7 @@ export function Leaderboard({
             <span className="rank">#{index + 1}</span>
             <span className="player-name">
               {player.name}
-              {isCurrentPlayer && <span className="you-badge">You</span>}
+              {isCurrentPlayer && <span className="you-badge">{t('game.you')}</span>}
             </span>
             <span className="score">
               {accumulatedScores[player.name] || 0} pts

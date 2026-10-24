@@ -15,7 +15,7 @@ i18n
         translation: daTranslations,
       },
     },
-    lng: 'en', // default language
+    lng: 'da', // default language; the switcher overrides it with the saved choice
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false, // React already escapes values

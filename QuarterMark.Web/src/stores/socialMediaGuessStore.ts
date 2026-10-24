@@ -13,6 +13,7 @@ interface SocialMediaGuessState {
   roundScores: Record<string, number>;
   answerRevealed: boolean;
   correctAnswer: string;
+  revealImageUrl: string | null; // Uncensored image shown after the reveal, if the question has one
   
   // Player state
   roundState: RoundState;
@@ -25,6 +26,7 @@ interface SocialMediaGuessState {
   setRoundScores: (scores: Record<string, number>) => void;
   setAnswerRevealed: (revealed: boolean) => void;
   setCorrectAnswer: (answer: string) => void;
+  setRevealImageUrl: (url: string | null) => void;
   
   // Player setters
   setRoundState: (state: RoundState) => void;
@@ -41,6 +43,7 @@ export const useSocialMediaGuessStore = create<SocialMediaGuessState>((set) => (
   roundScores: {},
   answerRevealed: false,
   correctAnswer: '',
+  revealImageUrl: null,
   
   // Player state
   roundState: 'Waiting',
@@ -48,11 +51,13 @@ export const useSocialMediaGuessStore = create<SocialMediaGuessState>((set) => (
 
   // Host setters
   setRoundActive: (roundActive) => set({ roundActive }),
-  setCurrentQuestion: (currentQuestion) => set({ currentQuestion }),
+  // A new question always starts on its censored image
+  setCurrentQuestion: (currentQuestion) => set({ currentQuestion, revealImageUrl: null }),
   setGuesses: (guesses) => set({ guesses }),
   setRoundScores: (roundScores) => set({ roundScores }),
   setAnswerRevealed: (answerRevealed) => set({ answerRevealed }),
   setCorrectAnswer: (correctAnswer) => set({ correctAnswer }),
+  setRevealImageUrl: (revealImageUrl) => set({ revealImageUrl }),
   
   // Player setters
   setRoundState: (roundState) => set({ roundState }),
@@ -65,6 +70,7 @@ export const useSocialMediaGuessStore = create<SocialMediaGuessState>((set) => (
     roundScores: {},
     answerRevealed: false,
     correctAnswer: '',
+    revealImageUrl: null,
     roundState: 'Waiting',
     hasGuessed: false,
   }),

@@ -87,7 +87,8 @@ public class GameSessionService : IGameSessionService
     public Task<string> SpinDrinkingWheelAsync(string roomCode)
     {
         var room = GetRoom(roomCode);
-        if (room == null || room.GameSession == null) 
+        // No session needed: the host can also spin from the lobby test button
+        if (room == null)
             return Task.FromResult<string>(string.Empty);
 
         var nonHostPlayers = room.Players.Where(p => !p.IsHost).ToList();

@@ -62,12 +62,8 @@ function WagerPlayer({ connection, playerName, players }: WagerPlayerProps) {
   // Find player from props (more up-to-date)
   const player = players.find(p => p.name === playerName);
   
-  // Calculate available score: base score + net changes from current round
-  // This ensures the score updates immediately after each question, even before round ends
-  // The roundScores track cumulative net winnings/losses for the current round
-  const baseScore = player?.score || 0;
-  const roundNetChange = roundScores[playerName] || 0;
-  const availableScore = Math.max(0, baseScore + roundNetChange);
+  // The server updates scores on every reveal, so this already includes earlier wager questions
+  const availableScore = Math.max(0, player?.score || 0);
 
   const [wagerInput, setWagerInput] = useState<string>('0');
 

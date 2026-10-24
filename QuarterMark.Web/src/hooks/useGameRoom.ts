@@ -1,8 +1,41 @@
 import { useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import signalRService from '../services/signalRService';
-import { useGameRoomStore } from '../stores/gameRoomStore';
+import { playerId, useGameRoomStore } from '../stores/gameRoomStore';
 import { PlayerDto } from '../types';
+
+export interface JoinRoomResult {
+  success: boolean;
+  error: string | null;
+  isHost: boolean;
+  rejoined: boolean;
+}
+
+// Room listeners are attached once per connection object; joining again (e.g. after a
+// reconnect) must not stack duplicate handlers.
+let roomListenersAttachedTo: unknown = null;
+
+function ensureRoomListeners() {
+  const connection = signalRService.getConnection();
+  if (!connection || roomListenersAttachedTo === connection) return;
+  roomListenersAttachedTo = connection;
+
+  const store = useGameRoomStore.getState;
+  signalRService.on('RoomCreated', (code: string) => {
+    store().setRoomCode(code);
+    store().setIsConnected(true);
+  });
+  signalRService.on('JoinedRoom', (code: string) => {
+    store().setRoomCode(code);
+    store().setIsConnected(true);
+  });
+  signalRService.on('Error', (errorMessage: string) => {
+    store().setError(errorMessage);
+  });
+  signalRService.on('PlayerListUpdated', (playerList: PlayerDto[]) => {
+    store().setPlayers(playerList);
+  });
+}
 
 export function useGameRoom() {
   const {
@@ -14,8 +47,6 @@ export function useGameRoom() {
     playerName,
     isHost,
     setConnection,
-    setRoomCode,
-    setPlayers,
     setError,
     setIsConnected,
     setPlayerName,
@@ -44,17 +75,9 @@ export function useGameRoom() {
 
       setPlayerName(playerName);
       setIsHost(true);
+      ensureRoomListeners();
 
-      // Set up listeners
-      signalRService.on('RoomCreated', (code: string) => {
-        setRoomCode(code);
-      });
-
-      signalRService.on('PlayerListUpdated', (playerList: PlayerDto[]) => {
-        setPlayers(playerList);
-      });
-
-      await signalRService.invoke('CreateRoom', playerName);
+      await signalRService.invoke('CreateRoom', playerName, playerId);
     },
     onError: (error) => {
       console.error('Error creating room:', error);
@@ -68,24 +91,18 @@ export function useGameRoom() {
         await connectMutation.mutateAsync();
       }
 
+      setError('');
       setPlayerName(playerName);
-      setIsHost(false);
+      ensureRoomListeners();
 
-      // Set up listeners
-      signalRService.on('JoinedRoom', (code: string) => {
-        setRoomCode(code);
-        setIsConnected(true);
-      });
-
-      signalRService.on('Error', (errorMessage: string) => {
-        setError(errorMessage);
-      });
-
-      signalRService.on('PlayerListUpdated', (playerList: PlayerDto[]) => {
-        setPlayers(playerList);
-      });
-
-      await signalRService.invoke('JoinRoom', code.toUpperCase(), playerName);
+      const result: JoinRoomResult = await signalRService.invoke('JoinRoom', code.toUpperCase(), playerName, playerId);
+      if (!result?.success) {
+        // Back to the join form, which shows the error sent by the server
+        setIsConnected(false);
+        return result;
+      }
+      setIsHost(result.isHost);
+      return result;
     },
     onError: (error) => {
       console.error('Error joining room:', error);
@@ -101,11 +118,28 @@ export function useGameRoom() {
   );
 
   const joinRoom = useCallback(
-    async (code: string, playerName: string) => {
-      await joinRoomMutation.mutateAsync({ code, playerName });
+    async (code: string, playerName: string): Promise<JoinRoomResult | undefined> => {
+      return await joinRoomMutation.mutateAsync({ code, playerName });
     },
     [joinRoomMutation]
   );
+
+  /**
+   * Takes this device's seat back after the connection dropped (screen lock, tab switch).
+   * Works for both players and the host; the server matches on the stored player id.
+   */
+  const rejoinRoom = useCallback(async (): Promise<JoinRoomResult | null> => {
+    const { roomCode: code, playerName: name } = useGameRoomStore.getState();
+    if (!code || !name) return null;
+    ensureRoomListeners();
+    const result: JoinRoomResult = await signalRService.invoke('JoinRoom', code, name, playerId);
+    if (result && !result.success) {
+      // Room gone (server restarted) or seat taken: back to the join/create form, which
+      // shows the error the server sent, instead of staying on a dead game screen
+      useGameRoomStore.getState().setIsConnected(false);
+    }
+    return result;
+  }, []);
 
   const connect = useCallback(async () => {
     await connectMutation.mutateAsync();
@@ -113,6 +147,12 @@ export function useGameRoom() {
 
   const leaveRoom = useCallback(async () => {
     if (connection) {
+      // Tell the server this is on purpose; a plain disconnect keeps the seat for a rejoin
+      try {
+        await signalRService.invoke('LeaveRoom');
+      } catch (error) {
+        console.error('Error leaving room:', error);
+      }
       await signalRService.disconnect();
       setConnection(null);
     }
@@ -129,6 +169,7 @@ export function useGameRoom() {
     isHost,
     createRoom,
     joinRoom,
+    rejoinRoom,
     connect,
     leaveRoom,
     isLoading: createRoomMutation.isPending || joinRoomMutation.isPending || connectMutation.isPending,

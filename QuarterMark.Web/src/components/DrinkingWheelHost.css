@@ -203,3 +203,35 @@
   }
 }
 
+
+.wheel-back-button {
+  position: fixed;
+  top: max(0.75rem, env(safe-area-inset-top));
+  left: max(0.75rem, env(safe-area-inset-left));
+  z-index: 1000;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.wheel-result-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.wheel-result-actions .continue-button,
+.wheel-result-actions .spin-again-button {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.spin-again-button {
+  margin: 2rem 0;
+  font-size: 1.5rem;
+  padding: 1.5rem 2.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}

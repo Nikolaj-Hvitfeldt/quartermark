@@ -37,41 +37,99 @@ public class GameHub : Hub
         _notificationService = notificationService;
     }
 
-    public async Task CreateRoom(string playerName)
+    public async Task CreateRoom(string playerName, string playerId)
     {
-        var roomCode = await _roomService.CreateRoomAsync(Context.ConnectionId, playerName);
+        var roomCode = await _roomService.CreateRoomAsync(Context.ConnectionId, playerName, playerId);
         await Groups.AddToGroupAsync(Context.ConnectionId, roomCode);
-        
+
         await _notificationService.NotifyClientAsync(Context.ConnectionId, "RoomCreated", roomCode);
-        
+
         var players = await _roomService.GetPlayersAsync(roomCode);
         await _notificationService.NotifyClientAsync(Context.ConnectionId, "PlayerListUpdated", players);
     }
 
-    public async Task JoinRoom(string roomCode, string playerName)
+    /// <summary>
+    /// Joins a room, or takes back an existing seat (player or host) when the same device
+    /// returns after its connection dropped.
+    /// </summary>
+    public async Task<object> JoinRoom(string roomCode, string playerName, string playerId)
     {
-        var success = await _roomService.JoinRoomAsync(roomCode, Context.ConnectionId, playerName);
-        
-        if (!success)
+        var result = await _roomService.JoinRoomAsync(roomCode, Context.ConnectionId, playerName, playerId);
+
+        if (result.Player == null)
         {
-            await _notificationService.NotifyClientAsync(Context.ConnectionId, "Error", "Room not found");
-            return;
+            var error = result.Status == JoinRoomStatus.NameTaken ? "Name already taken" : "Room not found";
+            await _notificationService.NotifyClientAsync(Context.ConnectionId, "Error", error);
+            return new { success = false, error, isHost = false, rejoined = false };
         }
 
+        if (result.PreviousConnectionId != null && result.PreviousConnectionId != Context.ConnectionId)
+        {
+            await Groups.RemoveFromGroupAsync(result.PreviousConnectionId, roomCode);
+        }
         await Groups.AddToGroupAsync(Context.ConnectionId, roomCode);
         await _notificationService.NotifyClientAsync(Context.ConnectionId, "JoinedRoom", roomCode);
-        
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+
+        var rejoined = result.Status == JoinRoomStatus.Rejoined;
+        if (rejoined && result.Player.IsHost)
+        {
+            await SendHostCatchUpAsync(roomCode);
+        }
+
+        return new { success = true, error = (string?)null, isHost = result.Player.IsHost, rejoined };
+    }
+
+    /// <summary>Snapshot of the current game for a device that was away. See ResyncStateBuilder.</summary>
+    public async Task<object?> GetResyncState()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return null;
+
+        var room = _roomService.GetRoom(roomCode);
+        var me = room?.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
+        if (room == null || me == null) return null;
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        return ResyncStateBuilder.Build(room, me, players);
+    }
+
+    /// <summary>Leaving on purpose (Back to Home). A dropped connection keeps the seat instead.</summary>
+    public async Task LeaveRoom()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        await _roomService.RemovePlayerAsync(Context.ConnectionId);
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomCode);
+
         var players = await _roomService.GetPlayersAsync(roomCode);
         await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
     }
 
-    public override async Task OnDisconnectedAsync(Exception? exception)
+    public async Task RemoveOfflinePlayer(string playerName)
     {
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        if (await _roomService.RemoveOfflinePlayerAsync(roomCode, playerName))
+        {
+            var players = await _roomService.GetPlayersAsync(roomCode);
+            await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
+        }
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        // Keep the seat: phones drop the connection when the screen locks or the tab is switched
+        var roomCode = await _roomService.MarkDisconnectedAsync(Context.ConnectionId);
         if (roomCode != null)
         {
-            await _roomService.RemovePlayerAsync(Context.ConnectionId);
-            
             var players = await _roomService.GetPlayersAsync(roomCode);
             await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", players);
         }
@@ -88,6 +146,7 @@ public class GameHub : Hub
         if (!isHost) return;
 
         await _wouldILieService.StartRoundAsync(roomCode);
+        SetCurrentGame(roomCode, ResyncStateBuilder.WouldILie);
         await _notificationService.NotifyRoomAsync(roomCode, "WouldILieRoundStarted");
     }
 
@@ -150,7 +209,8 @@ public class GameHub : Hub
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
         if (roomCode == null) return;
 
-        await _wouldILieService.SubmitVoteAsync(roomCode, Context.ConnectionId, claimedPlayerName);
+        var accepted = await _wouldILieService.SubmitVoteAsync(roomCode, Context.ConnectionId, claimedPlayerName);
+        if (!accepted) return;
         
         var question = GetCurrentQuestion(roomCode);
         if (question == null) return;
@@ -210,6 +270,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndWouldILieRound()
@@ -219,6 +283,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _wouldILieService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _wouldILieService.EndRoundAsync(roomCode);
         
@@ -244,6 +311,7 @@ public class GameHub : Hub
         if (!isHost) return;
 
         await _contestantGuessService.StartRoundAsync(roomCode);
+        SetCurrentGame(roomCode, ResyncStateBuilder.ContestantGuess);
         await _notificationService.NotifyRoomAsync(roomCode, "ContestantGuessRoundStarted");
     }
 
@@ -314,6 +382,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndContestantGuessRound()
@@ -323,6 +395,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _contestantGuessService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _contestantGuessService.EndRoundAsync(roomCode);
         
@@ -348,6 +423,7 @@ public class GameHub : Hub
         if (!isHost) return;
 
         await _quizService.StartRoundAsync(roomCode);
+        SetCurrentGame(roomCode, ResyncStateBuilder.Quiz);
         await _notificationService.NotifyRoomAsync(roomCode, "QuizRoundStarted");
     }
 
@@ -416,6 +492,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndQuizRound()
@@ -425,6 +505,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _quizService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _quizService.EndRoundAsync(roomCode);
         
@@ -450,10 +533,11 @@ public class GameHub : Hub
         if (!isHost) return;
 
         await _socialMediaGuessService.StartRoundAsync(roomCode);
+        SetCurrentGame(roomCode, ResyncStateBuilder.SocialMediaGuess);
         await _notificationService.NotifyRoomAsync(roomCode, "SocialMediaGuessRoundStarted");
     }
 
-    public async Task ShowSocialMediaGuessQuestion(string imageUrl, string correctAnswer, List<string> possibleAnswers)
+    public async Task ShowSocialMediaGuessQuestion(string imageUrl, string correctAnswer, List<string> possibleAnswers, string? revealImageUrl)
     {
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
         if (roomCode == null) return;
@@ -461,7 +545,8 @@ public class GameHub : Hub
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
 
-        await _socialMediaGuessService.ShowQuestionAsync(roomCode, imageUrl, correctAnswer, possibleAnswers);
+        // The reveal image is only sent with the answer, so players can't see it early
+        await _socialMediaGuessService.ShowQuestionAsync(roomCode, imageUrl, correctAnswer, possibleAnswers, revealImageUrl);
         
         await _notificationService.NotifyRoomAsync(roomCode, "SocialMediaGuessQuestionShown", new
         {
@@ -517,9 +602,14 @@ public class GameHub : Hub
             {
                 correctAnswer = question.CorrectAnswer,
                 guesses = question.Guesses,
+                revealImageUrl = question.RevealImageUrl,
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndSocialMediaGuessRound()
@@ -529,6 +619,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _socialMediaGuessService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _socialMediaGuessService.EndRoundAsync(roomCode);
         
@@ -663,6 +756,7 @@ public class GameHub : Hub
         if (!isHost) return;
 
         await _wagerService.StartRoundAsync(roomCode);
+        SetCurrentGame(roomCode, ResyncStateBuilder.Wager);
         await _notificationService.NotifyRoomAsync(roomCode, "WagerRoundStarted");
     }
 
@@ -722,9 +816,41 @@ public class GameHub : Hub
             // Only send if counts still match (prevents race conditions)
             if (finalTotalWagers >= finalTotalPlayers && finalTotalPlayers > 0)
             {
+                question.WagersClosed = true;
                 await _notificationService.NotifyRoomAsync(roomCode, "AllWagersReceived");
             }
         }
+    }
+
+    /// <summary>
+    /// Host escape hatch: stop waiting for wagers from players who are away (locked phone).
+    /// They get a 0 wager so they can still answer if they come back.
+    /// </summary>
+    public async Task CloseWagers()
+    {
+        var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
+        if (roomCode == null) return;
+
+        var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
+        if (!isHost) return;
+
+        var question = GetCurrentWagerQuestion(roomCode);
+        if (question == null || question.WagersClosed || question.IsRevealed) return;
+
+        await _wagerService.CloseWagersAsync(roomCode);
+
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var totalPlayers = players.Count(p => !p.IsHost);
+        await _notificationService.NotifyClientAsync(
+            await GetHostConnectionId(roomCode),
+            "WagerReceived",
+            new
+            {
+                totalWagers = question.Wagers.Count,
+                totalPlayers,
+                allWagersReceived = true
+            });
+        await _notificationService.NotifyRoomAsync(roomCode, "AllWagersReceived");
     }
 
     public async Task ResetWagers()
@@ -805,6 +931,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndWagerRound()
@@ -814,6 +944,9 @@ public class GameHub : Hub
 
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
+
+        // A double click on "End Round" must not add the round to the totals twice
+        if (!await _wagerService.IsRoundActiveAsync(roomCode)) return;
 
         var roundScores = await _wagerService.EndRoundAsync(roomCode);
         
@@ -836,6 +969,8 @@ public class GameHub : Hub
 
     private async Task CompleteGameAndCheckDrinkingWheelAsync(string roomCode, string gameType, Dictionary<string, int> roundScores)
     {
+        SetCurrentGame(roomCode, null);
+
         var sessionActive = await _gameSessionService.IsGameSessionActiveAsync(roomCode);
         if (!sessionActive) return;
 
@@ -852,6 +987,10 @@ public class GameHub : Hub
             accumulatedScores,
             players = updatedPlayers
         });
+
+        // CompleteGameAsync syncs Player.Score to the accumulated totals; push the corrected
+        // list so lobby and standings don't keep the values sent at end of round
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", updatedPlayers);
 
         // Don't automatically show drinking wheel - let the frontend decide when to show it
         // The frontend will show completion screen first, then drinking wheel after "Continue to Next Game"
@@ -915,6 +1054,7 @@ public class GameHub : Hub
 
         // Reset game session state
         await _gameSessionService.ResetSessionAsync(roomCode);
+        SetCurrentGame(roomCode, null);
 
         // Notify all players (including host) to return to the lobby
         await _notificationService.NotifyRoomAsync(roomCode, "ReturnToLobby");
@@ -923,5 +1063,139 @@ public class GameHub : Hub
     private async Task<string> GetHostConnectionId(string roomCode)
     {
         return await _roomService.GetHostConnectionIdAsync(roomCode);
+    }
+
+    private void SetCurrentGame(string roomCode, string? gameType)
+    {
+        var room = _roomService.GetRoom(roomCode);
+        if (room != null)
+        {
+            room.CurrentGame = gameType;
+        }
+    }
+
+    /// <summary>
+    /// The host page normally survives a dropped connection (laptop sleep, Wi-Fi blip) with its
+    /// state intact, but it misses progress events sent while it was away. Replay the current
+    /// question's progress and reveal so the host isn't left waiting on counts that already arrived.
+    /// </summary>
+    private async Task SendHostCatchUpAsync(string roomCode)
+    {
+        var room = _roomService.GetRoom(roomCode);
+        if (room == null) return;
+
+        var hostConnectionId = room.HostConnectionId;
+        var players = await _roomService.GetPlayersAsync(roomCode);
+        var totalPlayers = players.Count(p => !p.IsHost);
+
+        switch (ResyncStateBuilder.GetActiveGame(room))
+        {
+            case ResyncStateBuilder.WouldILie when room.WouldILieRound!.Questions.LastOrDefault() is { } q:
+                var assigned = q.LiarNames.Append(q.TruthTellerName).ToList();
+                if (q.State == QuestionState.Voting)
+                {
+                    await _notificationService.NotifyClientAsync(hostConnectionId, "VoteReceived", new
+                    {
+                        voterName = (string?)null,
+                        votedFor = (string?)null,
+                        totalVotes = q.Votes.Count,
+                        totalVoters = players.Count(p => !p.IsHost && !assigned.Contains(p.Name))
+                    });
+                }
+                if (q.IsRevealed)
+                {
+                    await _notificationService.NotifyClientAsync(hostConnectionId, "AnswerRevealed", new
+                    {
+                        correctPlayer = q.TruthTellerName,
+                        votes = new Dictionary<string, string>(q.Votes),
+                        roundScores = new Dictionary<string, int>(room.WouldILieRound.RoundScores)
+                    });
+                }
+                break;
+
+            case ResyncStateBuilder.ContestantGuess when room.ContestantGuessRound!.Questions.LastOrDefault() is { } q:
+                await SendGuessCatchUpAsync(hostConnectionId, "ContestantGuess", q.Guesses, q.CorrectAnswer, q.IsRevealed,
+                    room.ContestantGuessRound.RoundScores, totalPlayers);
+                break;
+
+            case ResyncStateBuilder.SocialMediaGuess when room.SocialMediaGuessRound!.Questions.LastOrDefault() is { } q:
+                await SendGuessCatchUpAsync(hostConnectionId, "SocialMediaGuess", q.Guesses, q.CorrectAnswer, q.IsRevealed,
+                    room.SocialMediaGuessRound.RoundScores, totalPlayers, q.RevealImageUrl);
+                break;
+
+            case ResyncStateBuilder.Quiz when room.QuizRound!.Questions.LastOrDefault() is { } q:
+                await _notificationService.NotifyClientAsync(hostConnectionId, "QuizAnswerReceived", new
+                {
+                    answeredCount = q.Guesses.Count,
+                    totalPlayers
+                });
+                if (q.IsRevealed)
+                {
+                    await _notificationService.NotifyClientAsync(hostConnectionId, "QuizAnswerRevealed", new
+                    {
+                        correctAnswer = q.CorrectAnswer,
+                        guesses = new Dictionary<string, string>(q.Guesses),
+                        roundScores = new Dictionary<string, int>(room.QuizRound.RoundScores)
+                    });
+                }
+                break;
+
+            case ResyncStateBuilder.Wager when room.WagerRound!.Questions.LastOrDefault() is { } q:
+                await _notificationService.NotifyClientAsync(hostConnectionId, "WagerReceived", new
+                {
+                    totalWagers = q.Wagers.Count,
+                    totalPlayers,
+                    allWagersReceived = q.WagersClosed
+                });
+                if (q.WagersClosed && !q.IsRevealed)
+                {
+                    await _notificationService.NotifyClientAsync(hostConnectionId, "AllWagersReceived");
+                }
+                await _notificationService.NotifyClientAsync(hostConnectionId, "WagerAnswerReceived", new
+                {
+                    totalAnswers = q.Guesses.Count,
+                    totalPlayers
+                });
+                if (q.IsRevealed)
+                {
+                    await _notificationService.NotifyClientAsync(hostConnectionId, "WagerAnswerRevealed", new
+                    {
+                        correctAnswer = q.CorrectAnswer,
+                        guesses = new Dictionary<string, string>(q.Guesses),
+                        wagers = new Dictionary<string, int>(q.Wagers),
+                        roundScores = new Dictionary<string, int>(room.WagerRound.RoundScores)
+                    });
+                }
+                break;
+        }
+    }
+
+    private async Task SendGuessCatchUpAsync(
+        string hostConnectionId,
+        string eventPrefix,
+        Dictionary<string, string> guesses,
+        string correctAnswer,
+        bool isRevealed,
+        Dictionary<string, int> roundScores,
+        int totalPlayers,
+        string? revealImageUrl = null)
+    {
+        await _notificationService.NotifyClientAsync(hostConnectionId, $"{eventPrefix}Received", new
+        {
+            playerName = (string?)null,
+            guessedContestantName = (string?)null,
+            totalGuesses = guesses.Count,
+            totalPlayers
+        });
+        if (isRevealed)
+        {
+            await _notificationService.NotifyClientAsync(hostConnectionId, $"{eventPrefix}AnswerRevealed", new
+            {
+                correctAnswer,
+                guesses = new Dictionary<string, string>(guesses),
+                revealImageUrl,
+                roundScores = new Dictionary<string, int>(roundScores)
+            });
+        }
     }
 }

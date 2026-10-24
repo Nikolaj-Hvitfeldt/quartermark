@@ -12,6 +12,8 @@ public interface IWagerService
     Task<Dictionary<string, int>> EndRoundAsync(string roomCode);
     Task<bool> IsRoundActiveAsync(string roomCode);
     WagerQuestion? GetCurrentQuestion(string roomCode);
+    /// <summary>Ends betting for the current question; missing wagers become 0.</summary>
+    Task<bool> CloseWagersAsync(string roomCode);
     Task<bool> ResetWagersAsync(string roomCode);
 }
 

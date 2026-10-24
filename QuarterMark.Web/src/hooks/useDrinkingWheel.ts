@@ -24,6 +24,8 @@ export function useDrinkingWheel(): UseDrinkingWheelResult {
 
   useEffect(() => {
     const handleWheelSpinning = () => {
+      // Clear the previous pick so "spin again" animates and lands afresh
+      setSelectedPlayer(null);
       setIsSpinning(true);
     };
 

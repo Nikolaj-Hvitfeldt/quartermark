@@ -1,4 +1,5 @@
 // Would I Lie game constants and utilities
+import i18n from '../i18n/config';
 
 /**
  * Deterministically shuffle an array using a seed value
@@ -27,30 +28,31 @@ export const WOULD_I_LIE_SCORING = {
   POINTS_PER_VOTE_RECEIVED: 10,
 } as const;
 
+// Getters so the texts follow the current language
 export const WOULD_I_LIE_TITLES = {
-  WHO_KNOWS: 'Who knows this person?',
-  WHOS_TELLING_TRUTH: "Who's telling the truth?",
-  VOTING_IN_PROGRESS: 'Voting in Progress',
-  ANSWER_REVEALED: 'Answer Revealed!',
-  ROUND_COMPLETE: '🎉 Round Complete!',
-  FINAL_STANDINGS: 'Final Standings',
-  CURRENT_STANDINGS: 'Current Standings',
-} as const;
+  get WHO_KNOWS() { return i18n.t('wouldILieGame.whoKnows'); },
+  get WHOS_TELLING_TRUTH() { return i18n.t('wouldILieGame.whosTellingTruth'); },
+  get VOTING_IN_PROGRESS() { return i18n.t('wouldILieGame.votingInProgress'); },
+  get ANSWER_REVEALED() { return i18n.t('wouldILieGame.answerRevealed'); },
+  get ROUND_COMPLETE() { return i18n.t('wouldILieGame.roundComplete'); },
+  get FINAL_STANDINGS() { return i18n.t('wouldILieGame.finalStandings'); },
+  get CURRENT_STANDINGS() { return i18n.t('wouldILieGame.currentStandings'); },
+};
 
 export const WOULD_I_LIE_MESSAGES = {
-  WAITING_FOR_HOST: 'Waiting for host to start the round...',
-  WAITING_FOR_VOTING: 'Waiting for host to start voting...',
-  CLAIMER_WAITING: 'You claimed to know them. Waiting for voting to start...',
-  VOTE_SUBMITTED: '✓ Vote submitted! Waiting for other players...',
-  WAITING_FOR_VOTES: 'Waiting for other players to vote...',
-  CLAIMS_TO_KNOW: 'Claims to know them',
-  VOTE_FOR_THEM: 'Vote for them',
-  TRUTH_TELLER: '✓ Truth Teller',
-  YOUR_VOTE: 'Your Vote',
-  LOADING: 'Loading...',
-  SKAAL: 'SKÅL!',
-  ROUND_COMPLETE_SKAAL: 'Round complete - SKÅL!',
-} as const;
+  get WAITING_FOR_HOST() { return i18n.t('game.waitingForRound'); },
+  get WAITING_FOR_VOTING() { return i18n.t('wouldILieGame.waitingForVoting'); },
+  get CLAIMER_WAITING() { return i18n.t('wouldILieGame.claimerWaiting'); },
+  get VOTE_SUBMITTED() { return i18n.t('wouldILieGame.voteSubmitted'); },
+  get WAITING_FOR_VOTES() { return i18n.t('wouldILieGame.waitingForVotes'); },
+  get CLAIMS_TO_KNOW() { return i18n.t('wouldILieGame.claimsToKnow'); },
+  get VOTE_FOR_THEM() { return i18n.t('wouldILieGame.voteForThem'); },
+  get TRUTH_TELLER() { return i18n.t('wouldILieGame.truthTellerBadge'); },
+  get YOUR_VOTE() { return i18n.t('wouldILieGame.yourVote'); },
+  get LOADING() { return i18n.t('common.loading'); },
+  get SKAAL() { return i18n.t('wouldILieGame.skaal'); },
+  get ROUND_COMPLETE_SKAAL() { return i18n.t('wouldILieGame.roundCompleteSkaal'); },
+};
 
 // Color classes for the 2-option answer grid
 export const OPTION_COLORS = ['option-blue', 'option-purple'] as const;
@@ -63,16 +65,16 @@ export function getOptionColorClass(index: number): string {
 export function getClaimerResultMessage(votesReceived: number): string {
   if (votesReceived > 0) {
     const points = votesReceived * WOULD_I_LIE_SCORING.POINTS_PER_VOTE_RECEIVED;
-    return `🎉 You received ${votesReceived} vote(s)! +${points} points`;
+    return i18n.t('wouldILieGame.receivedVotes', { count: votesReceived, points });
   }
-  return '😅 No one voted for you. 0 points';
+  return i18n.t('wouldILieGame.noVotes');
 }
 
 export function getVoterResultMessage(isCorrect: boolean): string {
   if (isCorrect) {
-    return `🎉 You guessed correctly! +${WOULD_I_LIE_SCORING.CORRECT_VOTE} points`;
+    return i18n.t('wouldILieGame.guessedRight', { points: WOULD_I_LIE_SCORING.CORRECT_VOTE });
   }
-  return '❌ You guessed wrong! 0 points';
+  return i18n.t('wouldILieGame.guessedWrong');
 }
 
 // Calculate votes received by a player

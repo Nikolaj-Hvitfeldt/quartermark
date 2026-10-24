@@ -32,8 +32,10 @@ function WouldILieHost({
     startRound,
     showQuestion,
     startVoting,
+    revealAnswer,
     endRound,
   } = useWouldILie(connection);
+  const [votingStartedFor, setVotingStartedFor] = useState<string | null>(null);
 
   const { wouldILieConfig } = useGameSession(connection);
 
@@ -99,8 +101,19 @@ function WouldILieHost({
   const handleStartVoting = async () => {
     try {
       await startVoting();
+      setVotingStartedFor(currentQuestion?.imageUrl ?? null);
     } catch (error) {
       console.error("Error starting voting:", error);
+    }
+  };
+
+  // The answer is revealed automatically once everyone has voted. If a voter's phone is
+  // locked that never happens, so the host can reveal with the votes that are in.
+  const handleRevealNow = async () => {
+    try {
+      await revealAnswer();
+    } catch (error) {
+      console.error("Error revealing answer:", error);
     }
   };
 
@@ -133,7 +146,7 @@ function WouldILieHost({
           <WouldILieStandings players={players} title="" />
           <div className="final-score-actions">
             <button className="btn btn-primary btn-large" onClick={handleBackToMain}>
-              Continue
+              {t("common.continue")}
             </button>
           </div>
         </div>
@@ -156,7 +169,7 @@ function WouldILieHost({
         />
         {hasConfig && (
           <div className="config-preview">
-            <p>📋 {totalRounds} rounds configured</p>
+            <p>{t("wouldILieGame.roundsConfigured", { count: totalRounds })}</p>
           </div>
         )}
       </div>
@@ -168,9 +181,9 @@ function WouldILieHost({
     return (
       <div className="would-i-lie-host">
         <div className="round-controls">
-          <h2>Question {currentRoundIndex + 1} of {totalRounds}</h2>
+          <h2>{t("common.questionProgress", { current: currentRoundIndex + 1, total: totalRounds })}</h2>
           <div className="loading-question">
-            <p>Loading...</p>
+            <p>{t("common.loading")}</p>
           </div>
         </div>
       </div>
@@ -222,26 +235,33 @@ function WouldILieHost({
 
         <WouldILieAnswerGrid options={answerOptions} />
 
-        <button className="btn btn-primary btn-large" onClick={handleStartVoting}>
-          Start Voting
-        </button>
+        {votingStartedFor === currentQuestion.imageUrl || voteProgress.total > 0 ? (
+          <button className="btn btn-secondary" onClick={handleRevealNow}>
+            {t("wouldILie.revealAnswerNow", "Reveal answer now")}
+            {voteProgress.total > 0 ? ` (${voteProgress.received}/${voteProgress.total})` : ""}
+          </button>
+        ) : (
+          <button className="btn btn-primary btn-large" onClick={handleStartVoting}>
+            {t("wouldILieGame.startVoting")}
+          </button>
+        )}
 
         {voteProgress.received > 0 && (
           <div className="wil-voting-progress">
             <p className="wil-vote-count">
-              Votes: {voteProgress.received}/{voteProgress.total}
+              {t("wouldILieGame.votes", { received: voteProgress.received, total: voteProgress.total })}
             </p>
 
             {voteProgress.received < voteProgress.total && eligibleDummyPlayers.length > 0 && (
               <div className="dummy-player-actions">
-                <h4>Submit vote for dummy player (testing):</h4>
+                <h4>{t("wouldILieGame.dummyVoteTitle")}</h4>
                 <div className="dummy-action-controls">
                   <select
                     value={dummyVotePlayer}
                     onChange={e => setDummyVotePlayer(e.target.value)}
                     className="input"
                   >
-                    <option value="">Select dummy player...</option>
+                    <option value="">{t("wouldILieGame.selectDummy")}</option>
                     {eligibleDummyPlayers.map(p => (
                       <option key={p.name} value={p.name}>{p.name}</option>
                     ))}
@@ -251,7 +271,7 @@ function WouldILieHost({
                     onChange={e => setDummyVoteFor(e.target.value)}
                     className="input"
                   >
-                    <option value="">Select who to vote for...</option>
+                    <option value="">{t("wouldILieGame.selectVoteFor")}</option>
                     {claims.map(claim => (
                       <option key={claim.playerName} value={claim.playerName}>
                         {claim.playerName}
@@ -263,7 +283,7 @@ function WouldILieHost({
                     onClick={handleDummyVoteSubmit}
                     disabled={!dummyVotePlayer || !dummyVoteFor}
                   >
-                    Submit Vote
+                    {t("wouldILieGame.submitVote")}
                   </button>
                 </div>
               </div>

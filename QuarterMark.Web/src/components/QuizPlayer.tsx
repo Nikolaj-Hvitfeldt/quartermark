@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState, useRef } from 'react';
 import { useQuiz } from '../hooks/useQuiz';
 import { QuizPlayerProps } from '../types';
@@ -10,6 +11,7 @@ import './Quiz.css';
 import './QuizPlayer.css';
 
 function QuizPlayer({ connection, playerName }: QuizPlayerProps) {
+  const { t } = useTranslation();
   const { players } = useGameRoomStore();
   const {
     roundState,
@@ -67,7 +69,7 @@ function QuizPlayer({ connection, playerName }: QuizPlayerProps) {
     return (
       <div className="quiz-player">
         <div className="waiting-message">
-          <h2>Waiting for question...</h2>
+          <h2>{t('game.waitingForQuestion')}</h2>
         </div>
       </div>
     );
@@ -88,7 +90,7 @@ function QuizPlayer({ connection, playerName }: QuizPlayerProps) {
           <>
             {hasAnswered ? (
               <div className="answer-submitted">
-                <p>✓ Answer submitted! Waiting for other players...</p>
+                <p>{t('game.answerSubmitted')}</p>
               </div>
             ) : (
               <AnswerGrid
@@ -111,7 +113,7 @@ function QuizPlayer({ connection, playerName }: QuizPlayerProps) {
             <div className="result-message">
               {isPlayerCorrect ? (
                 <div className="correct-message">
-                  <h3>🎉 Correct! +{pointsEarned} points</h3>
+                  <h3>{t('game.correctPoints', { points: pointsEarned })}</h3>
                   {pointsEarned > QUIZ_SCORING.BASE_POINTS && (
                     <p className="bonus-text">
                       {getBonusMessage(pointsEarned)}
@@ -120,8 +122,8 @@ function QuizPlayer({ connection, playerName }: QuizPlayerProps) {
                 </div>
               ) : (
                 <div className="incorrect-message">
-                  <h3>❌ Incorrect</h3>
-                  <p>The correct answer was: {correctAnswer}</p>
+                  <h3>{t('game.incorrect')}</h3>
+                  <p>{t('game.correctAnswerWas', { answer: correctAnswer })}</p>
                 </div>
               )}
             </div>

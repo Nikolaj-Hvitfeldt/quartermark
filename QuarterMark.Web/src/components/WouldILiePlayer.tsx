@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import signalRService from '../services/signalRService';
 import { usePlayerGameStore } from '../stores/playerGameStore';
@@ -20,6 +21,13 @@ import './WouldILie.css';
 import './WouldILiePlayer.css';
 
 function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProps) {
+  const { t } = useTranslation();
+  const roundEndTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Cancel the pending return-to-lobby when unmounting (e.g. the completion screen took over).
+  // Otherwise it can fire after the next game has started and pull the player out of it.
+  useEffect(() => () => clearTimeout(roundEndTimerRef.current), []);
+
   const {
     roundState,
     imageUrl,
@@ -89,7 +97,8 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
 
     const handleRoundEnded = () => {
       setRoundState('RoundEnded');
-      setTimeout(() => {
+      clearTimeout(roundEndTimerRef.current);
+      roundEndTimerRef.current = setTimeout(() => {
         onBack();
       }, GAME_CONSTANTS.PLAYER_ROUND_END_DELAY_WOULD_ILIE);
     };
@@ -266,7 +275,7 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
           <p className="wil-round-complete-message">{WOULD_I_LIE_MESSAGES.SKAAL}</p>
           <WouldILieStandings
             players={players}
-            title="📊 Final Standings"
+            title={t('game.finalStandingsTitle')}
             highlightPlayerName={playerName}
           />
         </div>

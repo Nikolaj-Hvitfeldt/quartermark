@@ -1,3 +1,5 @@
+import i18n from '../i18n/config';
+
 // Fireworks configuration
 export const FIREWORK_COLORS = [
   '#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', 
@@ -41,12 +43,13 @@ export const PODIUM_DIMENSIONS_MOBILE = {
 } as const;
 
 // Final results text
+// Getters so the texts follow the current language
 export const FINAL_RESULTS_TEXT = {
-  TITLE: 'Final Results',
-  SUBTITLE: 'Happy New Year',
-  PRIZE_MESSAGE: 'You win a firm handshake from the host',
-  WAITING_MESSAGE: 'Waiting for host to end the game...',
-} as const;
+  get TITLE() { return i18n.t('finalResults.title'); },
+  get SUBTITLE() { return i18n.t('finalResults.subtitle'); },
+  get PRIZE_MESSAGE() { return i18n.t('finalResults.prize'); },
+  get WAITING_MESSAGE() { return i18n.t('finalResults.waiting'); },
+};
 
 // Auto-show delay for players (milliseconds)
 export const FINAL_RESULTS_AUTO_SHOW_DELAY_MS = 3000;
