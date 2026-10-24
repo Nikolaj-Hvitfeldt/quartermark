@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import signalRService from '../services/signalRService';
@@ -20,6 +21,7 @@ import './WouldILie.css';
 import './WouldILiePlayer.css';
 
 function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProps) {
+  const { t } = useTranslation();
   const roundEndTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Cancel the pending return-to-lobby when unmounting (e.g. the completion screen took over).
@@ -273,7 +275,7 @@ function WouldILiePlayer({ connection, playerName, onBack }: WouldILiePlayerProp
           <p className="wil-round-complete-message">{WOULD_I_LIE_MESSAGES.SKAAL}</p>
           <WouldILieStandings
             players={players}
-            title="📊 Final Standings"
+            title={t('game.finalStandingsTitle')}
             highlightPlayerName={playerName}
           />
         </div>

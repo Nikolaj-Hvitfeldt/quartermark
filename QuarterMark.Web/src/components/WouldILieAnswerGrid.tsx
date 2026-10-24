@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { getOptionColorClass } from '../utils/wouldILieUtils';
 import './WouldILie.css';
 
@@ -23,6 +24,7 @@ export function WouldILieAnswerGrid({
   clickable = false,
   revealed: _revealed = false,
 }: WouldILieAnswerGridProps) {
+  const { t } = useTranslation();
   const handleClick = (playerName: string) => {
     if (clickable && onOptionClick) {
       onOptionClick(playerName);
@@ -51,8 +53,8 @@ export function WouldILieAnswerGrid({
           >
             <span className="wil-player-name">{option.playerName}</span>
             {option.label && <span className="wil-option-label">{option.label}</span>}
-            {option.showCorrectBadge && <span className="wil-correct-badge">✓ Truth Teller</span>}
-            {option.showPlayerBadge && <span className="wil-player-badge">Your Vote</span>}
+            {option.showCorrectBadge && <span className="wil-correct-badge">{t('wouldILieGame.truthTellerBadge')}</span>}
+            {option.showPlayerBadge && <span className="wil-player-badge">{t('wouldILieGame.yourVote')}</span>}
           </div>
         );
       })}

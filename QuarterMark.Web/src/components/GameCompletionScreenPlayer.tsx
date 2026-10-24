@@ -56,24 +56,24 @@ function GameCompletionScreenPlayer({
   return (
     <div className="game-completion-screen">
       <div className="completion-content">
-        <h2>🎉 {getGameName(gameType)} Complete! 🎉</h2>
+        <h2>{t('gameCompletion.title', { gameName: getGameName(gameType, t) })}</h2>
         <p className="game-progress">
-          Game {gameNumber} of {totalGames}
+          {t('game.gameOf', { number: gameNumber, total: totalGames })}
         </p>
 
         <div className="player-score-highlight">
           <div className="your-rank">
-            <span className="rank-label">Your Rank</span>
+            <span className="rank-label">{t('game.yourRank')}</span>
             <span className="rank-number">#{playerRank}</span>
           </div>
           <div className="your-score">
-            <span className="score-label">Your Score</span>
+            <span className="score-label">{t('game.yourScore')}</span>
             <span className="score-number">{playerScore} pts</span>
           </div>
         </div>
 
         <div className="scores-section">
-          <h3>Current Leaderboard</h3>
+          <h3>{t('game.currentLeaderboard')}</h3>
           <Leaderboard
             players={sortedPlayers}
             accumulatedScores={accumulatedScores}

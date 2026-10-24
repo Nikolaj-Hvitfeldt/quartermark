@@ -123,7 +123,7 @@ function HostScreen({ onBack }: HostScreenProps) {
 
   const handleCreateDummyPlayer = async () => {
     if (!dummyPlayerName.trim()) {
-      alert("Please enter a name for the dummy player");
+      alert(t("hostScreen.enterDummyName"));
       return;
     }
 
@@ -139,14 +139,14 @@ function HostScreen({ onBack }: HostScreenProps) {
 
   const handleCreateRoom = async () => {
     if (!playerName.trim()) {
-      alert("Please enter your name");
+      alert(t("hostScreen.enterName"));
       return;
     }
 
     try {
       await createRoom(playerName);
     } catch (error) {
-      alert("Failed to create room. Please try again.");
+      alert(t("hostScreen.createRoomFailed"));
     }
   };
 
@@ -302,18 +302,18 @@ function HostScreen({ onBack }: HostScreenProps) {
       ) : (
         <div className="host-game">
           <div className="room-code-display">
-            <h3>Room Code</h3>
+            <h3>{t("hostScreen.roomCode")}</h3>
             <div className="room-code">{roomCode}</div>
-            <p className="room-code-hint">Share this code with players</p>
+            <p className="room-code-hint">{t("hostScreen.roomCodeHint")}</p>
           </div>
 
           <div className="players-section">
-            <h3>Players ({players.length})</h3>
+            <h3>{t("common.playersCount", { count: players.length })}</h3>
             <div className="players-list">
               {players.map((player, index) => (
                 <div key={index} className={`player-card${player.isConnected === false ? " player-offline" : ""}`}>
                   <span className="player-name">{player.name}</span>
-                  {player.isHost && <span className="host-badge">Host</span>}
+                  {player.isHost && <span className="host-badge">{t("common.host")}</span>}
                   {player.isConnected === false && (
                     <>
                       <span className="offline-badge" title={t("hostScreen.offlineHint", "Their seat and score are kept until they reconnect")}>
@@ -326,21 +326,21 @@ function HostScreen({ onBack }: HostScreenProps) {
                       )}
                     </>
                   )}
-                  <span className="player-score">{player.score} pts</span>
+                  <span className="player-score">{player.score} {t("common.pts")}</span>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="dummy-players-section">
-            <h3>Test Players (Dummy)</h3>
+            <h3>{t("hostScreen.dummyTitle")}</h3>
             <p className="dummy-hint">
-              Create dummy players for testing without opening multiple browsers
+              {t("hostScreen.dummyHint")}
             </p>
             <div className="dummy-player-controls">
               <input
                 type="text"
-                placeholder="Enter dummy player name"
+                placeholder={t("hostScreen.dummyPlaceholder")}
                 value={dummyPlayerName}
                 onChange={(e) => setDummyPlayerName(e.target.value)}
                 className="input"
@@ -358,7 +358,7 @@ function HostScreen({ onBack }: HostScreenProps) {
                   !dummyPlayerName.trim() || createDummyPlayerMutation.isPending
                 }
               >
-                Add Dummy Player
+                {t("hostScreen.addDummy")}
               </button>
             </div>
             {dummyPlayers.length > 0 && (
@@ -370,7 +370,7 @@ function HostScreen({ onBack }: HostScreenProps) {
                       className="btn btn-small"
                       onClick={() => handleRemoveDummyPlayer(player.name)}
                     >
-                      Remove
+                      {t("hostScreen.removePlayer")}
                     </button>
                   </div>
                 ))}
@@ -430,12 +430,12 @@ function HostScreen({ onBack }: HostScreenProps) {
                   className="btn btn-primary btn-large"
                   onClick={handleStartSession}
                   disabled={wouldILieConfig.length === 0}
-                  title={wouldILieConfig.length === 0 ? 'Configure Would I Lie rounds first' : ''}
+                  title={wouldILieConfig.length === 0 ? t('hostScreen.configureWouldILieFirst') : ''}
                 >
-                  Start Game Session (5 Mini-Games)
+                  {t('hostScreen.startGameSession')}
                 </button>
                 {wouldILieConfig.length === 0 && (
-                  <p className="config-reminder">⚠️ Configure "Would I Lie" rounds before starting</p>
+                  <p className="config-reminder">{t('hostScreen.configureWouldILie')}</p>
                 )}
               </div>
             )}
@@ -481,7 +481,7 @@ function HostScreen({ onBack }: HostScreenProps) {
           
           {/* TEST BUTTONS - Remove these after testing */}
           <div className="test-mode-section">
-            <h4>🧪 Test Mode</h4>
+            <h4>🧪 {t("hostScreen.testMode")}</h4>
             <button
               className="btn btn-secondary btn-test"
               onClick={() => {
@@ -489,13 +489,13 @@ function HostScreen({ onBack }: HostScreenProps) {
                 setInGame("drinkingWheel");
               }}
             >
-              Test Drinking Wheel
+              {t("hostScreen.testDrinkingWheel")}
             </button>
             <button
               className="btn btn-secondary btn-test"
               onClick={() => setInGame("wager")}
             >
-              Test Wager Game
+              {t("hostScreen.testWager")}
             </button>
           </div>
         </div>

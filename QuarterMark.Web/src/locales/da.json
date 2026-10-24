@@ -1,6 +1,16 @@
 {
   "drinkingWheel": {
-    "spinAgain": "Spin igen"
+    "spinAgain": "Spin igen",
+    "timeToSpin": "Tid til at dreje hjulet!",
+    "noPlayersToSpin": "Ingen spillere at dreje for",
+    "noPlayers": "Ingen spillere",
+    "spinTheWheel": "Drej hjulet!",
+    "spinning": "Drejer...",
+    "congratulations": "Tillykke!",
+    "enjoyYour": "Nyd din",
+    "title": "Smirnoff Ice-hjulet",
+    "spinningTheWheel": "Hjulet drejer...",
+    "waitingForSpin": "Venter på, at værten drejer hjulet..."
   },
   "common": {
     "back": "Tilbage",
@@ -27,7 +37,9 @@
     "revealAnswer": "Afslør svar",
     "waitingForAnswers": "Venter på {{count}} flere svar",
     "waitingForGuesses": "Venter på {{count}} flere gæt",
-    "errorMessage": "Runde aktiv, men intet spørgsmål vises i øjeblikket. Dette bør ikke ske."
+    "errorMessage": "Runde aktiv, men intet spørgsmål vises i øjeblikket. Dette bør ikke ske.",
+    "playersCount": "Spillere ({{count}})",
+    "host": "Vært"
   },
   "hostScreen": {
     "offline": "Offline",
@@ -48,7 +60,19 @@
     "allGamesCompleted": "Alle spil gennemført",
     "sessionGameNumber": "Spil {{number}} af 5",
     "backToHome": "Tilbage til hjem",
-    "configureWouldILieLabel": "Konfigurer \"Vil jeg lyve\" runder"
+    "configureWouldILieLabel": "Konfigurer \"Vil jeg lyve\" runder",
+    "roomCode": "Rumkode",
+    "roomCodeHint": "Del koden med spillerne",
+    "dummyTitle": "Testspillere (dummy)",
+    "dummyHint": "Opret dummy-spillere til test uden at åbne flere browsere",
+    "dummyPlaceholder": "Navn på dummy-spiller",
+    "addDummy": "Tilføj dummy-spiller",
+    "testMode": "Testtilstand",
+    "testDrinkingWheel": "Test drikkehjulet",
+    "testWager": "Test Wager-spillet",
+    "enterDummyName": "Skriv et navn til dummy-spilleren",
+    "enterName": "Skriv dit navn",
+    "createRoomFailed": "Kunne ikke oprette rummet. Prøv igen."
   },
   "gameRules": {
     "wouldILie": {
@@ -146,6 +170,29 @@
       "incorrect": "❌ Forkert",
       "youLost": "Du tabte {{points}} point",
       "correctAnswerWas": "Det korrekte svar var: {{answer}}"
+    },
+    "questions": {
+      "q1": {
+        "question": "Hvad står Nikos kunstnernavn SLSH for?",
+        "answer1": "Store Lår Sexet Hår",
+        "answer2": "Spastisk Lam? Sikkert Ham",
+        "answer3": "Stort Lem Sent Hjem",
+        "answer4": "SLum SHeik"
+      },
+      "q2": {
+        "question": "I hvilket computerspil er Niko blandt de 1 % bedste på verdensranglisten?",
+        "answer1": "CounterStrike: Global Offensive",
+        "answer2": "CounterStrike 1.6",
+        "answer3": "CounterStrike Source",
+        "answer4": "CounterStrike 2"
+      },
+      "q3": {
+        "question": "Hvad er, i modsætning til hvad mange tror, Nikos yndlingsdrink?",
+        "answer1": "Gin Hass",
+        "answer2": "Vodka Redbull",
+        "answer3": "Strawberry Daiquiri",
+        "answer4": "Pink Pussy"
+      }
     }
   },
   "gameCompletion": {
@@ -182,7 +229,9 @@
     "enterRoomCode": "Indtast rumkode",
     "join": "Tilslut",
     "waitingForHost": "Venter på værten starter spillet...",
-    "waitingForHostEndGame": "Venter på værten afslutter spillet..."
+    "waitingForHostEndGame": "Venter på værten afslutter spillet...",
+    "room": "Rum: {{code}}",
+    "you": "Dig: {{name}}"
   },
   "app": {
     "welcome": "Velkommen til",
@@ -269,6 +318,88 @@
         "answer4": "LDLD x SLSH"
       }
     }
+  },
+  "wouldILieConfig": {
+    "needMorePlayers": "⚠️ Der mangler spillere",
+    "needMorePlayersHint": "Der skal være mindst 2 spillere ud over værten for at sætte spillet op.",
+    "currentPlayers": "Spillere ud over værten lige nu: {{count}}",
+    "title": "🎭 Sæt \"Vil jeg lyve\"-runder op",
+    "hint": "Vælg, hvem der kender personen (sandhed), og hvem der finder på en historie (løgner). Du kan sætte så mange runder op, du vil. Der skal være mindst 1.",
+    "round": "Runde {{number}}",
+    "configured": "✓ Klar",
+    "truthTeller": "🟢 Sandhed (kender personen):",
+    "liar": "🔴 Løgner (finder på en historie):",
+    "selectPlayer": "Vælg spiller...",
+    "configuredCount": "{{configured}} af {{total}} runder klar",
+    "save": "Gem opsætning ({{count}} runder)"
+  },
+  "game": {
+    "correctBadge": "✓ Rigtigt",
+    "yourAnswer": "Dit svar",
+    "playersChoseThis_one": "{{count}} spiller valgte dette",
+    "playersChoseThis_other": "{{count}} spillere valgte dette",
+    "waitingForRound": "Venter på, at værten starter runden...",
+    "waitingForQuestion": "Venter på spørgsmålet...",
+    "whichContestant": "Hvem af jer gemmer sig på billedet?",
+    "whoPostedThis": "Hvem har lagt det her op?",
+    "guessSubmitted": "✓ Gæt sendt! Venter på de andre...",
+    "answerSubmitted": "✓ Svar sendt! Venter på de andre...",
+    "correctPoints": "🎉 Rigtigt! +{{points}} point",
+    "incorrect": "❌ Forkert",
+    "correctAnswerWas": "Det rigtige svar var: {{answer}}",
+    "firstPlaceBonus": "🥇 Bonus for at være hurtigst!",
+    "secondPlaceBonus": "🥈 Bonus for at være næsthurtigst!",
+    "roundScores": "Rundens point",
+    "roundWinnings": "Rundens gevinster og tab",
+    "wagered": "Indsats: {{amount}} pts",
+    "you": "Dig",
+    "gameOf": "Spil {{number}} af {{total}}",
+    "yourRank": "Din placering",
+    "yourScore": "Dine point",
+    "currentLeaderboard": "Stillingen lige nu",
+    "guessesReceived": "Gæt modtaget: {{received}} / {{total}}",
+    "answersReceived": "Svar modtaget: {{received}} / {{total}}",
+    "answeredCount": "({{received}}/{{total}} har svaret)",
+    "startingQuiz": "Starter quizzen...",
+    "congratulations": "Tillykke",
+    "currentStandingsTitle": "📊 Stillingen lige nu",
+    "finalStandingsTitle": "📊 Endelig stilling"
+  },
+  "wouldILieGame": {
+    "whoKnows": "Hvem kender denne person?",
+    "whosTellingTruth": "Hvem taler sandt?",
+    "votingInProgress": "Afstemning i gang",
+    "answerRevealed": "Svaret er afsløret!",
+    "roundComplete": "🎉 Runden er slut!",
+    "finalStandings": "Endelig stilling",
+    "currentStandings": "Stillingen lige nu",
+    "waitingForVoting": "Venter på, at værten starter afstemningen...",
+    "claimerWaiting": "Du påstår at kende personen. Venter på, at afstemningen starter...",
+    "voteSubmitted": "✓ Stemme afgivet! Venter på de andre...",
+    "waitingForVotes": "Venter på, at de andre stemmer...",
+    "claimsToKnow": "Påstår at kende personen",
+    "voteForThem": "Stem på dem",
+    "truthTellerBadge": "✓ Taler sandt",
+    "yourVote": "Din stemme",
+    "skaal": "SKÅL!",
+    "roundCompleteSkaal": "Runden er slut - SKÅL!",
+    "receivedVotes_one": "🎉 Du fik {{count}} stemme! +{{points}} point",
+    "receivedVotes_other": "🎉 Du fik {{count}} stemmer! +{{points}} point",
+    "noVotes": "😅 Ingen stemte på dig. 0 point",
+    "guessedRight": "🎉 Du gættede rigtigt! +{{points}} point",
+    "guessedWrong": "❌ Du gættede forkert! 0 point",
+    "roundsConfigured": "📋 {{count}} runder sat op",
+    "startVoting": "Start afstemningen",
+    "votes": "Stemmer: {{received}}/{{total}}",
+    "dummyVoteTitle": "Stem for en dummy-spiller (test):",
+    "selectDummy": "Vælg dummy-spiller...",
+    "selectVoteFor": "Vælg, hvem der stemmes på...",
+    "submitVote": "Afgiv stemme"
+  },
+  "finalResults": {
+    "title": "Endelige resultater",
+    "subtitle": "Godt nytår",
+    "prize": "Du vinder et fast håndtryk fra værten",
+    "waiting": "Venter på, at værten afslutter spillet..."
   }
 }
-

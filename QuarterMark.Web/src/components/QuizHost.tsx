@@ -197,7 +197,7 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
 
           <div className="answer-progress">
             <p>
-              Answers received: {answerProgress.received} / {answerProgress.total}
+              {t('game.answersReceived', { received: answerProgress.received, total: answerProgress.total })}
             </p>
           </div>
           <AnswerGrid answers={currentQuestion.possibleAnswers} />
@@ -205,7 +205,7 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
             className="btn btn-primary"
             onClick={handleRevealAnswer}
           >
-            {allAnswered ? t('common.revealAnswer') : t('common.revealAnswer') + ` (${answerProgress.received}/${answerProgress.total} answered)`}
+            {allAnswered ? t('common.revealAnswer') : t('common.revealAnswer') + ' ' + t('game.answeredCount', { received: answerProgress.received, total: answerProgress.total })}
           </button>
         </div>
       </div>
@@ -217,8 +217,8 @@ function QuizHost({ connection, players, onBack }: QuizHostProps) {
       <button className="btn btn-back" onClick={onBack}>
         ← Back
       </button>
-      <h2>Quiz of 2025</h2>
-      <p>Starting quiz...</p>
+      <h2>{t('gameNames.quiz')}</h2>
+      <p>{t('game.startingQuiz')}</p>
     </div>
   );
 }

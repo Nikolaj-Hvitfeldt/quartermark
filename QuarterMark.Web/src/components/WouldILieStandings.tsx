@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PlayerDto } from '../types';
 import { sortPlayersByScore } from '../utils/standingsUtils';
 import './WouldILie.css';
@@ -10,14 +11,15 @@ interface WouldILieStandingsProps {
 
 export function WouldILieStandings({
   players,
-  title = '📊 Current Standings',
+  title,
   highlightPlayerName,
 }: WouldILieStandingsProps) {
+  const { t } = useTranslation();
   const sortedPlayers = sortPlayersByScore(players);
 
   return (
     <div className="wil-standings">
-      <h3>{title}</h3>
+      <h3>{title ?? t('game.currentStandingsTitle')}</h3>
       <div className="wil-standings-list">
         {sortedPlayers.map((player, index) => (
           <div

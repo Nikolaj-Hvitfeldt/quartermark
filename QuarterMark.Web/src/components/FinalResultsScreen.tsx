@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PlayerDto } from '../types';
 import { sortPlayersByScore } from '../utils/gameUtils';
 import { FINAL_RESULTS_TEXT } from '../utils/finalResultsConstants';
@@ -57,6 +58,7 @@ export function FinalResultsScreen({
   onClose,
   isHost,
 }: FinalResultsScreenProps) {
+  const { t } = useTranslation();
   const sortedPlayers = sortPlayersByScore(players, accumulatedScores);
   
   const first = sortedPlayers[PODIUM_POSITIONS.FIRST];
@@ -98,7 +100,7 @@ export function FinalResultsScreen({
           <div className="winner-announcement">
             <span className="trophy">🏆</span>
             <span className="winner-text">
-              Congratulations, <strong>{first.name}</strong>!
+              {t('game.congratulations')}, <strong>{first.name}</strong>!
             </span>
             <span className="trophy">🏆</span>
             <p className="prize-text">{FINAL_RESULTS_TEXT.PRIZE_MESSAGE}</p>
@@ -107,7 +109,7 @@ export function FinalResultsScreen({
 
         {isHost && (
           <button className="btn btn-primary btn-large return-btn" onClick={onClose}>
-            Return to Main Menu
+            {t('gameCompletion.returnToMenu')}
           </button>
         )}
         

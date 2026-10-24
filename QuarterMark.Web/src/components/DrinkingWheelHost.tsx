@@ -37,7 +37,7 @@ function DrinkingWheelHost({ players, onSpinComplete, onBack }: DrinkingWheelHos
       <FloatingBottles />
       <Confetti active={showConfetti} />
       <div className="wheel-container">
-        <WheelHeader selectedPlayer={selectedPlayer} isSpinning={isSpinning} subtitle="Time to spin the wheel!" />
+        <WheelHeader selectedPlayer={selectedPlayer} isSpinning={isSpinning} subtitle={t("drinkingWheel.timeToSpin")} />
 
         {nonHostPlayers.length > 0 ? (
           <PieChartWheel
@@ -46,7 +46,7 @@ function DrinkingWheelHost({ players, onSpinComplete, onBack }: DrinkingWheelHos
             isSpinning={isSpinning}
           />
         ) : (
-          <p>No players available to spin for</p>
+          <p>{t("drinkingWheel.noPlayersToSpin")}</p>
         )}
 
         {!selectedPlayer && (
@@ -55,7 +55,7 @@ function DrinkingWheelHost({ players, onSpinComplete, onBack }: DrinkingWheelHos
             onClick={handleSpin}
             disabled={isSpinning}
           >
-            {isSpinning ? "Spinning..." : "Spin the Wheel!"}
+            {isSpinning ? t("drinkingWheel.spinning") : t("drinkingWheel.spinTheWheel")}
           </button>
         )}
 
@@ -73,7 +73,7 @@ function DrinkingWheelHost({ players, onSpinComplete, onBack }: DrinkingWheelHos
               className="btn btn-primary btn-large continue-button"
               onClick={() => onSpinComplete?.()}
             >
-              Continue →
+              {t("standings.continueButton")}
             </button>
           </div>
         )}

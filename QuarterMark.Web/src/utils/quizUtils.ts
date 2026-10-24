@@ -1,3 +1,4 @@
+import i18n from '../i18n/config';
 /**
  * Quiz game utilities
  */
@@ -15,10 +16,10 @@ export const QUIZ_SCORING = {
  */
 export function getBonusMessage(points: number): string {
   if (points === QUIZ_SCORING.FIRST_PLACE_TOTAL) {
-    return '🥇 First place bonus!';
+    return i18n.t('game.firstPlaceBonus');
   }
   if (points === QUIZ_SCORING.SECOND_PLACE_TOTAL) {
-    return '🥈 Second place bonus!';
+    return i18n.t('game.secondPlaceBonus');
   }
   return '';
 }

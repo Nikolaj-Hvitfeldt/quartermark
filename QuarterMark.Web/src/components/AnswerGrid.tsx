@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import './AnswerGrid.css';
 
 interface AnswerGridProps {
@@ -21,6 +22,7 @@ export function AnswerGrid({
   onAnswerClick,
   disabled = false,
 }: AnswerGridProps) {
+  const { t } = useTranslation();
   const handleClick = (answer: string) => {
     if (!disabled && !revealed && onAnswerClick) {
       onAnswerClick(answer);
@@ -49,14 +51,14 @@ export function AnswerGrid({
           >
             <div className="answer-text">{answer}</div>
             {revealed && isCorrect && (
-              <div className="correct-badge">✓ Correct</div>
+              <div className="correct-badge">{t('game.correctBadge')}</div>
             )}
             {revealed && isPlayerChoice && playerName && (
-              <div className="player-badge">Your Answer</div>
+              <div className="player-badge">{t('game.yourAnswer')}</div>
             )}
             {revealed && guesses && guessCount > 0 && (
               <div className="guess-count">
-                {guessCount} {guessCount === 1 ? 'player' : 'players'} chose this
+                {t('game.playersChoseThis', { count: guessCount })}
               </div>
             )}
           </div>

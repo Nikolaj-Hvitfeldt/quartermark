@@ -1,6 +1,16 @@
 {
   "drinkingWheel": {
-    "spinAgain": "Spin again"
+    "spinAgain": "Spin again",
+    "timeToSpin": "Time to spin the wheel!",
+    "noPlayersToSpin": "No players available to spin for",
+    "noPlayers": "No players available",
+    "spinTheWheel": "Spin the Wheel!",
+    "spinning": "Spinning...",
+    "congratulations": "Congratulations!",
+    "enjoyYour": "Enjoy your",
+    "title": "Smirnoff Ice Wheel",
+    "spinningTheWheel": "Spinning the wheel...",
+    "waitingForSpin": "Waiting for host to spin..."
   },
   "common": {
     "back": "Back",
@@ -30,7 +40,9 @@
     "revealAnswer": "Reveal Answer",
     "waitingForAnswers": "Waiting for {{count}} more answer(s)",
     "waitingForGuesses": "Waiting for {{count}} more guess(es)",
-    "errorMessage": "Round active, but no question currently displayed. This should not happen."
+    "errorMessage": "Round active, but no question currently displayed. This should not happen.",
+    "playersCount": "Players ({{count}})",
+    "host": "Host"
   },
   "hostScreen": {
     "offline": "Offline",
@@ -51,7 +63,19 @@
     "allGamesCompleted": "All games completed",
     "sessionGameNumber": "Game {{number}} of 5",
     "backToHome": "Back to Home",
-    "configureWouldILieLabel": "Configure \"Would I Lie\" Rounds"
+    "configureWouldILieLabel": "Configure \"Would I Lie\" Rounds",
+    "roomCode": "Room Code",
+    "roomCodeHint": "Share this code with players",
+    "dummyTitle": "Test Players (Dummy)",
+    "dummyHint": "Create dummy players for testing without opening multiple browsers",
+    "dummyPlaceholder": "Enter dummy player name",
+    "addDummy": "Add Dummy Player",
+    "testMode": "Test Mode",
+    "testDrinkingWheel": "Test Drinking Wheel",
+    "testWager": "Test Wager Game",
+    "enterDummyName": "Please enter a name for the dummy player",
+    "enterName": "Please enter your name",
+    "createRoomFailed": "Failed to create room. Please try again."
   },
   "gameRules": {
     "wouldILie": {
@@ -206,7 +230,9 @@
     "enterRoomCode": "Enter room code",
     "join": "Join",
     "waitingForHost": "Waiting for host to start the game...",
-    "waitingForHostEndGame": "Waiting for host to end the game..."
+    "waitingForHostEndGame": "Waiting for host to end the game...",
+    "room": "Room: {{code}}",
+    "you": "You: {{name}}"
   },
   "app": {
     "welcome": "Welcome to",
@@ -293,6 +319,88 @@
         "answer4": "LDLD x SLSH"
       }
     }
+  },
+  "wouldILieConfig": {
+    "needMorePlayers": "⚠️ Need More Players",
+    "needMorePlayersHint": "You need at least 2 non-host players to configure this game.",
+    "currentPlayers": "Current non-host players: {{count}}",
+    "title": "🎭 Configure \"Would I Lie to You?\" Rounds",
+    "hint": "Assign who knows each person (Truth Teller) and who will make up a story (Liar). You can configure as many rounds as you want. At least 1 round is required.",
+    "round": "Round {{number}}",
+    "configured": "✓ Configured",
+    "truthTeller": "🟢 Truth Teller (knows this person):",
+    "liar": "🔴 Liar (will make up a story):",
+    "selectPlayer": "Select player...",
+    "configuredCount": "{{configured}} of {{total}} rounds configured",
+    "save": "Save Configuration ({{count}} rounds)"
+  },
+  "game": {
+    "correctBadge": "✓ Correct",
+    "yourAnswer": "Your Answer",
+    "playersChoseThis_one": "{{count}} player chose this",
+    "playersChoseThis_other": "{{count}} players chose this",
+    "waitingForRound": "Waiting for host to start the round...",
+    "waitingForQuestion": "Waiting for question...",
+    "whichContestant": "Which contestant is in this picture?",
+    "whoPostedThis": "Who posted this?",
+    "guessSubmitted": "✓ Guess submitted! Waiting for other players...",
+    "answerSubmitted": "✓ Answer submitted! Waiting for other players...",
+    "correctPoints": "🎉 Correct! +{{points}} points",
+    "incorrect": "❌ Incorrect",
+    "correctAnswerWas": "The correct answer was: {{answer}}",
+    "firstPlaceBonus": "🥇 First place bonus!",
+    "secondPlaceBonus": "🥈 Second place bonus!",
+    "roundScores": "Round Scores",
+    "roundWinnings": "Round Winnings/Losses",
+    "wagered": "Wagered: {{amount}} pts",
+    "you": "You",
+    "gameOf": "Game {{number}} of {{total}}",
+    "yourRank": "Your Rank",
+    "yourScore": "Your Score",
+    "currentLeaderboard": "Current Leaderboard",
+    "guessesReceived": "Guesses received: {{received}} / {{total}}",
+    "answersReceived": "Answers received: {{received}} / {{total}}",
+    "answeredCount": "({{received}}/{{total}} answered)",
+    "startingQuiz": "Starting quiz...",
+    "congratulations": "Congratulations",
+    "currentStandingsTitle": "📊 Current Standings",
+    "finalStandingsTitle": "📊 Final Standings"
+  },
+  "wouldILieGame": {
+    "whoKnows": "Who knows this person?",
+    "whosTellingTruth": "Who's telling the truth?",
+    "votingInProgress": "Voting in Progress",
+    "answerRevealed": "Answer Revealed!",
+    "roundComplete": "🎉 Round Complete!",
+    "finalStandings": "Final Standings",
+    "currentStandings": "Current Standings",
+    "waitingForVoting": "Waiting for host to start voting...",
+    "claimerWaiting": "You claimed to know them. Waiting for voting to start...",
+    "voteSubmitted": "✓ Vote submitted! Waiting for other players...",
+    "waitingForVotes": "Waiting for other players to vote...",
+    "claimsToKnow": "Claims to know them",
+    "voteForThem": "Vote for them",
+    "truthTellerBadge": "✓ Truth Teller",
+    "yourVote": "Your Vote",
+    "skaal": "SKÅL!",
+    "roundCompleteSkaal": "Round complete - SKÅL!",
+    "receivedVotes_one": "🎉 You received {{count}} vote! +{{points}} points",
+    "receivedVotes_other": "🎉 You received {{count}} votes! +{{points}} points",
+    "noVotes": "😅 No one voted for you. 0 points",
+    "guessedRight": "🎉 You guessed correctly! +{{points}} points",
+    "guessedWrong": "❌ You guessed wrong! 0 points",
+    "roundsConfigured": "📋 {{count}} rounds configured",
+    "startVoting": "Start Voting",
+    "votes": "Votes: {{received}}/{{total}}",
+    "dummyVoteTitle": "Submit vote for dummy player (testing):",
+    "selectDummy": "Select dummy player...",
+    "selectVoteFor": "Select who to vote for...",
+    "submitVote": "Submit Vote"
+  },
+  "finalResults": {
+    "title": "Final Results",
+    "subtitle": "Happy New Year",
+    "prize": "You win a firm handshake from the host",
+    "waiting": "Waiting for host to end the game..."
   }
 }
-

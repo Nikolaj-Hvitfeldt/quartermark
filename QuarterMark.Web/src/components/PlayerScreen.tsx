@@ -352,18 +352,18 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       ) : (
         <div className="player-game">
           <div className="player-info">
-            <h3>Room: {roomCode}</h3>
-            <p className="player-name-display">You: {playerName}</p>
+            <h3>{t('playerScreen.room', { code: roomCode })}</h3>
+            <p className="player-name-display">{t('playerScreen.you', { name: playerName })}</p>
           </div>
 
           <div className="players-section">
-            <h3>Players ({players.length})</h3>
+            <h3>{t('common.playersCount', { count: players.length })}</h3>
             <div className="players-list">
               {players.map((player, index) => (
                 <div key={index} className="player-card">
                   <span className="player-name">{player.name}</span>
-                  {player.isHost && <span className="host-badge">Host</span>}
-                  <span className="player-score">{player.score} pts</span>
+                  {player.isHost && <span className="host-badge">{t('common.host')}</span>}
+                  <span className="player-score">{player.score} {t('common.pts')}</span>
                 </div>
               ))}
             </div>

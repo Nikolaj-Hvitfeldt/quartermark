@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useSocialMediaGuess } from '../hooks/useSocialMediaGuess';
 import { useSocialMediaGuessStore } from '../stores/socialMediaGuessStore';
 import { SocialMediaGuessPlayerProps } from '../types';
@@ -9,6 +10,7 @@ import './SocialMediaGuess.css';
 import './SocialMediaGuessPlayer.css';
 
 function SocialMediaGuessPlayer({ connection, playerName, players }: SocialMediaGuessPlayerProps) {
+  const { t } = useTranslation();
   const {
     roundState,
     currentQuestion,
@@ -35,7 +37,7 @@ function SocialMediaGuessPlayer({ connection, playerName, players }: SocialMedia
     return (
       <div className="social-media-guess-player">
         <div className="waiting-message">
-          <h2>Waiting for host to start the round...</h2>
+          <h2>{t('game.waitingForRound')}</h2>
         </div>
       </div>
     );
@@ -47,14 +49,14 @@ function SocialMediaGuessPlayer({ connection, playerName, players }: SocialMedia
   return (
     <div className="social-media-guess-player">
       <div className="social-media-guess-question-container">
-        <h2>Who posted this?</h2>
+        <h2>{t('game.whoPostedThis')}</h2>
         <ImageDisplay imageUrl={answerRevealed && revealImageUrl ? revealImageUrl : currentQuestion.imageUrl} />
 
         {!answerRevealed ? (
           <>
             {hasGuessed ? (
               <div className="answer-submitted">
-                <p>✓ Guess submitted! Waiting for other players...</p>
+                <p>{t('game.guessSubmitted')}</p>
               </div>
             ) : (
               <AnswerGrid
@@ -77,12 +79,12 @@ function SocialMediaGuessPlayer({ connection, playerName, players }: SocialMedia
             <div className="result-message">
               {isPlayerCorrect ? (
                 <div className="correct-message">
-                  <h3>🎉 Correct! +{GAME_CONSTANTS.CONTESTANT_GUESS_POINTS_PER_CORRECT} points</h3>
+                  <h3>{t('game.correctPoints', { points: GAME_CONSTANTS.CONTESTANT_GUESS_POINTS_PER_CORRECT })}</h3>
                 </div>
               ) : (
                 <div className="incorrect-message">
-                  <h3>❌ Incorrect</h3>
-                  <p>The correct answer was: {correctAnswer}</p>
+                  <h3>{t('game.incorrect')}</h3>
+                  <p>{t('game.correctAnswerWas', { answer: correctAnswer })}</p>
                 </div>
               )}
             </div>

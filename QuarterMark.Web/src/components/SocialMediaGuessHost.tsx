@@ -210,7 +210,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
 
         <div className="guess-progress">
           <p>
-            Guesses received: {guessProgress.received} / {guessProgress.total}
+            {t('game.guessesReceived', { received: guessProgress.received, total: guessProgress.total })}
           </p>
         </div>
         <AnswerGrid answers={currentQuestion.possibleAnswers} />
@@ -218,7 +218,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
           className="btn btn-primary"
           onClick={handleRevealAnswer}
         >
-          {allGuessed ? t('common.revealAnswer') : t('common.revealAnswer') + ` (${guessProgress.received}/${guessProgress.total} answered)`}
+          {allGuessed ? t('common.revealAnswer') : t('common.revealAnswer') + ' ' + t('game.answeredCount', { received: guessProgress.received, total: guessProgress.total })}
         </button>
       </div>
     </div>

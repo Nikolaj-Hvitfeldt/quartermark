@@ -186,7 +186,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
 
           <div className="guess-progress">
             <p>
-              Guesses received: {guessProgress.received} / {guessProgress.total}
+              {t('game.guessesReceived', { received: guessProgress.received, total: guessProgress.total })}
             </p>
           </div>
           <AnswerGrid answers={currentQuestion.possibleAnswers} />
@@ -194,7 +194,7 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
             className="btn btn-primary"
             onClick={handleRevealAnswer}
           >
-            {allGuessed ? t('common.revealAnswer') : t('common.revealAnswer') + ` (${guessProgress.received}/${guessProgress.total} answered)`}
+            {allGuessed ? t('common.revealAnswer') : t('common.revealAnswer') + ' ' + t('game.answeredCount', { received: guessProgress.received, total: guessProgress.total })}
           </button>
         </div>
       </div>
@@ -207,10 +207,10 @@ function ContestantGuessHost({ connection, players, onBack }: ContestantGuessHos
       <button className="btn btn-back" onClick={onBack}>
         ← Back
       </button>
-      <h2>Contestant Guess</h2>
-      <p>Round active, but no question currently displayed. This should not happen.</p>
+      <h2>{t('gameNames.contestantGuess')}</h2>
+      <p>{t('common.errorMessage')}</p>
       <button className="btn btn-secondary" onClick={handleEndRound}>
-        End Round
+        {t('standings.endRound')}
       </button>
     </div>
   );
