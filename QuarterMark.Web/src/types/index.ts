@@ -115,6 +115,7 @@ export interface SocialMediaGuessQuestionShownData {
 export interface SocialMediaGuessAnswerRevealedData {
   correctAnswer: string;
   guesses: Record<string, string>;
+  revealImageUrl?: string | null; // Uncensored image to show now that the answer is out
   roundScores: Record<string, number>;
 }
 

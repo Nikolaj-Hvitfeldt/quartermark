@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PlayerDto } from '../types';
-import { WOULD_I_LIE_IMAGES, WouldILieRoundConfig } from '../data/wouldILieImages';
+import { WouldILieRoundConfig } from '../data/wouldILieImages';
+import { useActiveDataset } from '../stores/datasetStore';
 import './WouldILieConfig.css';
 
 interface WouldILieConfigProps {
@@ -11,13 +12,15 @@ interface WouldILieConfigProps {
 
 export function WouldILieConfig({ players, onConfigComplete, existingConfig }: WouldILieConfigProps) {
   const nonHostPlayers = players.filter(p => !p.isHost);
+  // Images from the dataset the host picked in the lobby
+  const images = useActiveDataset().wouldILieImages;
   
   // Initialize config state from existing config or empty
   const [roundConfigs, setRoundConfigs] = useState<Partial<WouldILieRoundConfig>[]>(() => {
     if (existingConfig && existingConfig.length > 0) {
       return existingConfig;
     }
-    return WOULD_I_LIE_IMAGES.map(img => ({
+    return images.map(img => ({
       imageId: img.id,
       imageUrl: img.imageUrl,
       truthTeller: '',
@@ -95,7 +98,7 @@ export function WouldILieConfig({ players, onConfigComplete, existingConfig }: W
       </div>
 
       <div className="rounds-list">
-        {WOULD_I_LIE_IMAGES.map((image, index) => {
+        {images.map((image, index) => {
           const config = roundConfigs[index];
           const isComplete = config?.truthTeller && config?.liar && config.truthTeller !== config.liar;
           const isExpanded = expandedRound === index;
@@ -173,7 +176,7 @@ export function WouldILieConfig({ players, onConfigComplete, existingConfig }: W
       <div className="config-footer">
         <div className="config-summary">
           <span className="configured-count">
-            {configuredRounds.length} of {WOULD_I_LIE_IMAGES.length} rounds configured
+            {configuredRounds.length} of {images.length} rounds configured
           </span>
         </div>
         <button

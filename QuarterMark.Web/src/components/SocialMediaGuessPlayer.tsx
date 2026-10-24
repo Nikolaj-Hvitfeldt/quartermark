@@ -1,4 +1,5 @@
 import { useSocialMediaGuess } from '../hooks/useSocialMediaGuess';
+import { useSocialMediaGuessStore } from '../stores/socialMediaGuessStore';
 import { SocialMediaGuessPlayerProps } from '../types';
 import { GAME_CONSTANTS } from '../utils/gameUtils';
 import { ImageDisplay } from './ImageDisplay';
@@ -18,6 +19,7 @@ function SocialMediaGuessPlayer({ connection, playerName, players }: SocialMedia
     roundScores,
     submitGuess,
   } = useSocialMediaGuess(connection);
+  const revealImageUrl = useSocialMediaGuessStore((s) => s.revealImageUrl);
 
   const handleAnswerClick = async (answer: string) => {
     if (hasGuessed || answerRevealed) return;
@@ -46,7 +48,7 @@ function SocialMediaGuessPlayer({ connection, playerName, players }: SocialMedia
     <div className="social-media-guess-player">
       <div className="social-media-guess-question-container">
         <h2>Who posted this?</h2>
-        <ImageDisplay imageUrl={currentQuestion.imageUrl} />
+        <ImageDisplay imageUrl={answerRevealed && revealImageUrl ? revealImageUrl : currentQuestion.imageUrl} />
 
         {!answerRevealed ? (
           <>

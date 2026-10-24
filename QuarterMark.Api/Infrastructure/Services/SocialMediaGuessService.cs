@@ -28,7 +28,7 @@ public class SocialMediaGuessService : ISocialMediaGuessService
         return Task.FromResult(true);
     }
 
-    public Task<bool> ShowQuestionAsync(string roomCode, string imageUrl, string correctAnswer, List<string> possibleAnswers)
+    public Task<bool> ShowQuestionAsync(string roomCode, string imageUrl, string correctAnswer, List<string> possibleAnswers, string? revealImageUrl)
     {
         var room = GetRoom(roomCode);
         if (room == null || room.SocialMediaGuessRound == null) return Task.FromResult(false);
@@ -44,6 +44,7 @@ public class SocialMediaGuessService : ISocialMediaGuessService
         var question = new SocialMediaGuessQuestion
         {
             ImageUrl = imageUrl,
+            RevealImageUrl = string.IsNullOrEmpty(revealImageUrl) ? null : revealImageUrl,
             CorrectAnswer = correctAnswer,
             PossibleAnswers = possibleAnswers,
             IsRevealed = false

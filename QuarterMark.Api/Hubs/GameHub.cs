@@ -525,7 +525,7 @@ public class GameHub : Hub
         await _notificationService.NotifyRoomAsync(roomCode, "SocialMediaGuessRoundStarted");
     }
 
-    public async Task ShowSocialMediaGuessQuestion(string imageUrl, string correctAnswer, List<string> possibleAnswers)
+    public async Task ShowSocialMediaGuessQuestion(string imageUrl, string correctAnswer, List<string> possibleAnswers, string? revealImageUrl)
     {
         var roomCode = await _roomService.GetRoomCodeAsync(Context.ConnectionId);
         if (roomCode == null) return;
@@ -533,7 +533,8 @@ public class GameHub : Hub
         var isHost = await _roomService.IsHostAsync(roomCode, Context.ConnectionId);
         if (!isHost) return;
 
-        await _socialMediaGuessService.ShowQuestionAsync(roomCode, imageUrl, correctAnswer, possibleAnswers);
+        // The reveal image is only sent with the answer, so players can't see it early
+        await _socialMediaGuessService.ShowQuestionAsync(roomCode, imageUrl, correctAnswer, possibleAnswers, revealImageUrl);
         
         await _notificationService.NotifyRoomAsync(roomCode, "SocialMediaGuessQuestionShown", new
         {
@@ -589,6 +590,7 @@ public class GameHub : Hub
             {
                 correctAnswer = question.CorrectAnswer,
                 guesses = question.Guesses,
+                revealImageUrl = question.RevealImageUrl,
                 roundScores
             });
         }
@@ -1098,7 +1100,7 @@ public class GameHub : Hub
 
             case ResyncStateBuilder.SocialMediaGuess when room.SocialMediaGuessRound!.Questions.LastOrDefault() is { } q:
                 await SendGuessCatchUpAsync(hostConnectionId, "SocialMediaGuess", q.Guesses, q.CorrectAnswer, q.IsRevealed,
-                    room.SocialMediaGuessRound.RoundScores, totalPlayers);
+                    room.SocialMediaGuessRound.RoundScores, totalPlayers, q.RevealImageUrl);
                 break;
 
             case ResyncStateBuilder.Quiz when room.QuizRound!.Questions.LastOrDefault() is { } q:
@@ -1155,7 +1157,8 @@ public class GameHub : Hub
         string correctAnswer,
         bool isRevealed,
         Dictionary<string, int> roundScores,
-        int totalPlayers)
+        int totalPlayers,
+        string? revealImageUrl = null)
     {
         await _notificationService.NotifyClientAsync(hostConnectionId, $"{eventPrefix}Received", new
         {
@@ -1170,6 +1173,7 @@ public class GameHub : Hub
             {
                 correctAnswer,
                 guesses = new Dictionary<string, string>(guesses),
+                revealImageUrl,
                 roundScores = new Dictionary<string, int>(roundScores)
             });
         }

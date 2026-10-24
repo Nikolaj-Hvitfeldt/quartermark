@@ -62,6 +62,7 @@ export function useSocialMediaGuess(connection: any) {
       setAnswerRevealed(true);
       setCorrectAnswer(data.correctAnswer);
       setGuesses(data.guesses);
+      useSocialMediaGuessStore.getState().setRevealImageUrl(data.revealImageUrl ?? null);
       setRoundState('Revealed');
     };
 
@@ -99,12 +100,14 @@ export function useSocialMediaGuess(connection: any) {
       imageUrl,
       correctAnswer,
       possibleAnswers,
+      revealImageUrl,
     }: {
       imageUrl: string;
       correctAnswer: string;
       possibleAnswers: string[];
+      revealImageUrl?: string;
     }) => {
-      await signalRService.invoke('ShowSocialMediaGuessQuestion', imageUrl, correctAnswer, possibleAnswers);
+      await signalRService.invoke('ShowSocialMediaGuessQuestion', imageUrl, correctAnswer, possibleAnswers, revealImageUrl ?? null);
     },
   });
 
@@ -134,8 +137,8 @@ export function useSocialMediaGuess(connection: any) {
   }, [startRoundMutation]);
 
   const showQuestion = useCallback(
-    async (imageUrl: string, correctAnswer: string, possibleAnswers: string[]) => {
-      await showQuestionMutation.mutateAsync({ imageUrl, correctAnswer, possibleAnswers });
+    async (imageUrl: string, correctAnswer: string, possibleAnswers: string[], revealImageUrl?: string) => {
+      await showQuestionMutation.mutateAsync({ imageUrl, correctAnswer, possibleAnswers, revealImageUrl });
     },
     [showQuestionMutation]
   );

@@ -6,7 +6,8 @@ import { ImageDisplay } from "./ImageDisplay";
 import { AnswerGrid } from "./AnswerGrid";
 import { StandingsScreen } from "./StandingsScreen";
 import { GameRulesCard } from "./GameRulesCard";
-import { SOCIAL_MEDIA_GUESS_QUESTIONS } from "../data/socialMediaGuessQuestions";
+import { useActiveDataset } from "../stores/datasetStore";
+import { useSocialMediaGuessStore } from "../stores/socialMediaGuessStore";
 import { getSocialMediaRules, getQuestionCountText } from "../data/gameRules";
 import { useTranslation } from "react-i18next";
 import "./SocialMediaGuess.css";
@@ -14,6 +15,8 @@ import "./SocialMediaGuessHost.css";
 
 function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessHostProps) {
   const { t } = useTranslation();
+  // Questions from the dataset the host picked in the lobby
+  const questions = useActiveDataset().socialMediaGuessQuestions;
   const {
     roundActive,
     currentQuestion,
@@ -26,14 +29,18 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     revealAnswer,
     endRound,
   } = useSocialMediaGuess(connection);
+  const revealImageUrl = useSocialMediaGuessStore((s) => s.revealImageUrl);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [guessProgress, setGuessProgress] = useState({ total: 0, received: 0 });
   const [showStandings, setShowStandings] = useState(false);
 
-  // Auto-navigate to standings after 3 seconds when answer is revealed
+  // Auto-navigate to standings after 3 seconds when answer is revealed. Questions with an
+  // uncensored reveal image wait for the host instead, so the room can look at it.
   useEffect(() => {
-    if (answerRevealed) {
+    if (answerRevealed && revealImageUrl) {
+      setShowStandings(false);
+    } else if (answerRevealed) {
       const timer = setTimeout(() => {
         setShowStandings(true);
       }, 3000);
@@ -41,7 +48,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     } else {
       setShowStandings(false);
     }
-  }, [answerRevealed]);
+  }, [answerRevealed, revealImageUrl]);
 
   useEffect(() => {
     if (!connection) return;
@@ -61,12 +68,13 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     try {
       await startRound();
       setCurrentQuestionIndex(0);
-      if (SOCIAL_MEDIA_GUESS_QUESTIONS.length > 0) {
-        const firstQuestion = SOCIAL_MEDIA_GUESS_QUESTIONS[0];
+      if (questions.length > 0) {
+        const firstQuestion = questions[0];
         await showQuestion(
           firstQuestion.imageUrl,
           firstQuestion.correctAnswer,
-          [...firstQuestion.answers]
+          [...firstQuestion.answers],
+          firstQuestion.revealImageUrl
         );
         setGuessProgress({ total: players.filter(p => !p.isHost).length, received: 0 });
       }
@@ -79,17 +87,18 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
     setShowStandings(false);
     const nextIndex = currentQuestionIndex + 1;
 
-    if (nextIndex >= SOCIAL_MEDIA_GUESS_QUESTIONS.length) {
+    if (nextIndex >= questions.length) {
       await handleEndRound();
       return;
     }
 
     try {
-      const nextQuestion = SOCIAL_MEDIA_GUESS_QUESTIONS[nextIndex];
+      const nextQuestion = questions[nextIndex];
       await showQuestion(
         nextQuestion.imageUrl,
         nextQuestion.correctAnswer,
-        [...nextQuestion.answers]
+        [...nextQuestion.answers],
+        nextQuestion.revealImageUrl
       );
       setCurrentQuestionIndex(nextIndex);
       setGuessProgress({ total: players.filter(p => !p.isHost).length, received: 0 });
@@ -116,7 +125,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
 
   if (!roundActive) {
     const socialMediaGuessRules = getSocialMediaRules(t);
-    const questionCount = getQuestionCountText(SOCIAL_MEDIA_GUESS_QUESTIONS.length, t);
+    const questionCount = getQuestionCountText(questions.length, t);
     return (
       <div className="social-media-guess-host">
         <GameRulesCard
@@ -147,7 +156,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
   }
 
   const allGuessed = guessProgress.received === guessProgress.total && guessProgress.total > 0;
-  const isLastQuestion = currentQuestionIndex + 1 >= SOCIAL_MEDIA_GUESS_QUESTIONS.length;
+  const isLastQuestion = currentQuestionIndex + 1 >= questions.length;
 
   // Show standings screen after 3 second delay when answer is revealed
   if (answerRevealed && showStandings) {
@@ -156,7 +165,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
         <StandingsScreen
           players={players}
           currentQuestion={currentQuestionIndex + 1}
-          totalQuestions={SOCIAL_MEDIA_GUESS_QUESTIONS.length}
+          totalQuestions={questions.length}
           onNextQuestion={handleNextQuestion}
           isLastQuestion={isLastQuestion}
         />
@@ -171,15 +180,20 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
         <button className="btn btn-back" onClick={onBack}>
           ← {t('common.back')}
         </button>
-        <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: SOCIAL_MEDIA_GUESS_QUESTIONS.length })}</h3>
+        <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: questions.length })}</h3>
         <div className="social-media-guess-question-container">
-          <ImageDisplay imageUrl={currentQuestion.imageUrl} altText="Who posted this?" />
+          <ImageDisplay imageUrl={revealImageUrl ?? currentQuestion.imageUrl} altText="Who posted this?" />
           <AnswerGrid
             answers={currentQuestion.possibleAnswers}
             correctAnswer={revealedCorrectAnswer}
             guesses={guesses}
             revealed={true}
           />
+          {revealImageUrl && (
+            <button className="btn btn-primary btn-large" onClick={() => setShowStandings(true)}>
+              {t('standings.viewStandings')}
+            </button>
+          )}
         </div>
       </div>
     );
@@ -190,7 +204,7 @@ function SocialMediaGuessHost({ connection, players, onBack }: SocialMediaGuessH
       <button className="btn btn-back" onClick={onBack}>
         ← {t('common.back')}
       </button>
-      <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: SOCIAL_MEDIA_GUESS_QUESTIONS.length })}</h3>
+      <h3 className="question-progress-header">{t('common.questionProgress', { current: currentQuestionIndex + 1, total: questions.length })}</h3>
       <div className="social-media-guess-question-container">
         <ImageDisplay imageUrl={currentQuestion.imageUrl} altText="Who posted this?" />
 

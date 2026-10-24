@@ -52,10 +52,10 @@ public static class ResyncStateBuilder
                 WouldILie => BuildWouldILie(room.WouldILieRound!, me),
                 ContestantGuess => BuildImageGuess(
                     room.ContestantGuessRound!.Questions.LastOrDefault(), room.ContestantGuessRound.RoundScores, me,
-                    q => (q.ImageUrl, q.PossibleAnswers, q.Guesses, q.CorrectAnswer, q.IsRevealed)),
+                    q => (q.ImageUrl, q.PossibleAnswers, q.Guesses, q.CorrectAnswer, q.IsRevealed, (string?)null)),
                 SocialMediaGuess => BuildImageGuess(
                     room.SocialMediaGuessRound!.Questions.LastOrDefault(), room.SocialMediaGuessRound.RoundScores, me,
-                    q => (q.ImageUrl, q.PossibleAnswers, q.Guesses, q.CorrectAnswer, q.IsRevealed)),
+                    q => (q.ImageUrl, q.PossibleAnswers, q.Guesses, q.CorrectAnswer, q.IsRevealed, q.RevealImageUrl)),
                 Quiz => BuildQuiz(room.QuizRound!, me),
                 Wager => BuildWager(room.WagerRound!, me),
                 _ => null
@@ -106,7 +106,7 @@ public static class ResyncStateBuilder
         TQuestion? q,
         Dictionary<string, int> roundScores,
         Player me,
-        Func<TQuestion, (string ImageUrl, List<string> PossibleAnswers, Dictionary<string, string> Guesses, string CorrectAnswer, bool IsRevealed)> fields)
+        Func<TQuestion, (string ImageUrl, List<string> PossibleAnswers, Dictionary<string, string> Guesses, string CorrectAnswer, bool IsRevealed, string? RevealImageUrl)> fields)
         where TQuestion : class
     {
         if (q == null)
@@ -124,6 +124,7 @@ public static class ResyncStateBuilder
                 {
                     correctAnswer = f.CorrectAnswer,
                     guesses = new Dictionary<string, string>(f.Guesses),
+                    revealImageUrl = f.RevealImageUrl,
                     roundScores = new Dictionary<string, int>(roundScores)
                 }
                 : null

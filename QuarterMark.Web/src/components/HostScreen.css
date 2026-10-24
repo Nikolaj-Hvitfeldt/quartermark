@@ -370,6 +370,24 @@
   max-width: 400px;
 }
 
+.dataset-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.dataset-picker label {
+  font-weight: 600;
+  color: #c9b037;
+}
+
+.dataset-summary {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
 .config-btn {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
   border: 2px solid rgba(102, 126, 234, 0.5);

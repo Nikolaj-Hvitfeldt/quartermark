@@ -33,6 +33,8 @@
     "offline": "Offline",
     "offlineHint": "Pladsen og pointene gemmes, til de kommer tilbage",
     "removePlayer": "Fjern",
+    "dataset": "Spildata",
+    "datasetCounts": "{{wil}} Would I Lie, {{morph}} AI-morph, {{social}} sociale medier",
     "createGameRoom": "Opret spilrum",
     "enterYourName": "Indtast dit navn",
     "createRoom": "Opret rum",

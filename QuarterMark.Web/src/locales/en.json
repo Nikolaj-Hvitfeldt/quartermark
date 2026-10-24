@@ -36,6 +36,8 @@
     "offline": "Offline",
     "offlineHint": "Their seat and score are kept until they reconnect",
     "removePlayer": "Remove",
+    "dataset": "Game data",
+    "datasetCounts": "{{wil}} Would I Lie, {{morph}} AI morph, {{social}} social media",
     "createGameRoom": "Create Game Room",
     "enterYourName": "Enter your name",
     "createRoom": "Create Room",

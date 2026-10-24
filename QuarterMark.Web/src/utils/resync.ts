@@ -110,6 +110,10 @@ function applyImageGuess(store: ImageGuessStore, game: any) {
   store.setHasGuessed(!!game.myAnswer);
   store.setRoundState('ShowingImage');
   applyRevealed(store, game.revealed);
+  // Social Media questions can swap to an uncensored image once revealed
+  if ('setRevealImageUrl' in store && game.revealed?.revealImageUrl) {
+    store.setRevealImageUrl(game.revealed.revealImageUrl);
+  }
 }
 
 function applyQuiz(game: any) {

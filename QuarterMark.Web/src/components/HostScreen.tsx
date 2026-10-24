@@ -18,6 +18,8 @@ import { WouldILieRoundConfig } from "../data/wouldILieImages";
 import { HostScreenProps } from "../types";
 import { useDevHostAutoCreate } from "../dev/devMode";
 import { useGameSessionStore } from "../stores/gameSessionStore";
+import { useActiveDataset, useDatasetStore } from "../stores/datasetStore";
+import { DATASETS } from "../data/datasets";
 import { ResyncState } from "../utils/resync";
 import "./HostScreen.css";
 
@@ -27,6 +29,8 @@ function HostScreen({ onBack }: HostScreenProps) {
     useGameRoom();
   const { isActive: sessionActive, currentGameNumber, accumulatedScores, showDrinkingWheel, wouldILieConfig, setShowDrinkingWheel, setWouldILieConfig, startSession } = useGameSession(connection);
   const { setActive: setSessionActive, setCurrentGameNumber, setAccumulatedScores } = useGameSessionStore();
+  const dataset = useActiveDataset();
+  const setDatasetId = useDatasetStore((s) => s.setDatasetId);
   const [showWouldILieConfig, setShowWouldILieConfig] = useState(false);
   const { completedGame, clearCompletedGame } = useGameCompletion({
     connection,
@@ -389,6 +393,32 @@ function HostScreen({ onBack }: HostScreenProps) {
           <div className="game-actions">
             {!sessionActive && !showWouldILieConfig && (
               <div className="pre-game-actions">
+                <div className="dataset-picker">
+                  <label htmlFor="dataset-select">{t('hostScreen.dataset', 'Game data')}</label>
+                  <select
+                    id="dataset-select"
+                    className="input"
+                    value={dataset.id}
+                    onChange={(e) => {
+                      setDatasetId(e.target.value);
+                      // Would I Lie rounds point at the old dataset's images
+                      setWouldILieConfig([]);
+                    }}
+                  >
+                    {DATASETS.map((d) => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </select>
+                  <p className="dataset-summary">
+                    {dataset.people.join(", ")} ·{" "}
+                    {t("hostScreen.datasetCounts", {
+                      defaultValue: "{{wil}} Would I Lie, {{morph}} AI morph, {{social}} social media",
+                      wil: dataset.wouldILieImages.length,
+                      morph: dataset.contestantGuessQuestions.length,
+                      social: dataset.socialMediaGuessQuestions.length,
+                    })}
+                  </p>
+                </div>
                 <button
                   className="btn btn-secondary btn-large config-btn"
                   onClick={() => setShowWouldILieConfig(true)}
