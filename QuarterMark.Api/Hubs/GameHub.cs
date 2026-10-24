@@ -270,6 +270,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndWouldILieRound()
@@ -378,6 +382,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndContestantGuessRound()
@@ -484,6 +492,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndQuizRound()
@@ -594,6 +606,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndSocialMediaGuessRound()
@@ -915,6 +931,10 @@ public class GameHub : Hub
                 roundScores
             });
         }
+
+        // Scores changed with this reveal; keep standings and the Wager limit current
+        var playersAfterReveal = await _roomService.GetPlayersAsync(roomCode);
+        await _notificationService.NotifyRoomAsync(roomCode, "PlayerListUpdated", playersAfterReveal);
     }
 
     public async Task EndWagerRound()

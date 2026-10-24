@@ -97,6 +97,8 @@ public class ContestantGuessService : IContestantGuessService
             }
         }
 
+        // Standings between questions (and the Wager limit) show the points won so far
+        room.ApplyRoundScores(room.ContestantGuessRound.RoundScores);
         return Task.FromResult(room.ContestantGuessRound.RoundScores);
     }
 
@@ -112,14 +114,7 @@ public class ContestantGuessService : IContestantGuessService
         if (host != null)
         {
             host.Score += lowestScore;
-            foreach (var roundScore in room.ContestantGuessRound.RoundScores)
-            {
-                var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
-                if (player != null)
-                {
-                    player.Score += roundScore.Value;
-                }
-            }
+            // Player scores already include this round (applied on each reveal)
         }
 
         room.ContestantGuessRound.IsActive = false;

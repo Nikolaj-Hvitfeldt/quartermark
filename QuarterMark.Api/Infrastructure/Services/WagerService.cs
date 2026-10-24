@@ -142,6 +142,8 @@ public class WagerService : IWagerService
             }
         }
 
+        // Standings between questions (and the Wager limit) show the points won so far
+        room.ApplyRoundScores(room.WagerRound.RoundScores, floorAtZero: true);
         return Task.FromResult(room.WagerRound.RoundScores);
     }
 
@@ -151,18 +153,7 @@ public class WagerService : IWagerService
         if (room == null || room.WagerRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
-        // Apply net winnings/losses to player scores
-        foreach (var roundScore in room.WagerRound.RoundScores)
-        {
-            var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
-            if (player != null)
-            {
-                player.Score += roundScore.Value;
-                // Ensure score doesn't go below 0
-                if (player.Score < 0)
-                    player.Score = 0;
-            }
-        }
+        // Player scores already include this round (applied on each reveal)
 
         // Host gets points equal to lowest scoring player (after wagers)
         var lowestScore = room.WagerRound.RoundScores.Values.DefaultIfEmpty(0).Min();

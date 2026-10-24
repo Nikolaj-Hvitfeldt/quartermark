@@ -98,6 +98,8 @@ public class SocialMediaGuessService : ISocialMediaGuessService
             }
         }
 
+        // Standings between questions (and the Wager limit) show the points won so far
+        room.ApplyRoundScores(room.SocialMediaGuessRound.RoundScores);
         return Task.FromResult(room.SocialMediaGuessRound.RoundScores);
     }
 
@@ -113,14 +115,7 @@ public class SocialMediaGuessService : ISocialMediaGuessService
         if (host != null)
         {
             host.Score += lowestScore;
-            foreach (var roundScore in room.SocialMediaGuessRound.RoundScores)
-            {
-                var player = room.Players.FirstOrDefault(p => p.Name == roundScore.Key);
-                if (player != null)
-                {
-                    player.Score += roundScore.Value;
-                }
-            }
+            // Player scores already include this round (applied on each reveal)
         }
 
         room.SocialMediaGuessRound.IsActive = false;
