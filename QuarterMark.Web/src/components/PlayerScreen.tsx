@@ -283,9 +283,8 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
             placeholder={t('playerScreen.enterRoomCode')}
             value={roomCodeInput}
             onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-            className="input"
+            className="input room-code-input"
             maxLength={4}
-            style={{ textTransform: 'uppercase', letterSpacing: '0.5rem', textAlign: 'center' }}
           />
           <input
             type="text"
