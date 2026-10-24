@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGameRoom } from '../hooks/useGameRoom';
 import { usePlayerStore } from '../stores/playerStore';
@@ -19,34 +19,61 @@ import WagerPlayer from './WagerPlayer';
 import DrinkingWheelPlayer from './DrinkingWheelPlayer';
 import GameCompletionScreenPlayer from './GameCompletionScreenPlayer';
 import { PlayerScreenProps } from '../types';
+import { useDevPlayerAutoJoin } from '../dev/devMode';
+import { applyResyncState, ResyncState } from '../utils/resync';
 import './PlayerScreen.css';
 
 function PlayerScreen({ onBack }: PlayerScreenProps) {
   const { t } = useTranslation();
-  const { connection, roomCode, players, error, isConnected, joinRoom, playerName: storedPlayerName, roomCode: storedRoomCode, connect } = useGameRoom();
+  const { connection, roomCode, players, error, isConnected, joinRoom, rejoinRoom, playerName: storedPlayerName, roomCode: storedRoomCode, connect } = useGameRoom();
   const { playerName, roomCodeInput, setPlayerName, setRoomCodeInput } = usePlayerStore();
   const { currentGameNumber, accumulatedScores } = useGameSession(connection);
   const [currentGame, setCurrentGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
-  const { completedGame, clearCompletedGame } = useGameCompletion({
+  const { completedGame, clearCompletedGame, showCompletedGame } = useGameCompletion({
     connection,
     // Don't set currentGame to null here - let completedGame state handle the navigation
     // The completion screen will be shown when completedGame is set
   });
   const [hasRestored, setHasRestored] = useState(false);
 
+  // Put this device back on the screen the game is at, after a reload or a dropped
+  // connection (screen lock, tab switch). Events sent while away are not replayed,
+  // so the server's snapshot is the source of truth.
+  const resyncFromServer = useCallback(async () => {
+    const state: ResyncState | null = await signalRService.invoke('GetResyncState');
+    if (!state) return;
+
+    const screen = applyResyncState(state);
+    if (screen) {
+      clearCompletedGame();
+      setCurrentGame(screen);
+    } else if (state.completedGame) {
+      setCurrentGame(null);
+      showCompletedGame(state.completedGame);
+    } else {
+      clearCompletedGame();
+      setCurrentGame(null);
+    }
+  }, [clearCompletedGame, showCompletedGame]);
+
+  useDevPlayerAutoJoin(isConnected, joinRoom, setPlayerName, setRoomCodeInput, resyncFromServer);
+
   // Restore connection and rejoin room on mount if we have stored room state
   useEffect(() => {
     if (hasRestored) return;
-    
+
     const restoreRoom = async () => {
       if (storedRoomCode && storedPlayerName && !isConnected) {
         try {
           setHasRestored(true);
           await connect();
-          await joinRoom(storedRoomCode, storedPlayerName);
           // Restore player name and room code input from storage
           setPlayerName(storedPlayerName);
           setRoomCodeInput(storedRoomCode);
+          const result = await joinRoom(storedRoomCode, storedPlayerName);
+          if (result?.rejoined) {
+            await resyncFromServer();
+          }
         } catch (error) {
           console.error('Failed to restore room connection:', error);
           setHasRestored(true);
@@ -56,39 +83,28 @@ function PlayerScreen({ onBack }: PlayerScreenProps) {
       }
     };
     restoreRoom();
-  }, [storedRoomCode, storedPlayerName, isConnected, hasRestored, connect, joinRoom, setPlayerName, setRoomCodeInput]);
+  }, [storedRoomCode, storedPlayerName, isConnected, hasRestored, connect, joinRoom, setPlayerName, setRoomCodeInput, resyncFromServer]);
 
-  // Handle reconnection when phone unlocks
+  // Handle reconnection when phone unlocks or the tab comes back
   useEffect(() => {
     const handleReconnected = async () => {
-      if (storedRoomCode && storedPlayerName) {
-        try {
-          // Reset current game state on reconnection - we'll wait for the next RoundStarted event
-          // This prevents getting stuck in a "waiting" state if we missed a RoundStarted event
-          setCurrentGame(null);
-          clearCompletedGame();
-          
-          // Reset all game stores to clear any stale state
-          useContestantGuessStore.getState().reset();
-          useQuizStore.getState().reset();
-          useWagerStore.getState().reset();
-          usePlayerGameStore.getState().reset();
-          useSocialMediaGuessStore.getState().reset();
-          
-          // Rejoin the room after reconnection
-          await joinRoom(storedRoomCode, storedPlayerName);
-        } catch (error) {
-          console.error('Failed to rejoin room after reconnection:', error);
+      try {
+        // Take the same seat back (score and answers are kept), then catch up
+        const result = await rejoinRoom();
+        if (result?.success) {
+          await resyncFromServer();
         }
+      } catch (error) {
+        console.error('Failed to rejoin room after reconnection:', error);
       }
     };
 
     window.addEventListener('signalr-reconnected', handleReconnected);
-    
+
     return () => {
       window.removeEventListener('signalr-reconnected', handleReconnected);
     };
-  }, [storedRoomCode, storedPlayerName, joinRoom, clearCompletedGame]);
+  }, [rejoinRoom, resyncFromServer]);
 
   useEffect(() => {
     if (!connection) return;

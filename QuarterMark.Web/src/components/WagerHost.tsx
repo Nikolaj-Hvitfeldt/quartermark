@@ -213,6 +213,20 @@ function WagerHost({ connection, players, onBack }: WagerHostProps) {
             >
               {t('wager.blindWager.resetWagers')}
             </button>
+            {/* Escape hatch when a phone is locked: missing bets become 0 and the game goes on */}
+            <button
+              className="btn btn-secondary"
+              onClick={async () => {
+                try {
+                  await signalRService.invoke("CloseWagers");
+                } catch (error) {
+                  console.error("Error closing wagers:", error);
+                }
+              }}
+              style={{ marginTop: '1rem', marginLeft: '0.5rem' }}
+            >
+              {t('wager.host.closeWagers', 'Continue without missing bets')}
+            </button>
           </div>
         )}
 

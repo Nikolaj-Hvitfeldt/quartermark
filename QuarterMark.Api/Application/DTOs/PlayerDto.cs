@@ -6,5 +6,5 @@ public class PlayerDto
     public bool IsHost { get; set; }
     public int Score { get; set; }
     public bool IsDummy { get; set; }
+    public bool IsConnected { get; set; } = true;
 }
-

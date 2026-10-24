@@ -4,6 +4,7 @@ export interface PlayerDto {
   isHost: boolean;
   score: number;
   isDummy?: boolean;
+  isConnected?: boolean; // false while the device is away (screen locked, tab switched)
 }
 
 export interface ClaimDto {
@@ -151,6 +152,7 @@ export interface QuizAnswerRevealedData {
 export interface DrinkingWheelHostProps {
   players: PlayerDto[];
   onSpinComplete: () => void;
+  onBack?: () => void; // Shown as a back button when the wheel is opened from the lobby test button
 }
 
 export interface DrinkingWheelPlayerProps {

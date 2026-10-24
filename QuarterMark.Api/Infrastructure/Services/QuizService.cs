@@ -82,6 +82,10 @@ public class QuizService : IQuizService
         if (room == null || room.CurrentQuizQuestion == null || room.QuizRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
+        // Revealing twice (double click, retry after reconnect) must not award points again
+        if (room.CurrentQuizQuestion.IsRevealed)
+            return Task.FromResult(room.QuizRound.RoundScores);
+
         room.CurrentQuizQuestion.IsRevealed = true;
 
         var correctAnswer = room.CurrentQuizQuestion.CorrectAnswer;

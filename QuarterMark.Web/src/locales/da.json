@@ -1,4 +1,7 @@
 {
+  "drinkingWheel": {
+    "spinAgain": "Spin igen"
+  },
   "common": {
     "back": "Tilbage",
     "backToHome": "Tilbage til hjem",
@@ -27,6 +30,9 @@
     "errorMessage": "Runde aktiv, men intet spørgsmål vises i øjeblikket. Dette bør ikke ske."
   },
   "hostScreen": {
+    "offline": "Offline",
+    "offlineHint": "Pladsen og pointene gemmes, til de kommer tilbage",
+    "removePlayer": "Fjern",
     "createGameRoom": "Opret spilrum",
     "enterYourName": "Indtast dit navn",
     "createRoom": "Opret rum",
@@ -122,6 +128,7 @@
       "blindWageringPhase": "🎲 Blind indsatsfase",
       "playersPlacingBets": "Spillere placerer deres indsats uden at se spørgsmålet!",
       "wagersReceived": "Indsatser modtaget: {{received}} / {{total}}",
+      "closeWagers": "Fortsæt uden manglende indsatser",
       "waitingForAll": "Venter på alle spillere placerer deres indsats...",
       "answersReceived": "Svar modtaget: {{received}} / {{total}}",
       "revealAnswer": "Afslør svar",
@@ -160,6 +167,7 @@
     "continueButton": "Fortsæt →"
   },
   "wouldILie": {
+    "revealAnswerNow": "Vis svaret nu",
     "whoKnowsThisPerson": "Hvem kender denne person?",
     "claimsToKnow": "Påstår at kende dem",
     "voteForThisPerson": "Stem på denne person",

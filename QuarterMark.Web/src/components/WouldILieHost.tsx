@@ -32,8 +32,10 @@ function WouldILieHost({
     startRound,
     showQuestion,
     startVoting,
+    revealAnswer,
     endRound,
   } = useWouldILie(connection);
+  const [votingStartedFor, setVotingStartedFor] = useState<string | null>(null);
 
   const { wouldILieConfig } = useGameSession(connection);
 
@@ -99,8 +101,19 @@ function WouldILieHost({
   const handleStartVoting = async () => {
     try {
       await startVoting();
+      setVotingStartedFor(currentQuestion?.imageUrl ?? null);
     } catch (error) {
       console.error("Error starting voting:", error);
+    }
+  };
+
+  // The answer is revealed automatically once everyone has voted. If a voter's phone is
+  // locked that never happens, so the host can reveal with the votes that are in.
+  const handleRevealNow = async () => {
+    try {
+      await revealAnswer();
+    } catch (error) {
+      console.error("Error revealing answer:", error);
     }
   };
 
@@ -222,9 +235,16 @@ function WouldILieHost({
 
         <WouldILieAnswerGrid options={answerOptions} />
 
-        <button className="btn btn-primary btn-large" onClick={handleStartVoting}>
-          Start Voting
-        </button>
+        {votingStartedFor === currentQuestion.imageUrl || voteProgress.total > 0 ? (
+          <button className="btn btn-secondary" onClick={handleRevealNow}>
+            {t("wouldILie.revealAnswerNow", "Reveal answer now")}
+            {voteProgress.total > 0 ? ` (${voteProgress.received}/${voteProgress.total})` : ""}
+          </button>
+        ) : (
+          <button className="btn btn-primary btn-large" onClick={handleStartVoting}>
+            Start Voting
+          </button>
+        )}
 
         {voteProgress.received > 0 && (
           <div className="wil-voting-progress">

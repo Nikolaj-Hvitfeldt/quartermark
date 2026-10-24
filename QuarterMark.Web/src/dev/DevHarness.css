@@ -1,0 +1,106 @@
+.dev-harness {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0b0b14;
+  color: #eee;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+}
+
+.dev-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 12px;
+  background: #16162a;
+  border-bottom: 1px solid #2a2a44;
+  flex-wrap: wrap;
+}
+
+.dev-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dev-toolbar select,
+.dev-restart {
+  background: #22223a;
+  color: #eee;
+  border: 1px solid #3a3a5c;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dev-room {
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.1em;
+}
+
+.dev-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 6px;
+  padding: 6px;
+}
+
+.dev-players {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 6px;
+}
+
+.dev-pane {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #2a2a44;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dev-pane-label {
+  padding: 3px 8px;
+  background: #16162a;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dev-pane-label a {
+  color: #9aa4ff;
+}
+
+.dev-frame-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dev-frame-wrap iframe {
+  border: 0;
+  display: block;
+  background: #000;
+}
+
+.dev-waiting {
+  padding: 16px;
+  opacity: 0.6;
+}
+
+.dev-lock {
+  background: #3a2230;
+  color: #ffd0d8;
+  border: 1px solid #6a3a4c;
+  border-radius: 4px;
+  padding: 0 6px;
+  font: inherit;
+  cursor: pointer;
+}

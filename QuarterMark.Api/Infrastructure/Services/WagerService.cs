@@ -103,6 +103,10 @@ public class WagerService : IWagerService
         if (room == null || room.CurrentWagerQuestion == null || room.WagerRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
+        // Revealing twice (double click, retry after reconnect) must not award points again
+        if (room.CurrentWagerQuestion.IsRevealed)
+            return Task.FromResult(room.WagerRound.RoundScores);
+
         room.CurrentWagerQuestion.IsRevealed = true;
 
         var correctAnswer = room.CurrentWagerQuestion.CorrectAnswer;
@@ -184,6 +188,21 @@ public class WagerService : IWagerService
         return room?.CurrentWagerQuestion;
     }
 
+    public Task<bool> CloseWagersAsync(string roomCode)
+    {
+        var room = GetRoom(roomCode);
+        if (room == null || room.CurrentWagerQuestion == null) return Task.FromResult(false);
+
+        // Players who never bet (phone locked, left) bet 0 so they can still answer if they return
+        foreach (var player in room.Players.Where(p => !p.IsHost))
+        {
+            room.CurrentWagerQuestion.Wagers.TryAdd(player.Name, 0);
+        }
+
+        room.CurrentWagerQuestion.WagersClosed = true;
+        return Task.FromResult(true);
+    }
+
     public Task<bool> ResetWagersAsync(string roomCode)
     {
         var room = GetRoom(roomCode);
@@ -191,6 +210,7 @@ public class WagerService : IWagerService
 
         // Clear all wagers for the current question
         room.CurrentWagerQuestion.Wagers.Clear();
+        room.CurrentWagerQuestion.WagersClosed = false;
         return Task.FromResult(true);
     }
 

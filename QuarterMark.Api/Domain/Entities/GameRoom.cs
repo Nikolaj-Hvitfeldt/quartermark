@@ -16,5 +16,6 @@ public class GameRoom
     public WagerRound? WagerRound { get; set; }
     public WagerQuestion? CurrentWagerQuestion { get; set; }
     public GameSession? GameSession { get; set; }
+    public string? CurrentGame { get; set; } // Game type whose round was started last; null between games
 }
 

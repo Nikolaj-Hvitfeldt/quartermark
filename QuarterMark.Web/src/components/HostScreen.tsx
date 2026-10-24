@@ -16,13 +16,17 @@ import GameCompletionScreen from "./GameCompletionScreen";
 import { WouldILieConfig } from "./WouldILieConfig";
 import { WouldILieRoundConfig } from "../data/wouldILieImages";
 import { HostScreenProps } from "../types";
+import { useDevHostAutoCreate } from "../dev/devMode";
+import { useGameSessionStore } from "../stores/gameSessionStore";
+import { ResyncState } from "../utils/resync";
 import "./HostScreen.css";
 
 function HostScreen({ onBack }: HostScreenProps) {
   const { t } = useTranslation();
-  const { connection, roomCode, players, isConnected, createRoom, playerName: storedPlayerName, roomCode: storedRoomCode, connect } =
+  const { connection, roomCode, players, isConnected, createRoom, joinRoom, rejoinRoom, playerName: storedPlayerName, roomCode: storedRoomCode, connect } =
     useGameRoom();
   const { isActive: sessionActive, currentGameNumber, accumulatedScores, showDrinkingWheel, wouldILieConfig, setShowDrinkingWheel, setWouldILieConfig, startSession } = useGameSession(connection);
+  const { setActive: setSessionActive, setCurrentGameNumber, setAccumulatedScores } = useGameSessionStore();
   const [showWouldILieConfig, setShowWouldILieConfig] = useState(false);
   const { completedGame, clearCompletedGame } = useGameCompletion({
     connection,
@@ -35,6 +39,15 @@ function HostScreen({ onBack }: HostScreenProps) {
   const [inGame, setInGame] = useState<string | null>(null); // null, "wouldILie", "contestantGuess", "quiz", "socialMediaGuess", or "drinkingWheel"
   const [hasRestored, setHasRestored] = useState(false);
   const [drinkingWheelGameNumber, setDrinkingWheelGameNumber] = useState<number>(0);
+  // True while the wheel is open from the lobby "Test Drinking Wheel" button
+  const [isWheelTest, setIsWheelTest] = useState(false);
+
+  const exitWheelTest = () => {
+    setIsWheelTest(false);
+    setInGame(null);
+  };
+
+  useDevHostAutoCreate(isConnected, roomCode, createRoom);
 
   // Restore connection and rejoin room on mount if we have stored room state
   useEffect(() => {
@@ -45,9 +58,19 @@ function HostScreen({ onBack }: HostScreenProps) {
         try {
           setHasRestored(true);
           await connect();
-          // The stored state indicates we were the host, so we need to create the room again
-          // Note: This won't work perfectly since the backend doesn't persist rooms, but it's better than nothing
-          await createRoom(storedPlayerName);
+          // The room survives the host's page reloading: take the host seat back so players,
+          // scores and the session are kept. Only start a new room if that one is gone.
+          const result = await joinRoom(storedRoomCode, storedPlayerName);
+          if (result?.success && result.isHost) {
+            const state: ResyncState | null = await signalRService.invoke("GetResyncState");
+            if (state?.session) {
+              setSessionActive(state.session.isActive);
+              setCurrentGameNumber(state.session.currentGameNumber);
+              setAccumulatedScores(state.session.accumulatedScores);
+            }
+          } else {
+            await createRoom(storedPlayerName);
+          }
         } catch (error) {
           console.error('Failed to restore room connection:', error);
           setHasRestored(true);
@@ -57,7 +80,30 @@ function HostScreen({ onBack }: HostScreenProps) {
       }
     };
     restoreRoom();
-  }, [storedRoomCode, storedPlayerName, isConnected, hasRestored, connect, createRoom]);
+  }, [storedRoomCode, storedPlayerName, isConnected, hasRestored, connect, createRoom, joinRoom, setSessionActive, setCurrentGameNumber, setAccumulatedScores]);
+
+  // Connection dropped and came back (laptop sleep, Wi-Fi blip): take the host seat back.
+  // The server then replays progress for the current question that arrived while away.
+  useEffect(() => {
+    const handleReconnected = async () => {
+      try {
+        await rejoinRoom();
+      } catch (error) {
+        console.error("Failed to rejoin room as host after reconnection:", error);
+      }
+    };
+
+    window.addEventListener("signalr-reconnected", handleReconnected);
+    return () => window.removeEventListener("signalr-reconnected", handleReconnected);
+  }, [rejoinRoom]);
+
+  const removeOfflinePlayer = async (name: string) => {
+    try {
+      await signalRService.invoke("RemoveOfflinePlayer", name);
+    } catch (error) {
+      console.error("Error removing offline player:", error);
+    }
+  };
 
   const createDummyPlayerMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -189,6 +235,11 @@ function HostScreen({ onBack }: HostScreenProps) {
           key={`drinking-wheel-${currentGameNumber}`} // Force remount for fresh state
           players={players}
           onSpinComplete={() => {
+            // Opened from the lobby test button: there is no next game to go to
+            if (isWheelTest) {
+              exitWheelTest();
+              return;
+            }
             // When host clicks "Continue" on drinking wheel, go to next game
             // Use the stored gameNumber from when the wheel was shown
             setShowDrinkingWheel(false);
@@ -197,6 +248,7 @@ function HostScreen({ onBack }: HostScreenProps) {
             const nextGameType = getNextGameType(gameNumber);
             setInGame(nextGameType);
           }}
+          onBack={isWheelTest ? exitWheelTest : undefined}
         />
       ) : inGame === "wouldILie" ? (
         <WouldILieHost
@@ -255,9 +307,21 @@ function HostScreen({ onBack }: HostScreenProps) {
             <h3>Players ({players.length})</h3>
             <div className="players-list">
               {players.map((player, index) => (
-                <div key={index} className="player-card">
+                <div key={index} className={`player-card${player.isConnected === false ? " player-offline" : ""}`}>
                   <span className="player-name">{player.name}</span>
                   {player.isHost && <span className="host-badge">Host</span>}
+                  {player.isConnected === false && (
+                    <>
+                      <span className="offline-badge" title={t("hostScreen.offlineHint", "Their seat and score are kept until they reconnect")}>
+                        {t("hostScreen.offline", "Offline")}
+                      </span>
+                      {!player.isHost && (
+                        <button className="btn btn-small" onClick={() => removeOfflinePlayer(player.name)}>
+                          {t("hostScreen.removePlayer", "Remove")}
+                        </button>
+                      )}
+                    </>
+                  )}
                   <span className="player-score">{player.score} pts</span>
                 </div>
               ))}
@@ -390,7 +454,10 @@ function HostScreen({ onBack }: HostScreenProps) {
             <h4>🧪 Test Mode</h4>
             <button
               className="btn btn-secondary btn-test"
-              onClick={() => setInGame("drinkingWheel")}
+              onClick={() => {
+                setIsWheelTest(true);
+                setInGame("drinkingWheel");
+              }}
             >
               Test Drinking Wheel
             </button>

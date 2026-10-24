@@ -77,6 +77,10 @@ public class SocialMediaGuessService : ISocialMediaGuessService
         if (room == null || room.CurrentSocialMediaGuessQuestion == null || room.SocialMediaGuessRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
+        // Revealing twice (double click, retry after reconnect) must not award points again
+        if (room.CurrentSocialMediaGuessQuestion.IsRevealed)
+            return Task.FromResult(room.SocialMediaGuessRound.RoundScores);
+
         room.CurrentSocialMediaGuessQuestion.IsRevealed = true;
 
         var correctAnswer = room.CurrentSocialMediaGuessQuestion.CorrectAnswer;

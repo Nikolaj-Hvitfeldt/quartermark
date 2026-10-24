@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.SignalR;
 using QuarterMark.Api.Application.Interfaces;
 using QuarterMark.Api.Hubs;
 using QuarterMark.Api.Infrastructure.Services;
@@ -5,7 +6,16 @@ using QuarterMark.Api.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
-builder.Services.AddSignalR();
+builder.Services.AddSingleton<RoomLockHubFilter>();
+builder.Services.AddSignalR(options =>
+{
+    options.AddFilter<RoomLockHubFilter>();
+    // Detect phones that went away (locked screen) within seconds rather than 30s,
+    // so the seat shows as offline and the device rejoins quickly. Must match the
+    // client's keep-alive (5s) and server timeout (15s) in signalRService.ts.
+    options.KeepAliveInterval = TimeSpan.FromSeconds(5);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(15);
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

@@ -77,6 +77,10 @@ public class ContestantGuessService : IContestantGuessService
         if (room == null || room.CurrentContestantGuessQuestion == null || room.ContestantGuessRound == null)
             return Task.FromResult(new Dictionary<string, int>());
 
+        // Revealing twice (double click, retry after reconnect) must not award points again
+        if (room.CurrentContestantGuessQuestion.IsRevealed)
+            return Task.FromResult(room.ContestantGuessRound.RoundScores);
+
         room.CurrentContestantGuessQuestion.IsRevealed = true;
 
         var correctAnswer = room.CurrentContestantGuessQuestion.CorrectAnswer;

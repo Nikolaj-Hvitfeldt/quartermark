@@ -52,7 +52,7 @@
   width: 120px;
   height: 120px;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-  transform: rotate(-90deg); /* Point the bottle upward */
+  /* No rotation here: the image already points up, and PieChartWheel.tsx rotates it */
 }
 
 

@@ -1,4 +1,7 @@
 {
+  "drinkingWheel": {
+    "spinAgain": "Spin again"
+  },
   "common": {
     "back": "Back",
     "backToHome": "Back to Home",
@@ -30,6 +33,9 @@
     "errorMessage": "Round active, but no question currently displayed. This should not happen."
   },
   "hostScreen": {
+    "offline": "Offline",
+    "offlineHint": "Their seat and score are kept until they reconnect",
+    "removePlayer": "Remove",
     "createGameRoom": "Create Game Room",
     "enterYourName": "Enter your name",
     "createRoom": "Create Room",
@@ -125,6 +131,7 @@
       "blindWageringPhase": "🎲 Blind Wagering Phase",
       "playersPlacingBets": "Players are placing their wagers!",
       "wagersReceived": "Wagers received: {{received}} / {{total}}",
+      "closeWagers": "Continue without missing bets",
       "waitingForAll": "Waiting for all players to place their wagers...",
       "answersReceived": "Answers received: {{received}} / {{total}}",
       "revealAnswer": "Reveal Answer",
@@ -184,6 +191,7 @@
     "continueButton": "Continue →"
   },
   "wouldILie": {
+    "revealAnswerNow": "Reveal answer now",
     "whoKnowsThisPerson": "Who knows this person?",
     "claimsToKnow": "Claims to know them",
     "voteForThisPerson": "Vote for this person",

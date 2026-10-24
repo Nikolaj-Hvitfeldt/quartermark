@@ -8,6 +8,7 @@ public class WagerQuestion
     public List<string> PossibleAnswers { get; set; } = new(); // List of possible answers
     public Dictionary<string, int> Wagers { get; set; } = new(); // playerName -> wagerAmount
     public Dictionary<string, string> Guesses { get; set; } = new(); // playerName -> selectedAnswer
+    public bool WagersClosed { get; set; } // True once everyone has wagered (or the host closed betting)
     public bool IsRevealed { get; set; }
 }
 
